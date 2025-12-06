@@ -363,7 +363,7 @@
                                             <el-icon style="margin-left: 3px"><Warning /></el-icon>
                                         </el-tooltip>
                                     </span>
-                                    <span class="extra">{{ userOnlineFor(userDialog) }}</span>
+                                    <span class="extra">{{ userOnlineFor(userDialog.ref) }}</span>
                                 </div>
                             </el-tooltip>
                         </div>
@@ -538,7 +538,7 @@
 
                 <el-tab-pane
                     name="Mutual Friends"
-                    v-if="userDialog.id !== currentUser.id"
+                    v-if="userDialog.id !== currentUser.id && !currentUser.hasSharedConnectionsOptOut"
                     :label="t('dialog.user.mutual_friends.header')"
                     lazy>
                     <div style="display: flex; align-items: center; justify-content: space-between">
@@ -794,12 +794,8 @@
                                             <span>({{ group.memberCount }})</span>
                                         </span>
                                     </div>
-                                    <el-dropdown
-                                        :disabled="group.privacy !== 'default'"
-                                        trigger="click"
-                                        size="small"
-                                        style="margin-right: 5px">
-                                        <el-button @click.stop size="small">
+                                    <el-dropdown trigger="click" size="small" style="margin-right: 5px">
+                                        <el-button :disabled="group.privacy !== 'default'" @click.stop size="small">
                                             <span v-if="group.myMember.visibility === 'visible'">{{
                                                 t('dialog.group.tags.visible')
                                             }}</span>

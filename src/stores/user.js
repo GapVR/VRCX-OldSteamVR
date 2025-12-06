@@ -1822,6 +1822,7 @@ export const useUserStore = defineStore('User', () => {
                 hasEmail: false,
                 hasLoggedInFromClient: false,
                 hasPendingEmail: false,
+                hasSharedConnectionsOptOut: false,
                 hideContentFilterSettings: false,
                 homeLocation: '',
                 id: '',
