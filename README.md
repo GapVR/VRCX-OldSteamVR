@@ -22,6 +22,9 @@ Sidebar
 User Dialog
 - Memo placeholder always shown.
 
+World Dialog
+- Added "Copy ID to clipboard" to error popup.
+
 Dialogs
 - Reduce padding from 20px to 5px.
 
