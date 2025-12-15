@@ -31,7 +31,7 @@
         return avatarType.value === '(own)'
             ? 'ri-lock-fill'
             : avatarType.value === '(public)'
-              ? 'ri-lock-unlock-fill'
+              ? 'ri-lock-unlock-line'
               : '';
     });
 

@@ -435,8 +435,7 @@ export const useAvatarStore = defineStore('Avatar', () => {
                     }?${type}=${encodeURIComponent(search)}&n=5000`,
                     method: 'GET',
                     headers: {
-                        Referer: 'https://vrcx.app',
-                        'VRCX-ID': vrcxUpdaterStore.vrcxId
+                        Referer: 'https://vrcx.app'
                     }
                 });
                 const json = JSON.parse(response.data);
@@ -515,8 +514,7 @@ export const useAvatarStore = defineStore('Avatar', () => {
                 url: `${url}?authorId=${encodeURIComponent(authorId)}`,
                 method: 'GET',
                 headers: {
-                    Referer: 'https://vrcx.app',
-                    'VRCX-ID': vrcxUpdaterStore.vrcxId
+                    Referer: 'https://vrcx.app'
                 }
             });
             const json = JSON.parse(response.data);

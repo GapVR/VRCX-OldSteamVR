@@ -22,13 +22,11 @@ export async function initSentry(app) {
         if (!(await isSentryEnabled())) {
             return;
         }
-        const vrcxId = await configRepository.getString('VRCX_id', '');
         const response = await webApiService.execute({
             url: 'https://api0.vrcx.app/errorreporting/getdsn',
             method: 'GET',
             headers: {
-                Referer: 'https://vrcx.app',
-                'VRCX-ID': vrcxId
+                Referer: 'https://vrcx.app'
             }
         });
         if (response.status !== 200) {
@@ -91,8 +89,7 @@ export async function initSentry(app) {
                         window.performance.memory.totalJSHeapSize / 1024 / 1024,
                     jsHeapSizeLimit:
                         // @ts-ignore
-                        window.performance.memory.jsHeapSizeLimit / 1024 / 1024,
-                    vrcxId: vrcxId
+                        window.performance.memory.jsHeapSizeLimit / 1024 / 1024
                 };
                 return span;
             },

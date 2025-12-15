@@ -23,7 +23,6 @@ export const useVRCXUpdaterStore = defineStore('VRCXUpdater', () => {
     const autoUpdateVRCX = ref('Auto Download');
     const latestAppVersion = ref('');
     const branch = ref('Stable');
-    const vrcxId = ref('');
     const checkingForVRCXUpdate = ref(false);
     const VRCXUpdateDialog = ref({
         visible: false,
@@ -49,9 +48,8 @@ export const useVRCXUpdaterStore = defineStore('VRCXUpdater', () => {
             console.log('Architecture:', arch.value);
         }
 
-        const [VRCX_autoUpdateVRCX, VRCX_id] = await Promise.all([
-            configRepository.getString('VRCX_autoUpdateVRCX', 'Auto Download'),
-            configRepository.getString('VRCX_id', '')
+        const [VRCX_autoUpdateVRCX] = await Promise.all([
+            configRepository.getString('VRCX_autoUpdateVRCX', 'Auto Download')
         ]);
 
         if (VRCX_autoUpdateVRCX === 'Auto Install') {
@@ -64,10 +62,8 @@ export const useVRCXUpdaterStore = defineStore('VRCXUpdater', () => {
         }
 
         appVersion.value = await AppApi.GetVersion();
-        vrcxId.value = VRCX_id;
 
         await initBranch();
-        await loadVrcxId();
 
         if (await compareAppVersion()) {
             showChangeLogDialog();
@@ -131,12 +127,6 @@ export const useVRCXUpdaterStore = defineStore('VRCXUpdater', () => {
         }
         return false;
     }
-    async function loadVrcxId() {
-        if (!vrcxId.value) {
-            vrcxId.value = crypto.randomUUID();
-            await configRepository.setString('VRCX_id', vrcxId.value);
-        }
-    }
     function getAssetOfInterest(assets) {
         let downloadUrl = '';
         let hashString = '';
@@ -199,9 +189,6 @@ export const useVRCXUpdaterStore = defineStore('VRCXUpdater', () => {
             response = await webApiService.execute({
                 url,
                 method: 'GET',
-                headers: {
-                    'VRCX-ID': vrcxId.value
-                }
             });
             json = JSON.parse(response.data);
         } catch (error) {
@@ -278,9 +265,6 @@ export const useVRCXUpdaterStore = defineStore('VRCXUpdater', () => {
             response = await webApiService.execute({
                 url,
                 method: 'GET',
-                headers: {
-                    'VRCX-ID': vrcxId.value
-                }
             });
             json = JSON.parse(response.data);
         } catch (error) {
@@ -409,7 +393,6 @@ export const useVRCXUpdaterStore = defineStore('VRCXUpdater', () => {
         latestAppVersion,
         branch,
         currentVersion,
-        vrcxId,
         checkingForVRCXUpdate,
         VRCXUpdateDialog,
         changeLogDialog,
