@@ -25,7 +25,7 @@ const t = i18n.global.t;
 /**
  * @template T
  * @param {string} endpoint
- * @param {RequestInit & { params?: any } & {customMsg?: string}} [options]
+ * @param {RequestInit & { params?: any }} [options]
  * @returns {Promise<T>}
  */
 export function request(endpoint, options) {
@@ -159,9 +159,7 @@ export function request(endpoint, options) {
                 if (text) {
                     new Noty({
                         type: 'success',
-                        text: options.customMsg
-                            ? options.customMsg
-                            : escapeTag(text)
+                        text: escapeTag(text)
                     }).show();
                 }
                 return data;

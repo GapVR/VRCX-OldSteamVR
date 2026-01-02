@@ -2122,12 +2122,9 @@
                 reportUserForHacking(userId);
                 break;
             case 'Unfriend':
-                args = await friendRequest.deleteFriend(
-                    {
-                        userId
-                    },
-                    t('dialog.user.actions.unfriend_success_msg')
-                );
+                args = await friendRequest.deleteFriend({
+                    userId
+                });
                 handleFriendDelete(args);
                 break;
         }
