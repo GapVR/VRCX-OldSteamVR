@@ -65,6 +65,10 @@ export const useFriendStore = defineStore('Friend', () => {
     const isRefreshFriendsLoading = ref(false);
     const onlineFriendCount = ref(0);
 
+    const pendingOfflineDelay = 170000;
+    let pendingOfflineWorker = null;
+    const pendingOfflineMap = new Map();
+
     const friendLogTable = ref({
         data: [],
         filters: [
@@ -86,16 +90,12 @@ export const useFriendStore = defineStore('Friend', () => {
         tableProps: {
             stripe: true,
             size: 'small',
-            defaultSort: {
-                prop: 'created_at',
-                order: 'descending'
-            }
+            defaultSort: null
         },
         pageSize: 20,
         pageSizeLinked: true,
         paginationProps: {
-            layout: 'sizes,prev,pager,next,total',
-            pageSizes: [10, 15, 20, 25, 50, 100]
+            layout: 'sizes,prev,pager,next,total'
         }
     });
 
@@ -191,8 +191,15 @@ export const useFriendStore = defineStore('Friend', () => {
             friendLogTable.value.data = [];
             groupStore.groupInstances = [];
             onlineFriendCount.value = 0;
+            pendingOfflineMap.clear();
             if (isLoggedIn) {
                 initFriendsList();
+                pendingOfflineWorkerFunction();
+            } else {
+                if (pendingOfflineWorker !== null) {
+                    workerTimers.clearInterval(pendingOfflineWorker);
+                    pendingOfflineWorker = null;
+                }
             }
         },
         { flush: 'sync' }
@@ -314,8 +321,6 @@ export const useFriendStore = defineStore('Friend', () => {
         }
     }
 
-    const pendingOfflineDelay = 170000;
-
     /**
      * @param {string} id
      * @param {string?} stateInput
@@ -326,19 +331,17 @@ export const useFriendStore = defineStore('Friend', () => {
             return;
         }
         const ref = userStore.cachedUsers.get(id);
-        if (stateInput) {
-            ctx.pendingState = stateInput;
-            if (typeof ref !== 'undefined') {
-                ctx.ref.state = stateInput;
-            }
+        if (stateInput && typeof ref !== 'undefined') {
+            ctx.ref.state = stateInput;
         }
         if (stateInput === 'online') {
-            if (AppDebug.debugFriendState && ctx.pendingOffline) {
-                const time = (Date.now() - ctx.pendingOfflineTime) / 1000;
+            const pendingOffline = pendingOfflineMap.get(id);
+            if (AppDebug.debugFriendState && pendingOffline) {
+                const time = (Date.now() - pendingOffline.startTime) / 1000;
                 console.log(`${ctx.name} pendingOfflineCancelTime ${time}`);
             }
             ctx.pendingOffline = false;
-            ctx.pendingOfflineTime = '';
+            pendingOfflineMap.delete(id);
         }
         const isVIP = localFavoriteFriends.has(id);
         let location = '';
@@ -406,11 +409,16 @@ export const useFriendStore = defineStore('Friend', () => {
                 ctx.name = ref.displayName;
             }
             if (!watchState.isFriendsLoaded) {
-                updateFriendDelayedCheck(ctx, location, $location_at);
+                updateFriendDelayedCheck(
+                    ctx,
+                    stateInput,
+                    location,
+                    $location_at
+                );
                 return;
             }
             // prevent status flapping
-            if (ctx.pendingOffline) {
+            if (pendingOfflineMap.has(id)) {
                 if (AppDebug.debugFriendState) {
                     console.log(ctx.name, 'pendingOfflineAlreadyWaiting');
                 }
@@ -419,59 +427,78 @@ export const useFriendStore = defineStore('Friend', () => {
             if (AppDebug.debugFriendState) {
                 console.log(ctx.name, 'pendingOfflineBegin');
             }
+            pendingOfflineMap.set(id, {
+                startTime: Date.now(),
+                newState: stateInput,
+                previousLocation: location,
+                previousLocationAt: $location_at
+            });
             ctx.pendingOffline = true;
-            ctx.pendingOfflineTime = Date.now();
-            // wait 2minutes then check if user came back online
-            workerTimers.setTimeout(
-                () => {
-                    if (!ctx.pendingOffline) {
-                        if (AppDebug.debugFriendState) {
-                            console.log(
-                                ctx.name,
-                                'pendingOfflineAlreadyCancelled'
-                            );
-                        }
-                        return;
-                    }
-                    ctx.pendingOffline = false;
-                    ctx.pendingOfflineTime = '';
-                    if (ctx.pendingState === ctx.state) {
-                        if (AppDebug.debugFriendState) {
-                            console.log(
-                                ctx.name,
-                                'pendingOfflineCancelledStateMatched'
-                            );
-                        }
-                        return;
-                    }
-                    if (AppDebug.debugFriendState) {
-                        console.log(ctx.name, 'pendingOfflineEnd');
-                    }
-                    updateFriendDelayedCheck(ctx, location, $location_at);
-                },
-                pendingOfflineDelay + Math.floor(Math.random() * 10000)
-            ); // plus ~10sec random delay
         } else {
             ctx.ref = ref;
             ctx.isVIP = isVIP;
             if (typeof ref !== 'undefined') {
                 ctx.name = ref.displayName;
+                updateFriendDelayedCheck(
+                    ctx,
+                    ctx.ref.state,
+                    location,
+                    $location_at
+                );
             }
-            updateFriendDelayedCheck(ctx, location, $location_at);
         }
+    }
+
+    async function pendingOfflineWorkerFunction() {
+        pendingOfflineWorker = workerTimers.setInterval(() => {
+            const now = Date.now();
+            for (const [id, pending] of pendingOfflineMap.entries()) {
+                if (now - pending.startTime >= pendingOfflineDelay) {
+                    const ctx = friends.get(id);
+                    if (typeof ctx === 'undefined') {
+                        pendingOfflineMap.delete(id);
+                        continue;
+                    }
+                    ctx.pendingOffline = false;
+                    if (pending.newState === ctx.state) {
+                        console.error(
+                            ctx.name,
+                            'pendingOfflineCancelledStateMatched, this should never happen'
+                        );
+                        pendingOfflineMap.delete(id);
+                        continue;
+                    }
+                    if (AppDebug.debugFriendState) {
+                        console.log(ctx.name, 'pendingOfflineEnd');
+                    }
+                    pendingOfflineMap.delete(id);
+                    updateFriendDelayedCheck(
+                        ctx,
+                        pending.newState,
+                        pending.previousLocation,
+                        pending.previousLocationAt
+                    );
+                }
+            }
+        }, 1000);
     }
 
     /**
      * @param {Object} ctx
+     * @param {string} newState
      * @param {string} location
      * @param {number} $location_at
      */
-    async function updateFriendDelayedCheck(ctx, location, $location_at) {
+    async function updateFriendDelayedCheck(
+        ctx,
+        newState,
+        location,
+        $location_at
+    ) {
         let feed;
         let groupName;
         let worldName;
         const id = ctx.id;
-        const newState = ctx.pendingState;
         if (AppDebug.debugFriendState) {
             console.log(
                 `${ctx.name} updateFriendState ${ctx.state} -> ${newState}`
@@ -625,8 +652,6 @@ export const useFriendStore = defineStore('Friend', () => {
             name,
             memo: '',
             pendingOffline: false,
-            pendingOfflineTime: '',
-            pendingState: '',
             $nickName: ''
         });
         if (watchState.isFriendsLoaded) {
@@ -1579,7 +1604,7 @@ export const useFriendStore = defineStore('Friend', () => {
         isRefreshFriendsLoading.value = true;
         watchState.isFriendsLoaded = false;
         friendLog = new Map();
-        initFriendLogHistoryTable();
+        await initFriendLogHistoryTable();
 
         try {
             if (await configRepository.getBool(`friendLogInit_${userId}`)) {

@@ -15,6 +15,7 @@ import { useAvatarProviderStore } from './avatarProvider';
 import { useAvatarStore } from './avatar';
 import { useFavoriteStore } from './favorite';
 import { useFriendStore } from './friend';
+import { useGalleryStore } from './gallery';
 import { useGameLogStore } from './gameLog';
 import { useGameStore } from './game';
 import { useGroupStore } from './group';
@@ -50,6 +51,7 @@ export const useVrcxStore = defineStore('Vrcx', () => {
     const gameLogStore = useGameLogStore();
     const updateLoopStore = useUpdateLoopStore();
     const vrcStatusStore = useVrcStatusStore();
+    const galleryStore = useGalleryStore();
     const { t } = useI18n();
 
     const state = reactive({
@@ -257,8 +259,9 @@ export const useVrcxStore = defineStore('Vrcx', () => {
                 instanceStore.cachedInstances.delete(id);
             }
         });
-        avatarStore.cachedAvatarNames = new Map();
-        userStore.customUserTags = new Map();
+        avatarStore.cachedAvatarNames.clear();
+        userStore.customUserTags.clear();
+        galleryStore.cachedEmoji.clear();
     }
 
     function eventVrcxMessage(data) {
@@ -352,12 +355,25 @@ export const useVrcxStore = defineStore('Vrcx', () => {
                     displayName: user.displayName
                 });
             }
-            newPath = await AppApi.AddScreenshotMetadata(
-                path,
-                JSON.stringify(metadata),
-                location.worldId,
-                advancedSettingsStore.screenshotHelperModifyFilename
-            );
+            try {
+                newPath = await AppApi.AddScreenshotMetadata(
+                    path,
+                    JSON.stringify(metadata),
+                    location.worldId,
+                    advancedSettingsStore.screenshotHelperModifyFilename
+                );
+            } catch (e) {
+                console.error('Failed to add screenshot metadata', e);
+                if (e.message.includes('UnauthorizedAccessException')) {
+                    ElMessage({
+                        message:
+                            'Failed to add screenshot metadata, access denied. Make sure VRCX has permission to access the screenshot folder.',
+                        type: 'error',
+                        duration: 10000
+                    });
+                }
+                return;
+            }
             if (!newPath) {
                 console.error('Failed to add screenshot metadata', path);
                 return;
@@ -509,11 +525,38 @@ export const useVrcxStore = defineStore('Vrcx', () => {
 
     async function startupLaunchCommand() {
         const command = await AppApi.GetLaunchCommand();
-        if (command) {
-            eventLaunchCommand(command);
+        if (!command) {
+            return;
         }
+        if (command.startsWith('crash/')) {
+            const crashMessage = command.replace('crash/', '');
+            console.error('VRCX recovered from crash:', crashMessage);
+
+            if (advancedSettingsStore.sentryErrorReporting) {
+                try {
+                    import('@sentry/vue').then((Sentry) => {
+                        Sentry.captureMessage(
+                            `crash message: ${crashMessage}`,
+                            {
+                                level: 'fatal'
+                            }
+                        );
+                    });
+                } catch (error) {
+                    console.error('Error setting up Sentry feedback:', error);
+                }
+            }
+
+            ElMessage({
+                message: t('message.crash.vrcx_reload'),
+                type: 'success'
+            });
+            return;
+        }
+        eventLaunchCommand(command);
     }
 
+    // called from C#
     function eventLaunchCommand(input) {
         if (!watchState.isLoggedIn) {
             return;

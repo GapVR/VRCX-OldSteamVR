@@ -27,7 +27,7 @@ function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
 
-function computeForceOptions(nodes, links) {
+export function computeForceOptions(nodes, links) {
     const nodeCount = nodes.length || 1;
     const degreeSum = nodes.reduce((sum, node) => sum + (node.degree || 0), 0);
     const maxSymbol = nodes.reduce(
@@ -53,6 +53,38 @@ function computeForceOptions(nodes, links) {
         gravity: 0.3,
         layoutAnimation: nodes.length < 1000
     };
+}
+
+export function applyForceOverrides(force, forceOverrides) {
+    if (!forceOverrides) {
+        return force;
+    }
+    const merged = { ...force };
+    if (typeof forceOverrides.repulsion === 'number') {
+        merged.repulsion = Math.max(0, forceOverrides.repulsion);
+    }
+    if (Array.isArray(forceOverrides.edgeLength)) {
+        const [
+            minRaw = merged.edgeLength?.[0],
+            maxRaw = merged.edgeLength?.[1]
+        ] = forceOverrides.edgeLength;
+        const min =
+            typeof minRaw === 'number' ? minRaw : merged.edgeLength?.[0];
+        const max =
+            typeof maxRaw === 'number' ? maxRaw : merged.edgeLength?.[1];
+        const hasBoth = typeof min === 'number' && typeof max === 'number';
+        if (hasBoth) {
+            const normalizedMin = Math.max(0, min);
+            merged.edgeLength = [normalizedMin, Math.max(normalizedMin, max)];
+        }
+    }
+    if (typeof forceOverrides.gravity === 'number') {
+        merged.gravity = clamp(forceOverrides.gravity, 0, 1);
+    }
+    if (typeof forceOverrides.layoutAnimation === 'boolean') {
+        merged.layoutAnimation = forceOverrides.layoutAnimation;
+    }
+    return merged;
 }
 
 const t = i18n.global.t;
@@ -149,19 +181,26 @@ export function useMutualGraphChart({ cachedUsers, graphPayload }) {
         updateChart?.(graphPayload.value);
     }
 
-    function createChartOption(payload) {
+    function createChartOption(payload, force) {
         const nodes = payload?.nodes ?? [];
         const links = payload?.links ?? [];
-        const force = computeForceOptions(nodes, links);
         const labelMap = Object.create(null);
         nodes.forEach((node) => {
             if (node?.id) {
                 labelMap[node.id] = node.name || node.id;
             }
         });
+
+        const resolvedForce = {
+            ...(force || {}),
+            layoutAnimation: false
+        };
         return {
             color: COLORS_PALETTE,
             backgroundColor: 'transparent',
+            animation: false,
+            animationDuration: 0,
+            animationDurationUpdate: 0,
             tooltip: {
                 trigger: 'item',
                 formatter: (params) => {
@@ -179,17 +218,6 @@ export function useMutualGraphChart({ cachedUsers, graphPayload }) {
                         );
                         return `${name}\n${mutualLabel}`;
                     }
-                    if (params.dataType === 'edge') {
-                        const sourceLabel =
-                            labelMap[params.data.source] || params.data.source;
-                        const targetLabel =
-                            labelMap[params.data.target] || params.data.target;
-                        return t('view.charts.mutual_friend.tooltip.edge', {
-                            source: sourceLabel,
-                            target: targetLabel
-                        });
-                    }
-                    return '';
                 }
             },
             series: [
@@ -199,6 +227,9 @@ export function useMutualGraphChart({ cachedUsers, graphPayload }) {
                     legendHoverLink: false,
                     roam: true,
                     roamTrigger: 'global',
+                    animation: false,
+                    animationDuration: 0,
+                    animationDurationUpdate: 0,
                     data: nodes,
                     links,
                     label: {
@@ -207,17 +238,12 @@ export function useMutualGraphChart({ cachedUsers, graphPayload }) {
                     symbol: 'circle',
                     emphasis: {
                         focus: 'adjacency',
-                        scale: true,
                         itemStyle: {
                             borderWidth: 3,
                             opacity: 1
-                        },
-                        lineStyle: {
-                            width: 5,
-                            opacity: 0.5
                         }
                     },
-                    force,
+                    force: resolvedForce,
                     itemStyle: {
                         borderColor: '#ffffff',
                         borderWidth: 1,
@@ -228,9 +254,6 @@ export function useMutualGraphChart({ cachedUsers, graphPayload }) {
                         curveness: 0.18,
                         width: 0.5,
                         opacity: 0.4
-                    },
-                    labelLayout: {
-                        hideOverlap: true
                     }
                 }
             ]

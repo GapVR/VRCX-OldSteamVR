@@ -69,6 +69,23 @@ namespace VRCX
         public void OnRenderProcessTerminated(IWebBrowser chromiumWebBrowser, IBrowser browser, CefTerminationStatus status,
             int errorCode, string errorMessage)
         {
+            var message = status switch
+            {
+                CefTerminationStatus.AbnormalTermination => "Browser terminated abnormally.",
+                CefTerminationStatus.ProcessWasKilled => "Browser was killed.",
+                CefTerminationStatus.ProcessCrashed => "Browser crashed.",
+                CefTerminationStatus.OutOfMemory => "Browser out of memory.",
+                _ => $"Browser terminated with unhandled status code '{status}'"
+            };
+            _logger.Error("Render process terminated: {Message} ErrorCode: {ErrorCode} ErrorMessage: {ErrorMessage}",
+                message, errorCode, errorMessage);
+            StartupArgs.LaunchArguments.LaunchCommand = $"crash/{message}";
+
+            if (chromiumWebBrowser.IsDisposed || chromiumWebBrowser.IsLoading)
+                return;
+
+            _logger.Info("Attempting to reload browser...");
+            chromiumWebBrowser.Reload();
         }
     }
 }

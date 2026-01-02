@@ -46,7 +46,7 @@ export async function initSentry(app) {
             release: version,
             replaysSessionSampleRate: 0,
             replaysOnErrorSampleRate: 1.0,
-            tracesSampleRate: 0.001,
+            tracesSampleRate: 0.0001,
             beforeSend(event, hint) {
                 const error = hint.originalException;
                 if (error && typeof error.message === 'string') {
@@ -68,8 +68,12 @@ export async function initSentry(app) {
                             'An error occurred while sending the request'
                         ) ||
                         error.message.includes('database or disk is full') ||
+                        error.message.includes('disk I/O error') ||
                         error.message.includes(
                             'There is not enough space on the disk.'
+                        ) ||
+                        error.message.includes(
+                            'The requested address is not valid in its context.'
                         )
                     ) {
                         return null;

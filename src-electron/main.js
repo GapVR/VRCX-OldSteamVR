@@ -56,6 +56,7 @@ const noInstall = args.includes('--no-install');
 const x11 = args.includes('--x11');
 const noDesktop = args.includes('--no-desktop');
 const startup = args.includes('--startup');
+const debug = args.includes('--hot-reload');
 const noUpdater =
     args.includes('--no-updater') ||
     fs.existsSync(path.join(rootDir, '.no-updater'));
@@ -327,6 +328,10 @@ function createWindow() {
     applyWindowState();
     const indexPath = path.join(rootDir, 'build/html/index.html');
     mainWindow.loadFile(indexPath);
+    if (debug) {
+        mainWindow.loadURL('http://localhost:9000/index.html');
+        mainWindow.webContents.openDevTools();
+    }
 
     // add proxy config, doesn't work, thanks electron
     // const proxy = VRCXStorage.Get('VRCX_Proxy');
@@ -430,13 +435,17 @@ function createWristOverlayWindowOffscreen() {
         frame: false,
         show: false,
         webPreferences: {
+            partition: 'vrcx-vr-overlay',
             offscreen: true,
             preload: path.join(__dirname, 'preload.js')
         }
     });
     wristOverlayWindow.webContents.setFrameRate(2);
 
-    const indexPath = path.join(rootDir, 'build/html/vr.html');
+    let indexPath = path.join(rootDir, 'build/html/vr.html');
+    if (debug) {
+        indexPath = 'http://localhost:9000/vr.html';
+    }
     const fileUrl = `file://${indexPath}?wrist`;
     wristOverlayWindow.loadURL(fileUrl, { userAgent: version });
 
@@ -493,13 +502,17 @@ function createHmdOverlayWindowOffscreen() {
         frame: false,
         show: false,
         webPreferences: {
+            partition: 'vrcx-vr-overlay',
             offscreen: true,
             preload: path.join(__dirname, 'preload.js')
         }
     });
     hmdOverlayWindow.webContents.setFrameRate(48);
 
-    const indexPath = path.join(rootDir, 'build/html/vr.html');
+    let indexPath = path.join(rootDir, 'build/html/vr.html');
+    if (debug) {
+        indexPath = 'http://localhost:9000/vr.html';
+    }
     const fileUrl = `file://${indexPath}?hmd`;
     hmdOverlayWindow.loadURL(fileUrl, { userAgent: version });
 
@@ -687,7 +700,7 @@ async function createDesktopFile() {
 
     // Download the icon and save it to the target directory
     const iconPath = path.join(homePath, '.local/share/icons/VRCX.png');
-    if (!fs.existsSync(iconPath)) {
+    if (!fs.existsSync(iconPath) || fs.statSync(iconPath).size === 0) {
         const iconDir = path.dirname(iconPath);
         if (!fs.existsSync(iconDir)) {
             fs.mkdirSync(iconDir, { recursive: true });

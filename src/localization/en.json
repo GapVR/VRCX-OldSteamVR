@@ -172,7 +172,22 @@
                 "local_favorites": "Local Favorites",
                 "new_group": "New Group",
                 "refresh": "Refresh",
-                "cancel_refresh": "Cancel Refresh"
+                "cancel_refresh": "Cancel Refresh",
+                "check_invalid": "Check for deleted/private avatars",
+                "check_description": "Detect and remove invalid avatars from this group",
+                "checking": "Checking for invalid avatars...",
+                "check_progress": "Progress: {current}/{total}",
+                "check_complete": "Check complete!",
+                "check_summary": "Checked {total} avatars, found {invalid} invalid, removed {removed}",
+                "removed_list_header": "Avatars pending deletion:",
+                "copy_removed_ids": "Copy Avatar IDs",
+                "copied_ids": "Avatar IDs copied to clipboard",
+                "checking_progress": "Checking avatar ({current}/{total})...",
+                "confirm_delete_invalid": "Delete Invalid Avatars?",
+                "confirm_delete_description": "Found {count} invalid avatars, delete them?",
+                "delete_summary": "Successfully deleted {removed} invalid avatars",
+                "no_invalid_found": "No invalid avatars found",
+                "delete_cancelled": "Delete operation cancelled"
             },
             "edit_mode": "Edit Mode",
             "copy": "Copy",
@@ -246,7 +261,10 @@
                     "invite": "Group Invite",
                     "joinRequest": "Group Join Request",
                     "transfer": "Group Transfer",
-                    "queueReady": "Queue Ready"
+                    "queueReady": "Queue Ready",
+                    "event": {
+                        "created": "Group Event Created"
+                    }
                 },
                 "moderation": {
                     "warning": {
@@ -261,7 +279,11 @@
                 },
                 "badge": {
                     "earned": "Badge Earned"
-                }
+                },
+                "vrcplus": {
+                    "gift": "VRC+ Gift"
+                },
+                "localNotifs": "System"
             }
         },
         "friend_list": {
@@ -340,6 +362,22 @@
                 "tooltip": {
                     "mutual_friends_count": "Mutual friends: {count}",
                     "edge": "{source} ↔ {target}"
+                },
+                "force_dialog": {
+                    "open_label": "Adjust graph layout settings",
+                    "title": "Graph Layout Settings",
+                    "description": "Fine-tune the force-directed layout used to draw the mutual friend graph.",
+                    "repulsion": "Repulsion",
+                    "edge_length_min": "Edge length (min)",
+                    "edge_length_max": "Edge length (max)",
+                    "gravity": "Gravity",
+                    "apply": "Apply",
+                    "reset": "Reset",
+                    "repulsion_help": "Repulsion between nodes.",
+                    "edge_length_min_help": "Minimum distance between connected nodes.",
+                    "edge_length_max_help": "Maximum distance between connected nodes.",
+                    "gravity_help": "Pull strength toward the graph center.",
+                    "invalid_input": "Please enter non-negative numbers."
                 }
             }
         },
@@ -520,6 +558,8 @@
                     "sort_instance_users_by_time": "time",
                     "sort_instance_users_by_alphabet": "alphabetical",
                     "table_max_size": "Table Max Size",
+                    "table_page_sizes": "Table Page Sizes",
+                    "table_page_sizes_error": "Page size must be a number between 1 and 1000",
                     "show_notification_icon_dot": "Show Tray Notification Dot"
                 },
                 "timedate": {
@@ -728,9 +768,9 @@
                         "enable_tooltip": "Fetches video titles for use with gameLog and duration for overlay progress bar"
                     },
                     "translation_api": {
-                        "header": "Google Translate API",
+                        "header": "Bio Translate API",
                         "enable": "Enable",
-                        "translation_api_key": "Google Translate API Key",
+                        "translation_api_key": "Translate API Key",
                         "enable_tooltip": "Translate user bios"
                     },
                     "video_progress_pie": {
@@ -910,6 +950,7 @@
                 "edit_pronouns": "Pronouns",
                 "report_hacking": "Report For Hacking",
                 "unfriend": "Unfriend",
+                "unfriend_success_msg": "Unfriended",
                 "logout": "Logout"
             },
             "info": {
@@ -1407,11 +1448,27 @@
             "save": "Save"
         },
         "translation_api": {
-            "header": "Google Translate API",
+            "header": "Bio Translation API",
             "description": "Enter your Google translate API Key",
             "placeholder": "Google Translate API Key",
             "guide": "Guide",
-            "save": "Save"
+            "mode": "Provider",
+            "mode_google": "Google Translate",
+            "mode_openai": "OpenAI",
+            "test": "Test",
+            "save": "Save",
+            "msg_disabled": "Translation API disabled",
+            "msg_fill_endpoint_model": "Please fill endpoint and model",
+            "msg_settings_invalid": "Translation settings invalid",
+            "msg_settings_saved": "Translation settings saved",
+            "msg_test_success": "Test succeeded",
+            "msg_test_failed": "Test failed",
+            "openai": {
+                "endpoint": "API Endpoint",
+                "api_key": "API Key (Optional)",
+                "model": "Model Name",
+                "prompt_optional": "Prompt (Optional)"
+            }
         },
         "set_world_tags": {
             "header": "Set World Tags",
@@ -1469,9 +1526,9 @@
             "short_url_notice": "Short URL's expire after a set period of time",
             "location": "Location",
             "copy_tooltip": "Copy to clipboard",
-            "start_as_desktop": "Start as Desktop (No VR)",
+            "start_as_desktop": "Launch (Desktop)",
             "invite": "Invite",
-            "launch": "Launch",
+            "launch": "Launch (VR)",
             "open_ingame": "Open in-game",
             "self_invite": "Self invite",
             "game_running_warning": "Are you sure you want to launch a second VRChat instance?",
@@ -1907,6 +1964,9 @@
         "screenshot_metadata": {
             "deleted": "Screenshot metadata deleted",
             "delete_failed": "Failed to delete screenshot metadata"
+        },
+        "crash": {
+            "vrcx_reload": "VRCX was reloaded for stability"
         }
     },
     "prompt": {

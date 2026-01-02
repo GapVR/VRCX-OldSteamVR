@@ -4,11 +4,7 @@
             v-loading="loading"
             :data="paginatedData"
             v-bind="mergedTableProps"
-            default-sort-prop="created_at"
-            default-sort-order="descending"
-            lazy
-            @sort-change="handleSortChange"
-            @selection-change="handleSelectionChange"
+            :default-sort="resolvedDefaultSort"
             @row-click="handleRowClick">
             <slot></slot>
         </el-table>
@@ -17,8 +13,8 @@
             <el-pagination
                 size="small"
                 :current-page="internalCurrentPage"
-                :page-size="internalPageSize"
-                :total="filteredData.length"
+                :page-size="effectivePageSize"
+                :total="totalItems"
                 v-bind="mergedPaginationProps"
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange" />
@@ -26,232 +22,176 @@
     </div>
 </template>
 
-<script>
-    import { computed, ref, toRefs, watch } from 'vue';
+<script setup>
+    import { computed, ref, toRaw, toRefs, watch } from 'vue';
 
-    import { useAppearanceSettingsStore } from '../stores';
+    import { useAppearanceSettingsStore, useVrcxStore } from '../stores';
 
-    export default {
-        name: 'DataTable',
-        props: {
-            data: {
-                type: Array,
-                default: () => []
-            },
-            tableProps: {
-                type: Object,
-                default: () => ({})
-            },
-            paginationProps: {
-                type: Object,
-                default: () => ({})
-            },
-            currentPage: {
-                type: Number,
-                default: 1
-            },
-            pageSize: {
-                type: Number,
-                default: 20
-            },
-            pageSizeLinked: {
-                type: Boolean,
-                default: false
-            },
-            filters: {
-                type: [Array, Object],
-                default: () => []
-            },
-            loading: {
-                type: Boolean,
-                default: false
-            },
-            layout: {
-                type: String,
-                default: 'table, pagination'
-            }
+    const props = defineProps({
+        data: {
+            type: Array,
+            default: () => []
         },
-        emits: [
-            'update:currentPage',
-            'update:pageSize',
-            'update:tableProps',
-            'size-change',
-            'current-change',
-            'selection-change',
-            'row-click',
-            'filtered-data',
-            'sort-change'
-        ],
-        setup(props, { emit }) {
-            const appearanceSettingsStore = useAppearanceSettingsStore();
-            const { data, currentPage, pageSize, tableProps, paginationProps, filters } = toRefs(props);
+        tableProps: {
+            type: Object,
+            default: () => ({})
+        },
+        paginationProps: {
+            type: Object,
+            default: () => ({})
+        },
+        pageSize: {
+            type: Number,
+            default: 20
+        },
+        pageSizeLinked: {
+            type: Boolean,
+            default: false
+        },
+        filters: {
+            type: Array,
+            default: () => []
+        },
+        loading: {
+            type: Boolean,
+            default: false
+        },
+        layout: {
+            type: String,
+            default: 'table, pagination'
+        }
+    });
 
-            const internalCurrentPage = ref(currentPage.value);
-            const internalPageSize = ref(pageSize.value);
-            const sortData = ref({
-                prop: props.tableProps.defaultSort?.prop || 'created_at',
-                order: props.tableProps.defaultSort?.order || 'descending'
-            });
+    const emit = defineEmits(['row-click']);
 
-            const showPagination = computed(() => {
-                return props.layout.includes('pagination');
-            });
+    const appearanceSettingsStore = useAppearanceSettingsStore();
+    const vrcxStore = useVrcxStore();
 
-            const mergedTableProps = computed(() => ({
-                stripe: true,
-                ...tableProps.value
-            }));
+    const { data, pageSize, tableProps, paginationProps, filters } = toRefs(props);
 
-            const mergedPaginationProps = computed(() => ({
-                layout: 'sizes, prev, pager, next, total',
-                pageSizes: [10, 15, 20, 25, 50, 100],
-                ...paginationProps.value
-            }));
+    const internalCurrentPage = ref(1);
+    const internalPageSize = ref(pageSize.value);
 
-            const applyFilter = function (row, filter) {
-                if (Array.isArray(filter.prop)) {
-                    return filter.prop.some((propItem) => applyFilter(row, { prop: propItem, value: filter.value }));
-                }
+    const asRawArray = (value) => (Array.isArray(value) ? toRaw(value) : []);
+    const isEmptyFilterValue = (value) => (Array.isArray(value) ? value.length === 0 : !value);
 
-                const cellValue = row[filter.prop];
-                if (cellValue === undefined || cellValue === null) return false;
+    const showPagination = computed(() => {
+        return props.layout.includes('pagination');
+    });
 
-                if (Array.isArray(filter.value)) {
-                    // assume filter dropdown multi select
-                    return filter.value.some((val) => String(cellValue).toLowerCase() === String(val).toLowerCase());
-                } else {
-                    return String(cellValue).toLowerCase().includes(String(filter.value).toLowerCase());
-                }
-            };
+    const effectivePageSize = computed(() => {
+        return props.pageSizeLinked ? appearanceSettingsStore.tablePageSize : internalPageSize.value;
+    });
 
-            const filteredData = computed(() => {
-                let result = [...data.value];
+    const resolvedDefaultSort = computed(() => {
+        if (props.tableProps?.defaultSort === null) {
+            return undefined;
+        }
+        return (
+            props.tableProps?.defaultSort ?? {
+                prop: 'created_at',
+                order: 'descending'
+            }
+        );
+    });
 
-                if (filters.value && Array.isArray(filters.value) && filters.value.length > 0) {
-                    filters.value.forEach((filter) => {
-                        if (!filter.value) {
-                            return;
-                        }
-                        if (filter.filterFn) {
-                            result = result.filter((row) => filter.filterFn(row, filter));
-                        } else if (!Array.isArray(filter.value) || filter.value.length > 0) {
-                            result = result.filter((row) => applyFilter(row, filter));
-                        }
-                    });
-                }
+    const mergedTableProps = computed(() => {
+        const src = tableProps.value || {};
+        const rest = { ...src };
+        if ('defaultSort' in rest) {
+            delete rest.defaultSort;
+        }
+        return {
+            stripe: true,
+            ...rest
+        };
+    });
 
-                if (sortData.value.prop && sortData.value.order) {
-                    const { prop, order } = sortData.value;
-                    result.sort((a, b) => {
-                        const aVal = a[prop];
-                        const bVal = b[prop];
-                        let comparison = 0;
+    const mergedPaginationProps = computed(() => ({
+        layout: 'sizes, prev, pager, next, total',
+        ...paginationProps.value,
+        pageSizes: paginationProps.value?.pageSizes ?? appearanceSettingsStore.tablePageSizes
+    }));
 
-                        if (aVal == null && bVal == null) return 0;
-                        if (aVal == null) return 1;
-                        if (bVal == null) return -1;
+    const applyFilter = function (row, filter) {
+        if (Array.isArray(filter.prop)) {
+            return filter.prop.some((propItem) => applyFilter(row, { prop: propItem, value: filter.value }));
+        }
 
-                        if (typeof aVal === 'number' && typeof bVal === 'number') {
-                            comparison = aVal - bVal;
-                        } else if (aVal instanceof Date && bVal instanceof Date) {
-                            comparison = aVal.getTime() - bVal.getTime();
-                        } else {
-                            const aStr = String(aVal).toLowerCase();
-                            const bStr = String(bVal).toLowerCase();
-                            if (aStr > bStr) comparison = 1;
-                            else if (aStr < bStr) comparison = -1;
-                        }
+        const cellValue = row[filter.prop];
+        if (cellValue === undefined || cellValue === null) return false;
 
-                        return order === 'descending' ? -comparison : comparison;
-                    });
-                }
-
-                emit('filtered-data', result);
-                return result;
-            });
-
-            const paginatedData = computed(() => {
-                if (!showPagination.value) {
-                    return filteredData.value;
-                }
-
-                const start = (internalCurrentPage.value - 1) * internalPageSize.value;
-                const end = start + internalPageSize.value;
-                return filteredData.value.slice(start, end);
-            });
-
-            const handleSortChange = ({ prop, order }) => {
-                if (props.tableProps.defaultSort) {
-                    const { tableProps } = props;
-                    tableProps.defaultSort.prop = prop;
-                    tableProps.defaultSort.order = order;
-                    emit('update:tableProps', tableProps);
-                }
-                sortData.value = { prop, order };
-                emit('sort-change', sortData.value);
-            };
-
-            const handleSelectionChange = (selection) => {
-                emit('selection-change', selection);
-            };
-
-            const handleRowClick = (row, column, event) => {
-                emit('row-click', row, column, event);
-            };
-
-            const handleSizeChange = (size) => {
-                if (props.pageSizeLinked) {
-                    appearanceSettingsStore.setTablePageSize(size);
-                }
-                internalPageSize.value = size;
-            };
-
-            const handleCurrentChange = (page) => {
-                internalCurrentPage.value = page;
-            };
-
-            watch(currentPage, (newVal) => {
-                internalCurrentPage.value = newVal;
-            });
-
-            watch(pageSize, (newVal) => {
-                internalPageSize.value = newVal;
-            });
-
-            watch(
-                () => props.tableProps.defaultSort,
-                (newSort) => {
-                    if (newSort) {
-                        sortData.value = {
-                            prop: newSort.prop,
-                            order: newSort.order
-                        };
-                    }
-                },
-                { immediate: true }
-            );
-
-            return {
-                internalCurrentPage,
-                internalPageSize,
-                showPagination,
-                mergedTableProps,
-                mergedPaginationProps,
-                filteredData,
-                paginatedData,
-                handleSortChange,
-                handleSelectionChange,
-                handleRowClick,
-                handleSizeChange,
-                handleCurrentChange
-            };
+        if (Array.isArray(filter.value)) {
+            return filter.value.some((val) => String(cellValue).toLowerCase() === String(val).toLowerCase());
+        } else {
+            return String(cellValue).toLowerCase().includes(String(filter.value).toLowerCase());
         }
     };
+
+    const filteredData = computed(() => {
+        const rawData = asRawArray(data.value);
+        const rawFilters = Array.isArray(filters.value) ? filters.value : [];
+        const activeFilters = rawFilters.filter((filter) => !isEmptyFilterValue(filter?.value));
+
+        if (activeFilters.length === 0) {
+            return rawData;
+        }
+
+        return rawData.filter((row) => {
+            for (const filter of activeFilters) {
+                if (filter.filterFn) {
+                    if (!filter.filterFn(row, filter)) return false;
+                    continue;
+                }
+                if (!applyFilter(row, filter)) return false;
+            }
+            return true;
+        });
+    });
+
+    const paginatedData = computed(() => {
+        if (!showPagination.value) {
+            return filteredData.value;
+        }
+
+        const start = (internalCurrentPage.value - 1) * effectivePageSize.value;
+        const end = start + effectivePageSize.value;
+        return filteredData.value.slice(start, end);
+    });
+
+    const totalItems = computed(() => {
+        const length = filteredData.value.length;
+        const max = vrcxStore.maxTableSize;
+        return length > max && length < max + 51 ? max : length;
+    });
+
+    const handleRowClick = (row, column, event) => {
+        emit('row-click', row, column, event);
+    };
+
+    const handleSizeChange = (size) => {
+        if (props.pageSizeLinked) {
+            appearanceSettingsStore.setTablePageSize(size);
+            return;
+        }
+        internalPageSize.value = size;
+    };
+
+    const handleCurrentChange = (page) => {
+        internalCurrentPage.value = page;
+    };
+
+    watch(pageSize, (newVal) => {
+        internalPageSize.value = newVal;
+    });
 </script>
 
 <style scoped>
     .data-table-wrapper {
         margin: 0 3px;
+        font-feature-settings:
+            'tnum' 1,
+            'lnum' 1;
     }
 
     .pagination-wrapper {

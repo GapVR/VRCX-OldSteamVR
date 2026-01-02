@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import { defineConfig } from 'vite';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 
+import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -24,6 +25,7 @@ export default defineConfig(() => ({
     base: '',
     plugins: [
         vue(),
+        tailwindcss(),
         buildAndUploadSourceMaps &&
             sentryVitePlugin({
                 authToken,
@@ -42,7 +44,7 @@ export default defineConfig(() => ({
         lightningcss: {
             minify: true,
             targets: {
-                chrome: 135
+                chrome: 140
             }
         }
     },
@@ -55,12 +57,11 @@ export default defineConfig(() => ({
         strictPort: true
     },
     build: {
-        target: 'esnext',
+        target: 'chrome140',
         outDir: '../build/html',
         cssMinify: 'lightningcss',
         license: true,
         emptyOutDir: true,
-        copyPublicDir: false,
         reportCompressedSize: false,
         chunkSizeWarningLimit: 5000,
         modulePreload: true,

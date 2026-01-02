@@ -29,6 +29,7 @@
 
 :root {
     color-scheme: dark;
+    --el-button-hover-border-color: #{$--theme-primary};
 }
 
 html,
@@ -259,6 +260,11 @@ div.x-friend-list
 
 .el-button {
     color: $--theme-text-2;
+    background-color: transparent;
+}
+
+.el-button.el-button--primary {
+    background-color: $--theme-primary !important;
 }
 
 .el-button:not(.el-button--text, .el-button--primary, .is-disabled) {
@@ -274,7 +280,7 @@ div.x-friend-list
 .el-button:not(.el-button--text, .el-button--primary, .is-disabled):hover {
     color: $--theme-text-1 !important;
     background-color: $--theme-border-2;
-    border-color: $--theme-border-3;
+    border-color: var(--el-button-hover-border-color);
 }
 
 .el-button.is-disabled,

@@ -13,7 +13,7 @@
                 style="width: 150px" />
         </div>
 
-        <DataTable v-loading="loading" v-bind="previousInstancesGroupDialogTable" style="margin-top: 10px">
+        <DataTable :loading="loading" v-bind="previousInstancesGroupDialogTable" style="margin-top: 10px">
             <el-table-column :label="t('table.previous_instances.date')" prop="created_at" sortable width="170">
                 <template #default="scope">
                     <span>{{ formatDateFilter(scope.row.created_at, 'long') }}</span>
@@ -94,7 +94,7 @@
             defaultSort: { prop: 'created_at', order: 'descending' }
         },
         pageSize: 10,
-        paginationProps: { layout: 'sizes,prev,pager,next,total', pageSizes: [10, 25, 50, 100] }
+        paginationProps: { layout: 'sizes,prev,pager,next,total' }
     });
 
     const props = defineProps({

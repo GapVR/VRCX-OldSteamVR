@@ -69,16 +69,12 @@ export const useNotificationStore = defineStore('Notification', () => {
         tableProps: {
             stripe: true,
             size: 'small',
-            defaultSort: {
-                prop: 'created_at',
-                order: 'descending'
-            }
+            defaultSort: null
         },
         pageSize: 20,
         pageSizeLinked: true,
         paginationProps: {
-            layout: 'sizes,prev,pager,next,total',
-            pageSizes: [10, 15, 20, 25, 50, 100]
+            layout: 'sizes,prev,pager,next,total'
         }
     });
     const unseenNotifications = ref([]);
@@ -235,6 +231,13 @@ export const useNotificationStore = defineStore('Notification', () => {
         let currentLocation = locationStore.lastLocation.location;
         if (locationStore.lastLocation.location === 'traveling') {
             currentLocation = locationStore.lastLocationDestination;
+        }
+        if (!currentLocation) {
+            // game log disabled, use API location
+            currentLocation = userStore.currentUser.$locationTag;
+            if (userStore.currentUser.$travelingToLocation) {
+                currentLocation = userStore.currentUser.$travelingToLocation;
+            }
         }
         if (!currentLocation) {
             return;

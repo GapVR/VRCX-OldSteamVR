@@ -25,7 +25,7 @@ const t = i18n.global.t;
 /**
  * @template T
  * @param {string} endpoint
- * @param {RequestInit & { params?: any }} [options]
+ * @param {RequestInit & { params?: any } & {customMsg?: string}} [options]
  * @returns {Promise<T>}
  */
 export function request(endpoint, options) {
@@ -159,7 +159,9 @@ export function request(endpoint, options) {
                 if (text) {
                     new Noty({
                         type: 'success',
-                        text: escapeTag(text)
+                        text: options.customMsg
+                            ? options.customMsg
+                            : escapeTag(text)
                     }).show();
                 }
                 return data;
@@ -194,7 +196,7 @@ export function request(endpoint, options) {
             if (
                 init.method === 'GET' &&
                 status === 404 &&
-                endpoint.startsWith('avatars/')
+                endpoint?.startsWith('avatars/')
             ) {
                 ElMessage({
                     message: t('message.api_handler.avatar_private_or_deleted'),

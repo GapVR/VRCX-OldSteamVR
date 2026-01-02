@@ -75,7 +75,11 @@ namespace VRCX
                 if (!string.IsNullOrEmpty(Text))
                     builder.AddText(Text);
 
-                builder.Show();
+                // builder.Show();
+                
+                //// Hacky fix for: Error CS1061 : 'ToastContentBuilder' does not contain a definition for 'Show'
+                var toastContent = builder.GetToastContent();
+                ShowToastNotification(toastContent.GetContent());
             }
             catch (System.AccessViolationException ex)
             {
@@ -84,6 +88,27 @@ namespace VRCX
             catch (Exception ex)
             {
                 logger.Error(ex, "Unknown error when sending desktop notification");
+            }
+        }
+        
+        private void ShowToastNotification(string xmlContent)
+        {
+            var toastXmlType = Type.GetType("Windows.Data.Xml.Dom.XmlDocument, Windows, ContentType=WindowsRuntime");
+            if (toastXmlType != null)
+            {
+                var xmlDoc = Activator.CreateInstance(toastXmlType);
+                var loadXmlMethod = toastXmlType.GetMethod("LoadXml");
+                loadXmlMethod?.Invoke(xmlDoc, new object[] { xmlContent });
+
+                var toastType = Type.GetType("Windows.UI.Notifications.ToastNotification, Windows, ContentType=WindowsRuntime");
+                var toastNotification = Activator.CreateInstance(toastType, xmlDoc);
+
+                var notifierType = Type.GetType("Windows.UI.Notifications.ToastNotificationManager, Windows, ContentType=WindowsRuntime");
+                var createNotifierMethod = notifierType?.GetMethod("CreateToastNotifier", new Type[0]);
+                var notifier = createNotifierMethod?.Invoke(null, null);
+
+                var showMethod = notifier?.GetType().GetMethod("Show");
+                showMethod?.Invoke(notifier, new object[] { toastNotification });
             }
         }
 

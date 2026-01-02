@@ -11,10 +11,12 @@
                 <span>{{ text }}</span>
             </span>
             <span v-if="groupName" :class="{ 'x-link': link }" @click="handleShowGroupDialog">({{ groupName }})</span>
-            <span v-if="region" :class="['flags', 'inline-block', 'ml-5', region]"></span>
-            <el-tooltip v-if="isClosed" :content="t('dialog.user.info.instance_closed')">
+            <span
+                v-if="region"
+                :class="['flags', 'inline-block', 'ml-5', region, 'transform-[translateY(3px)]']"></span>
+            <NativeTooltip v-if="isClosed" :content="t('dialog.user.info.instance_closed')">
                 <el-icon :class="['inline-block', 'ml-5']" style="color: lightcoral"><WarnTriangleFilled /></el-icon>
-            </el-tooltip>
+            </NativeTooltip>
             <el-icon v-if="strict" :class="['inline-block', 'ml-5']"><Lock /></el-icon>
         </span>
     </div>
@@ -22,7 +24,7 @@
 
 <script setup>
     import { Loading, Lock, WarnTriangleFilled } from '@element-plus/icons-vue';
-    import { ref, watch, watchEffect } from 'vue';
+    import { onBeforeUnmount, ref, watch } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useI18n } from 'vue-i18n';
 
@@ -66,9 +68,12 @@
     const groupName = ref('');
     const isClosed = ref(false);
 
-    watchEffect(() => {
-        parse();
+    let isDisposed = false;
+    onBeforeUnmount(() => {
+        isDisposed = true;
     });
+
+    watch(() => [props.location, props.traveling, props.hint, props.grouphint], parse, { immediate: true });
 
     watch(
         () => lastInstanceApplied.value,
@@ -76,8 +81,7 @@
             if (instanceId === currentInstanceId()) {
                 parse();
             }
-        },
-        { immediate: true }
+        }
     );
 
     function currentInstanceId() {
@@ -88,6 +92,9 @@
     }
 
     function parse() {
+        if (isDisposed) {
+            return;
+        }
         text.value = '';
         region.value = '';
         strict.value = false;
@@ -122,7 +129,7 @@
             groupName.value = L.groupId;
             getGroupName(instanceId)
                 .then((name) => {
-                    if (name && currentInstanceId() === L.tag) {
+                    if (!isDisposed && name && currentInstanceId() === L.tag) {
                         groupName.value = name;
                     }
                 })
@@ -163,7 +170,7 @@
             if (typeof ref === 'undefined') {
                 getWorldName(L.worldId)
                     .then((name) => {
-                        if (name && currentInstanceId() === L.tag) {
+                        if (!isDisposed && name && currentInstanceId() === L.tag) {
                             if (L.instanceId) {
                                 text.value = `${name} #${instanceName} ${L.accessTypeName}`;
                             } else {

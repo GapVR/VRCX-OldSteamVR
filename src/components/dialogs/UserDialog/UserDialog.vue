@@ -238,6 +238,8 @@
                                         v-if="translationApi && userDialog.ref.bio"
                                         text
                                         size="small"
+                                        :loading="translateLoading"
+                                        :disabled="translateLoading"
                                         style="margin-left: 5px; padding: 0"
                                         @click="translateBio"
                                         ><i class="ri-translate-2"></i
@@ -250,7 +252,7 @@
                                         style="margin-left: 5px; padding: 0"
                                         @click="showBioDialog"></el-button>
                                 </div>
-                                <div style="margin-top: 5px">
+                                <div style="margin-top: 5px" class="flex">
                                     <el-tooltip v-for="(link, index) in userDialog.ref.bioLinks" :key="index">
                                         <template #content>
                                             <span v-text="link"></span>
@@ -581,6 +583,20 @@
                                 </template>
                             </el-dropdown>
                         </div>
+                    </div>
+                    <div
+                        v-if="mutualFriendsError"
+                        @click="openExternalLink('https://docs.vrchat.com/docs/vrchat-202542#mutuals')"
+                        style="
+                            margin-top: 20px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            color: #f56c6c;
+                            cursor: pointer;
+                        ">
+                        <el-icon style="margin-right: 5px"><Warning /></el-icon>
+                        <span>Mutual Friends unavailable due to VRChat staged rollout, click for more info</span>
                     </div>
                     <ul
                         class="x-friend-list"
@@ -1405,7 +1421,8 @@
     const { t } = useI18n();
 
     const { hideUserNotes, hideUserMemos } = storeToRefs(useAppearanceSettingsStore());
-    const { bioLanguage, avatarRemoteDatabase, translationApi } = storeToRefs(useAdvancedSettingsStore());
+    const { bioLanguage, avatarRemoteDatabase, translationApi, translationApiType } =
+        storeToRefs(useAdvancedSettingsStore());
     const { translateText } = useAdvancedSettingsStore();
     const { userDialog, languageDialog, currentUser, isLocalUserVrcPlusSupporter } = storeToRefs(useUserStore());
     const {
@@ -1516,6 +1533,8 @@
         bioLinks: []
     });
 
+    const translateLoading = ref(false);
+
     const pronounsDialog = ref({
         visible: false,
         loading: false,
@@ -1531,6 +1550,7 @@
 
     const isEditNoteAndMemoDialogVisible = ref(false);
     const vrchatCredit = ref(null);
+    const mutualFriendsError = ref(false);
 
     const userDialogAvatars = computed(() => {
         const { avatars, avatarReleaseStatus } = userDialog.value;
@@ -1876,9 +1896,6 @@
             }
         } else if (command === 'Previous Instances') {
             showPreviousInstancesUserDialog(D.ref);
-        } else if (command === 'Manage Gallery') {
-            userDialog.value.visible = false;
-            redirectToToolsTab();
         } else if (command === 'Invite To Group') {
             showInviteGroupDialog('', D.id);
         } else if (command === 'Send Boop') {
@@ -2105,9 +2122,12 @@
                 reportUserForHacking(userId);
                 break;
             case 'Unfriend':
-                args = await friendRequest.deleteFriend({
-                    userId
-                });
+                args = await friendRequest.deleteFriend(
+                    {
+                        userId
+                    },
+                    t('dialog.user.actions.unfriend_success_msg')
+                );
                 handleFriendDelete(args);
                 break;
         }
@@ -2217,6 +2237,7 @@
                     const mutualIds = userDialog.value.mutualFriends.map((u) => u.id);
                     database.updateMutualsForFriend(userId, mutualIds);
                 }
+                mutualFriendsError.value = !success;
             }
         });
     }
@@ -2405,8 +2426,10 @@
             return;
         }
 
+        translateLoading.value = true;
         try {
-            const translated = await translateText(bio + '\n\nTranslated by Google', targetLang);
+            const providerLabel = translationApiType.value === 'openai' ? 'OpenAI' : 'Google';
+            const translated = await translateText(`${bio}\n\nTranslated by ${providerLabel}`, targetLang);
             if (!translated) {
                 throw new Error('No translation returned');
             }
@@ -2416,6 +2439,8 @@
             userDialog.value.ref.bio = translated;
         } catch (err) {
             console.error('Translation failed:', err);
+        } finally {
+            translateLoading.value = false;
         }
     }
 

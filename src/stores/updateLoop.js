@@ -73,7 +73,11 @@ export const useUpdateLoopStore = defineStore('UpdateLoop', () => {
                     state.nextFriendsRefresh = 3600; // 1hour
                     friendStore.refreshFriendsList();
                     authStore.updateStoredUser(userStore.currentUser);
-                    if (gameStore.isGameRunning) {
+                    if (
+                        userStore.currentUser.last_activity &&
+                        new Date(userStore.currentUser.last_activity) >
+                            new Date(Date.now() - 3600 * 1000) // 1hour
+                    ) {
                         moderationStore.refreshPlayerModerations();
                     }
                 }
@@ -134,7 +138,7 @@ export const useUpdateLoopStore = defineStore('UpdateLoop', () => {
                 }
                 if (--state.nextDatabaseOptimize <= 0) {
                     state.nextDatabaseOptimize = 86400; // 1 day
-                    database.optimize();
+                    database.optimize().catch(console.error);
                 }
             }
         } catch (err) {

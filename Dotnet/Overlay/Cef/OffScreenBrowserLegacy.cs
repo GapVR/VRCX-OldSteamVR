@@ -25,15 +25,24 @@ namespace VRCX
         private int _height;
 
         public OffScreenBrowserLegacy(string address, int width, int height)
-            : base(
-                address,
-                new BrowserSettings()
-                {
-                    DefaultEncoding = "UTF-8"
-                }
-            )
+            : base(address, automaticallyCreateBrowser: false)
         {
             _paintBufferLock = new ReaderWriterLockSlim();
+
+            var windowInfo = new WindowInfo();
+            windowInfo.SetAsWindowless(IntPtr.Zero);
+            windowInfo.WindowlessRenderingEnabled = true;
+            windowInfo.SharedTextureEnabled = false;
+            windowInfo.Width = width;
+            windowInfo.Height = height;
+
+            var browserSettings = new BrowserSettings()
+            {
+                DefaultEncoding = "UTF-8",
+                WindowlessFrameRate = 24
+            };
+
+            CreateBrowser(windowInfo, browserSettings);
 
             Size = new System.Drawing.Size(width, height);
             RenderHandler = this;
