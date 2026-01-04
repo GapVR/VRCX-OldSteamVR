@@ -68,9 +68,7 @@ export const useSharedFeedStore = defineStore('SharedFeed', () => {
         if (!watchState.isFriendsLoaded) {
             return;
         }
-        if (wristOverlaySettingsStore.overlayWrist === false) {
-            return;
-        }
+        // TODO: remove debounce, decouple blocked player join/leave notifications, pull data from database with filters instead of sharedFeed
         if (state.updateSharedFeedTimer) {
             if (forceUpdate) {
                 state.updateSharedFeedPendingForceUpdate = true;
@@ -364,56 +362,40 @@ export const useSharedFeedStore = defineStore('SharedFeed', () => {
             }
             // BlockedOnPlayerJoined, BlockedOnPlayerLeft, MutedOnPlayerJoined, MutedOnPlayerLeft
             if (ctx.type === 'OnPlayerJoined' || ctx.type === 'OnPlayerLeft') {
-                if (
-                    ctx.userId &&
-                    !moderationStore.cachedPlayerModerationsUserIds.has(
-                        ctx.userId
-                    )
-                ) {
-                    // no moderation for this userId, skip
-                } else {
-                    for (var ref of moderationStore.cachedPlayerModerations.values()) {
-                        if (
-                            ref.targetDisplayName !== ctx.displayName &&
-                            ref.sourceUserId !== ctx.userId
-                        ) {
-                            continue;
-                        }
-
-                        let type = '';
-                        if (ref.type === 'block') {
-                            type = `Blocked${ctx.type}`;
-                        } else if (ref.type === 'mute') {
-                            type = `Muted${ctx.type}`;
-                        } else {
-                            continue;
-                        }
-
-                        const entry = {
-                            created_at: ctx.created_at,
-                            type,
-                            displayName: ref.targetDisplayName,
-                            userId: ref.targetUserId,
-                            isFriend,
-                            isFavorite
-                        };
-                        if (
-                            wristFilter[type] &&
-                            (wristFilter[type] === 'Everyone' ||
-                                (wristFilter[type] === 'Friends' && isFriend) ||
-                                (wristFilter[type] === 'VIP' && isFavorite))
-                        ) {
-                            wristArr.unshift(entry);
-                            const entryTime = Date.parse(entry.created_at);
-                            if (
-                                !earliestKeptTime ||
-                                entryTime < earliestKeptTime
-                            ) {
-                                earliestKeptTime = entryTime;
-                            }
-                        }
-                        notificationStore.queueGameLogNoty(entry);
+                for (var ref of moderationStore.cachedPlayerModerations.values()) {
+                    if (
+                        ref.targetDisplayName !== ctx.displayName &&
+                        ref.sourceUserId !== ctx.userId
+                    ) {
+                        continue;
                     }
+
+                    let type = '';
+                    if (ref.type === 'block') {
+                        type = `Blocked${ctx.type}`;
+                    } else if (ref.type === 'mute') {
+                        type = `Muted${ctx.type}`;
+                    } else {
+                        continue;
+                    }
+
+                    const entry = {
+                        created_at: ctx.created_at,
+                        type,
+                        displayName: ref.targetDisplayName,
+                        userId: ref.targetUserId,
+                        isFriend,
+                        isFavorite
+                    };
+                    if (
+                        wristFilter[type] &&
+                        (wristFilter[type] === 'Everyone' ||
+                            (wristFilter[type] === 'Friends' && isFriend) ||
+                            (wristFilter[type] === 'VIP' && isFavorite))
+                    ) {
+                        wristArr.unshift(entry);
+                    }
+                    notificationStore.queueGameLogNoty(entry);
                 }
             }
             // when too many user joins happen at once when switching instances
