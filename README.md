@@ -2,7 +2,7 @@
 
 **Notice:** This fork of VRCX is intended to maintain compatibility with older versions of SteamVR (tested with SteamVR 2.7.4) that was broken after 2025-08-23 and includes minor UI usability improvements. It is not the official project and may not have the latest features or updates from the main project. For the official version, please see: [https://github.com/vrcx-team/VRCX](https://github.com/vrcx-team/VRCX)
 
-**Changes (VRCX Release 2025.12.06):**
+**Changes (VRCX Release 2026.01.04):**
 
 NavMenu
 - Moved Favorite Worlds/Avatars/Friends to navbar.
