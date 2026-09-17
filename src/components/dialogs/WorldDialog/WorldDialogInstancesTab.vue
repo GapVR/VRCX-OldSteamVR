@@ -1,53 +1,56 @@
 <template>
     <div>
-        <div class="my-2 rounded-xl bg-(--profile-card) p-3">
-            <div class="flex justify-between items-start mb-2 pb-2 border-b border-border">
-                <div class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                    {{ t('dialog.world.instances.header') }}
-                </div>
-                <div class="flex gap-1 items-center text-muted-foreground text-[12px]">
-                    <span class="inline-flex items-center gap-1 leading-none">
-                        <Globe2 class="size-3" />
-                        {{ t('dialog.world.instances.public_count', { count: worldDialog.ref.publicOccupants }) }}
-                    </span>
-                    <span class="ml-2 inline-flex items-center gap-1 leading-none">
-                        <LockKeyhole class="size-3" />
-                        {{
-                            t('dialog.world.instances.private_count', {
-                                count: worldDialog.ref.privateOccupants
-                            })
-                        }}
-                    </span>
-                </div>
-            </div>
-            <div v-for="room in worldDialog.rooms" :key="room.id">
+        <div v-for="room in worldDialog.rooms" :key="room.id">
                 <template v-if="isAgeGatedInstancesVisible || !(room.ageGate || room.location?.includes('~ageGate'))">
-                    <div style="margin: 6px 0">
-                        <div class="flex flex-wrap gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
+                    <div style="margin: 1px 0">
+                        <div class="flex flex-wrap items-center gap-1 whitespace-nowrap overflow-hidden text-ellipsis">
                             <LocationWorld
                                 class="text-sm"
                                 :locationobject="room.$location"
                                 :currentuserid="currentUser.id"
                                 :worlddialogshortname="worldDialog.$location.shortName" />
-                            <InstanceActionBar
-                                class="text-sm"
-                                :location="room.$location.tag"
-                                :launch-location="room.tag"
-                                :instance-location="room.tag"
-                                :shortname="room.$location.shortName"
-                                :currentlocation="lastLocation.location"
-                                :instance="room.ref"
-                                :friendcount="room.friendCount"
-                                :refresh-tooltip="t('dialog.world.instances.refresh_instance_info')"
-                                :show-history="!!instanceJoinHistory.get(room.$location.tag)"
-                                :history-tooltip="t('dialog.previous_instances.info')"
-                                :on-refresh="() => refreshInstancePlayerCount(room.tag)"
-                                :on-history="() => showPreviousInstancesInfoDialog(room.location)" />
+                            <!-- Plain text readout: user count, friends -->
+                            <template v-if="room.ref && room.ref.userCount !== undefined">
+                                <span class="text-sm flex items-center gap-1 font-semibold" :class="!room.ref.hasCapacityForYou ? 'text-red-500' : 'text-foreground'">
+                                    <UsersRound class="size-3.5" />{{ t('dialog.world.instances.players') }}<span>{{ room.ref.userCount }}/{{ room.ref.capacity }}</span>
+                                </span>
+                            </template>
+                            <template v-if="room.friendCount">
+                                <span class="text-sm flex items-center gap-1 font-semibold text-foreground"><UserPlus2 class="size-3.5" /><span>{{ room.friendCount }}</span></span>
+                            </template>
+                            <!-- Action buttons -->
+                            <TooltipWrapper v-if="checkCanInviteSelf(room.tag)" :content="t('dialog.user.info.launch_invite_tooltip')" side="top">
+                                <Button size="icon-sm" variant="outline" class="rounded-full h-5 w-5 text-muted-foreground hover:text-foreground" @click="launchStore.showLaunchDialog(room.tag)">
+                                    <LogIn class="size-3" />
+                                </Button>
+                            </TooltipWrapper>
+                            <template v-if="checkCanInviteSelf(room.tag)">
+                                <TooltipWrapper v-if="!canOpenInstanceInGame" :content="t('dialog.user.info.self_invite_tooltip')" side="top">
+                                    <Button size="icon-sm" variant="outline" class="rounded-full h-5 w-5 text-muted-foreground hover:text-foreground" @click="selfInvite(room.tag, room.$location.shortName)">
+                                        <Mail class="size-3" />
+                                    </Button>
+                                </TooltipWrapper>
+                                <TooltipWrapper v-else :content="t('dialog.user.info.open_in_vrchat_tooltip')" side="top">
+                                    <Button size="icon-sm" variant="outline" class="rounded-full h-5 w-5 text-muted-foreground hover:text-foreground" @click="launchStore.tryOpenInstanceInVrc(room.tag, room.$location.shortName)">
+                                        <Mail class="size-3" />
+                                    </Button>
+                                </TooltipWrapper>
+                            </template>
+                            <TooltipWrapper :content="t('dialog.world.instances.refresh_instance_info')" side="top">
+                                <Button size="icon-sm" variant="outline" class="rounded-full h-5 w-5 text-muted-foreground hover:text-foreground" @click="refreshInstancePlayerCount(room.tag)">
+                                    <RefreshCw class="size-3" />
+                                </Button>
+                            </TooltipWrapper>
+                            <TooltipWrapper v-if="instanceJoinHistory.get(room.$location.tag)" :content="t('dialog.previous_instances.info')" side="top">
+                                <Button size="icon-sm" variant="outline" class="rounded-full h-5 w-5 text-muted-foreground hover:text-foreground" @click="showPreviousInstancesInfoDialog(room.location)">
+                                    <History class="size-3" />
+                                </Button>
+                            </TooltipWrapper>
                         </div>
                         <div
                             v-if="room.$location.userId || room.users.length"
                             class="flex flex-wrap items-start"
-                            style="margin: 8px 0; max-height: unset">
+                            style="margin: 2px 0; max-height: unset">
                             <div
                                 v-if="room.$location.userId"
                                 class="box-border flex items-center p-1.5 text-[13px] cursor-pointer w-[167px] hover:rounded-[25px_5px_5px_25px]"
@@ -113,52 +116,15 @@
                 </template>
             </div>
         </div>
-        <div
-            v-if="worldDialog.ref.description && worldDialog.ref.name !== worldDialog.ref.description"
-            class="my-2 text-xs rounded-xl bg-(--profile-card) p-3">
-            <div class="flex justify-between pb-2 border-b border-border">
-                <div class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                    {{ t('dialog.world.info.description') }}
-                </div>
-                <Button
-                    v-if="translationApi"
-                    class="w-3 h-3 text-xs text-muted-foreground px-2"
-                    size="icon-sm"
-                    variant="ghost"
-                    @click="translateDescription">
-                    <Spinner v-if="isTranslating" class="size-1" />
-                    <Languages v-else class="h-3 w-3" />
-                </Button>
-            </div>
-            <div class="flex items-start">
-                <span class="flex-1 break-words py-2">
-                    {{ translatedDescription || worldDialog.ref.description }}
-                </span>
-            </div>
-        </div>
-        <div class="my-2 text-xs rounded-xl bg-(--profile-card) p-3">
-            <div
-                class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-2 pb-2 border-b border-border">
-                {{ t('dialog.world.info.memo') }}
-            </div>
-            <InputGroupTextareaField
-                v-model="memo"
-                class="text-xs"
-                :rows="1"
-                :autosize="true"
-                :placeholder="t('dialog.world.info.memo_placeholder')"
-                input-class="resize-none min-h-0"
-                @change="onWorldMemoChange" />
-        </div>
-    </div>
 </template>
 
 <script setup>
-    import { Globe2, Languages, LockKeyhole, User } from 'lucide-vue-next';
+    import { History, LogIn, Mail, RefreshCw, User, UsersRound, UserPlus2 } from 'lucide-vue-next';
     import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
     import IconFrame from '@/components/IconFrame.vue';
     import { Button } from '@/components/ui/button';
-    import { InputGroupTextareaField } from '@/components/ui/input-group';
+    import { TooltipWrapper } from '@/components/ui/tooltip';
+
     import { Spinner } from '@/components/ui/spinner';
     import { storeToRefs } from 'pinia';
     import { ref, watch } from 'vue';
@@ -170,14 +136,15 @@
         useAdvancedSettingsStore,
         useAppearanceSettingsStore,
         useInstanceStore,
+        useInviteStore,
+        useLaunchStore,
         useLocationStore,
         useUserStore,
         useWorldStore
     } from '../../../stores';
 
-    import InstanceActionBar from '../../InstanceActionBar.vue';
     import { showUserDialog } from '../../../coordinators/userCoordinator';
-    import { useWorldMemo } from './useWorldDialogInfo';
+    import { useInviteChecks } from '../../../composables/useInviteChecks';
 
     const { t } = useI18n();
     const { userImage, userStatusClass } = useUserDisplay();
@@ -188,10 +155,24 @@
     const { translateText } = useAdvancedSettingsStore();
     const { currentUser } = storeToRefs(useUserStore());
     const { worldDialog } = storeToRefs(useWorldStore());
-    const { memo, onWorldMemoChange } = useWorldMemo(worldDialog);
     const { lastLocation } = storeToRefs(useLocationStore());
     const { showPreviousInstancesInfoDialog } = useInstanceStore();
     const { instanceJoinHistory } = storeToRefs(useInstanceStore());
+    const launchStore = useLaunchStore();
+    const inviteStore = useInviteStore();
+    const { canOpenInstanceInGame } = storeToRefs(inviteStore);
+    const { isOpeningInstance } = storeToRefs(launchStore);
+    const { checkCanInviteSelf } = useInviteChecks();
+
+    function selfInvite(tag, shortName) {
+        const parts = tag.split('/');
+        const worldId = parts[0];
+        const instanceId = parts[1]?.split('?')[0];
+        if (!worldId || !instanceId) return;
+        import('../../../api').then(({ instanceRequest }) => {
+            instanceRequest.selfInvite({ instanceId, worldId, shortName });
+        });
+    }
 
     const translatedDescription = ref('');
     const isTranslating = ref(false);

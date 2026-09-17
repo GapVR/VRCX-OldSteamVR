@@ -1595,6 +1595,7 @@
                 "delete": "削除"
             },
             "instances": {
+                "players": "Players",
                 "header": "インスタンス",
                 "public_count": "パブリック {count}",
                 "private_count": "プライベート {count}",

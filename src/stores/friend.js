@@ -304,6 +304,11 @@ export const useFriendStore = defineStore('Friend', () => {
         return result;
     });
 
+    // Private instance friend count
+    function countPrivateFriends(list) {
+        return list.filter((f) => !isRealInstance(f.ref?.location)).length;
+    }
+
     const friendsInSameInstance = computed(() => {
         const friendsList = {};
 
@@ -1301,6 +1306,7 @@ export const useFriendStore = defineStore('Friend', () => {
 
         updateLocalFavoriteFriends,
         updateSidebarFavorites,
+        countPrivateFriends,
         deleteFriend,
         refreshFriendsStatus,
         addFriend,

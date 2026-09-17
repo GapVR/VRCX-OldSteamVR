@@ -274,7 +274,7 @@ export const useInstanceStore = defineStore('Instance', () => {
         if (!accessTypeLabel || !location.instanceId) {
             return baseLabel;
         }
-        return `${baseLabel} · ${accessTypeLabel}`;
+        return `${baseLabel} ${accessTypeLabel}`;
     }
 
     /**

@@ -27,7 +27,7 @@
                             v-if="showUnavailable"
                             :title="t('view.favorite.unavailable_tooltip')"
                             class="h-4 w-4" />
-                        <Lock v-if="isPrivateWorld" :title="t('view.favorite.private')" class="h-4 w-4" />
+                        <Lock v-if="isPrivateWorld" :title="t('view.favorite.private')" class="h-4 w-4" style="color: #e6a23c" />
                     </ItemTitle>
                     <ItemDescription class="truncate line-clamp-1 text-xs">
                         {{ authorText }}
@@ -36,7 +36,23 @@
                 <ItemActions v-if="editMode && !isLocalFavorite" @click.stop>
                     <Checkbox v-model="isSelected" />
                 </ItemActions>
-                <DropdownMenu v-else-if="!editMode">
+                <template v-else>
+                    <ItemActions>
+                        <TooltipWrapper
+                            side="top"
+                            :content="t('view.favorite.edit_favorite_tooltip')">
+                            <Button
+                                size="icon-sm"
+                                variant="outline"
+                                class="rounded-full w-6 h-6"
+                                @click.stop="showFavoriteDialog('world', favorite.id)"
+                                :ariaLabel="t('view.favorite.edit_favorite_tooltip')">
+                                <Star class="h-4 w-4" />
+                            </Button>
+                        </TooltipWrapper>
+                    </ItemActions>
+                    <ItemActions>
+                        <DropdownMenu>
                     <DropdownMenuTrigger as-child>
                         <Button
                             size="icon-sm"
@@ -65,7 +81,9 @@
                             </template>
                         </WorldActionMenuItems>
                     </DropdownMenuContent>
-                </DropdownMenu>
+                        </DropdownMenu>
+                    </ItemActions>
+                </template>
             </Item>
         </ContextMenuTrigger>
         <ContextMenuContent>
@@ -90,9 +108,10 @@
 </template>
 
 <script setup>
-    import { AlertTriangle, Image, Lock, MoreHorizontal } from 'lucide-vue-next';
+    import { AlertTriangle, Image, Lock, MoreHorizontal, Star } from 'lucide-vue-next';
     import { Button } from '@/components/ui/button';
     import { Checkbox } from '@/components/ui/checkbox';
+    import TooltipWrapper from '@/components/ui/tooltip/TooltipWrapper.vue';
     import {
         ContextMenu,
         ContextMenuContent,

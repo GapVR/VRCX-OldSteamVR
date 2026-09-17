@@ -106,7 +106,7 @@
             "avatars": {
                 "search": "검색",
                 "vrchat_favorites": "VRChat 즐겨찾기",
-                "local_favorites": "Local Favorites (Requires VRC+)",
+                "local_favorites": "Local Favorites",
                 "new_group": "새 그룹",
                 "check_invalid": "이 그룹의 유효하지 않은 모델 확인",
                 "check_description": "이 그룹에서 유효하지 않은 모델을 감지하고 삭제",
@@ -632,6 +632,7 @@
                 "delete": "삭제"
             },
             "instances": {
+                "players": "Players",
                 "header": "인스턴스",
                 "public_count": "공개 {count}",
                 "private_count": "비공개 {count}",
@@ -828,7 +829,7 @@
             "header": "그룹 선택",
             "vrchat_favorites": "VRChat 즐겨찾기",
             "local_favorites": "VRCX 즐겨찾기",
-            "local_avatar_favorites": "Local Favorites (Requires VRC+)"
+            "local_avatar_favorites": "Local Favorites"
         },
         "social_status": {
             "header": "소셜 상태 설정",

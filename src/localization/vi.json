@@ -106,7 +106,7 @@
             "avatars": {
                 "search": "Tìm kiếm",
                 "vrchat_favorites": "Yêu thích lưu trên VRChat",
-                "local_favorites": "Local Favorites (Requires VRC+)",
+                "local_favorites": "Local Favorites",
                 "new_group": "Nhóm mới"
             },
             "export": "Xuất dữ liệu",
@@ -621,6 +621,7 @@
                 "delete": "Xóa"
             },
             "instances": {
+                "players": "Players",
                 "header": "Instances",
                 "public_count": "Public {count}",
                 "private_count": "Private {count}",
@@ -817,7 +818,7 @@
             "header": "Chọn Group",
             "vrchat_favorites": "Yêu thích lưu trong VRChat",
             "local_favorites": "Yêu thích lưu trong máy",
-            "local_avatar_favorites": "Local Favorites (Requires VRC+)"
+            "local_avatar_favorites": "Local Favorites"
         },
         "social_status": {
             "header": "Social Status",

@@ -88,7 +88,6 @@
                         v-else
                         style="width: 100%; white-space: initial"
                         class="my-1"
-                        :disabled="!isLocalUserVrcPlusSupporter"
                         @click="addLocalAvatarFavorite(favoriteDialog.objectId, group)">
                         {{ group }} ({{ localAvatarFavGroupLength(group) }})
                     </Button>

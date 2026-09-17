@@ -142,10 +142,13 @@
     const dialogClass = computed(() => {
         switch (activeType.value) {
             case 'user':
+                return 'x-dialog translate-y-0 sm:max-w-230 overflow-hidden flex flex-col bg-secondary';
             case 'group':
-            case 'world':
+                return 'x-dialog translate-y-0 sm:max-w-230 overflow-hidden flex flex-col bg-secondary';
             case 'avatar':
-                return 'x-dialog translate-y-0 sm:max-w-270 overflow-hidden flex flex-col';
+                return 'x-dialog translate-y-0 sm:max-w-230 overflow-hidden flex flex-col bg-secondary';
+            case 'world':
+                return 'x-dialog translate-y-0 sm:max-w-230 overflow-hidden flex flex-col bg-secondary';
             case 'group-member-moderation':
                 return 'x-dialog translate-y-0 max-w-none flex flex-col sm:min-w-[90vw] sm:max-w-[90vw] sm:min-h-[80vh] sm:max-h-[80vh]';
             case 'previous-instances-info':
@@ -185,7 +188,8 @@
 
         const userDialogBaseStyle = {
             overflow: 'hidden',
-            backgroundClip: 'padding-box'
+            backgroundClip: 'padding-box',
+            backgroundColor: 'var(--background)'
         };
 
         const opacity = -appearanceSettingsStore.profileBackgroundOpacity + 1; // Invert the opacity value

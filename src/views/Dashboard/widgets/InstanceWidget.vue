@@ -25,8 +25,8 @@
             <!-- Info bar -->
             <div class="flex items-center gap-2 border-b px-2.5 py-1.5 text-[12px] text-muted-foreground">
                 <span class="truncate font-medium text-foreground">{{ worldName }}</span>
-                <span v-if="locationInfo" class="shrink-0">· {{ locationInfo }}</span>
-                <span class="shrink-0">· {{ playerCount }} {{ t('dashboard.widget.instance_players') }}</span>
+                <span v-if="locationInfo" class="shrink-0">{{ locationInfo }}</span>
+                <span class="shrink-0">{{ playerCount }} {{ t('dashboard.widget.instance_players') }}</span>
             </div>
 
             <!-- Player table -->

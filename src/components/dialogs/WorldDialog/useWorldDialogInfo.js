@@ -74,7 +74,8 @@ export function useWorldDialogInfo(worldDialog, { t, toast, sdkUnityVersion }) {
                 platforms.unshift(platformWithVersion);
             }
         }
-        return platforms.join('\n');
+        return platforms.join(', ');
+
     });
 
     const worldDialogPlatformCreatedAt = computed(() => {

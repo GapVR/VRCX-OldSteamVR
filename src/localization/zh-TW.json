@@ -1594,6 +1594,7 @@
                 "delete": "刪除"
             },
             "instances": {
+                "players": "Players",
                 "header": "房間",
                 "public_count": "公開 {count}",
                 "private_count": "私人 {count}",

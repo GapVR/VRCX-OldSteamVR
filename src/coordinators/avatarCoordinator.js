@@ -110,7 +110,7 @@ export function showAvatarDialog(avatarId, options = {}) {
     D.galleryLoading = true;
     D.isFavorite =
         favoriteStore.getCachedFavoritesByObjectId(avatarId) ||
-        (userStore.isLocalUserVrcPlusSupporter && favoriteStore.localAvatarFavoritesList.includes(avatarId));
+        favoriteStore.localAvatarFavoritesList.includes(avatarId);
     D.isBlocked = avatarStore.cachedAvatarModerations.has(avatarId);
     const ref2 = avatarStore.cachedAvatars.get(avatarId);
     if (typeof ref2 !== 'undefined') {

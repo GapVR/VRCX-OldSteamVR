@@ -175,13 +175,13 @@ export function createJoinLeaveEntry(type, dt, displayName, location, userId, ti
  * @param {string} location
  * @returns {object}
  */
-export function createPortalSpawnEntry(dt, location) {
+export function createPortalSpawnEntry(dt, location, displayName = '', userId = '') {
     return {
         created_at: dt,
         type: 'PortalSpawn',
         location,
-        displayName: '',
-        userId: '',
+        displayName,
+        userId,
         instanceId: '',
         worldName: ''
     };

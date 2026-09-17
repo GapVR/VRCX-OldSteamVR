@@ -991,6 +991,7 @@
                 "delete": "Usuń"
             },
             "instances": {
+                "players": "Players",
                 "header": "Instancje",
                 "public_count": "Publiczne {count}",
                 "private_count": "Prywatne {count}",

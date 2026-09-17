@@ -224,9 +224,10 @@ export const columns = [
         meta: { label: () => t('table.feed.type') },
         cell: ({ row }) => {
             const type = row.getValue('type');
+            const feedTypeVariants = { GPS: 'gps', Online: 'online', Offline: 'offline', Status: 'status', Avatar: 'outline', Bio: 'bio' };
             return (
                 <div>
-                    <Badge variant="outline" class="text-muted-foreground">
+                    <Badge variant={feedTypeVariants[type] || 'outline'}>
                         {t(`view.feed.filters.${type}`)}
                     </Badge>
                 </div>
@@ -247,7 +248,10 @@ export const columns = [
                     state={friend?.state ?? ''}
                     location={friend?.ref?.location ?? ''}
                 >
-                    <span class="cursor-pointer pr-2.5" onClick={() => showUserDialog(original.userId)}>
+                    <span
+                        class="cursor-pointer pr-2.5"
+                        style={friend?.ref?.$userColour ? { color: friend.ref.$userColour } : {}}
+                        onClick={() => showUserDialog(original.userId)}>
                         {original.displayName}
                     </span>
                 </UserContextMenu>

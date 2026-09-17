@@ -30,7 +30,7 @@
                 <AlertTriangle class="text-orange-500 my-auto" />
             </TooltipWrapper>
         </div>
-        <Lock v-if="strict" class="text-muted-foreground" />
+        <Lock v-if="strict" style="color: #e6a23c" />
     </div>
 </template>
 

@@ -73,8 +73,17 @@ export const createColumns = ({ getCreatedAt, onDelete, onDeletePrompt }) => {
                 const label = t(`view.game_log.filters.${original.type}`);
                 const isLink = Boolean(original.location) && original.type !== 'Location';
 
+                const variantMap = {
+                    OnPlayerJoined: 'online',
+                    OnPlayerLeft: 'offline',
+                    VideoPlay: 'outline',
+                    Location: 'gps',
+                    PortalSpawn: 'gps'
+                };
+                const variant = variantMap[original.type] ?? 'outline';
+
                 return (
-                    <Badge variant="outline" class="text-muted-foreground">
+                    <Badge variant={variant}>
                         <span
                             class={isLink ? 'cursor-pointer' : undefined}
                             onClick={() => isLink && showWorldDialog(original.location)}

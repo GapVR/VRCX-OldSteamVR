@@ -1575,6 +1575,7 @@
                 "delete": "Törlés"
             },
             "instances": {
+                "players": "Players",
                 "header": "Helyzetek",
                 "public_count": "Nyilvános {count}",
                 "private_count": "Privát {count}",

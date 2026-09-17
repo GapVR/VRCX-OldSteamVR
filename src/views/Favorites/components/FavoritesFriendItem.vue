@@ -41,7 +41,23 @@
                 <ItemActions v-if="editMode" @click.stop>
                     <Checkbox v-model="isSelected" />
                 </ItemActions>
-                <DropdownMenu v-else>
+                <template v-else>
+                    <ItemActions>
+                        <TooltipWrapper
+                            side="top"
+                            :content="t('view.favorite.edit_favorite_tooltip')">
+                            <Button
+                                size="icon-sm"
+                                variant="outline"
+                                class="rounded-full w-6 h-6"
+                                @click.stop="showFavoriteDialog('friend', favorite.id)"
+                                :ariaLabel="t('view.favorite.edit_favorite_tooltip')">
+                                <Star class="h-4 w-4" />
+                            </Button>
+                        </TooltipWrapper>
+                    </ItemActions>
+                    <ItemActions>
+                        <DropdownMenu>
                     <DropdownMenuTrigger as-child>
                         <Button
                             size="icon-sm"
@@ -86,7 +102,9 @@
                             {{ deleteMenuLabel }}
                         </DropdownMenuItem>
                     </DropdownMenuContent>
-                </DropdownMenu>
+                        </DropdownMenu>
+                    </ItemActions>
+                </template>
             </Item>
         </UserContextMenu>
     </template>
@@ -117,7 +135,7 @@
 </template>
 
 <script setup>
-    import { MoreHorizontal, Trash2, User } from 'lucide-vue-next';
+    import { MoreHorizontal, Star, Trash2, User } from 'lucide-vue-next';
     import { Button } from '@/components/ui/button';
     import { Checkbox } from '@/components/ui/checkbox';
     import { ContextMenuItem, ContextMenuSeparator } from '@/components/ui/context-menu';
@@ -146,6 +164,7 @@
     import Location from '../../../components/Location.vue';
     import UserContextMenu from '../../../components/UserContextMenu.vue';
     import IconFrame from '../../../components/IconFrame.vue';
+    import TooltipWrapper from '@/components/ui/tooltip/TooltipWrapper.vue';
 
     const { userImage } = useUserDisplay();
     const props = defineProps({

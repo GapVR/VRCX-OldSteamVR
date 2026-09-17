@@ -8,7 +8,7 @@
         </span>
         <span>{{ text }}</span>
         <span v-if="groupName">({{ groupName }})</span>
-        <Lock v-if="strict" class="h-4 w-4" style="display: inline-block; margin-left: 5px" />
+        <Lock v-if="strict" class="h-4 w-4" style="display: inline-block; margin-left: 5px; color: #e6a23c" />
     </span>
 </template>
 

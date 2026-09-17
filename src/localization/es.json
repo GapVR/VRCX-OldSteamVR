@@ -800,6 +800,7 @@
                 "delete": "Eliminar"
             },
             "instances": {
+                "players": "Players",
                 "header": "Instancias",
                 "public_count": "Público {count}",
                 "private_count": "Privado {count}",

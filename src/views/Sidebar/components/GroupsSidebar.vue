@@ -1,7 +1,7 @@
 <template>
     <div ref="scrollRootRef" class="relative h-full">
         <div ref="scrollViewportRef" class="h-full w-full overflow-auto">
-            <div class="px-1.5 py-2.5">
+            <div class="px-[5px] py-2.5">
                 <div v-if="virtualRows.length" class="relative w-full box-border" :style="virtualContainerStyle">
                     <template v-for="item in virtualItems" :key="String(item.virtualItem.key)">
                         <div
@@ -12,7 +12,7 @@
                             :style="rowStyle(item)">
                             <template v-if="item.row.type === 'group-header'">
                                 <div
-                                    class="cursor-pointer pt-4 pb-1.5 text-xs"
+                                    class="cursor-pointer pt-2 pb-0.75 text-xs"
                                     :style="
                                         item.row.headerPaddingTop
                                             ? { paddingTop: item.row.headerPaddingTop }
@@ -33,7 +33,7 @@
                                 <ContextMenu>
                                     <ContextMenuTrigger as-child>
                                         <div
-                                            class="box-border flex items-center p-1.5 text-[13px] cursor-pointer hover:bg-muted/50 hover:rounded-lg"
+                                            class="box-border flex items-center px-1.5 py-0.5 text-[13px] cursor-pointer hover:bg-muted/50 hover:rounded-lg"
                                             @click="showGroupDialog(item.row.ownerId)">
                                             <template v-if="item.row.isVisible">
                                                 <div class="relative inline-block flex-none size-9 mr-2.5">

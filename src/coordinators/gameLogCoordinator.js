@@ -259,7 +259,7 @@ export function addGameLogEntry(gameLog, location) {
             if (vrcxStore.ipcEnabled && gameStore.isGameRunning) {
                 break;
             }
-            entry = createPortalSpawnEntry(gameLog.dt, location);
+            entry = createPortalSpawnEntry(gameLog.dt, location, gameLog.displayName, gameLog.userId);
             database.addGamelogPortalSpawnToDatabase(entry);
             break;
         case 'video-play':

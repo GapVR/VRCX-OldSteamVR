@@ -1433,6 +1433,7 @@
                 "new_instance_and_open_ingame": "สร้างอินสแตนซ์ใหม่และเปิดในเกม"
             },
             "instances": {
+                "players": "Players",
                 "header": "อินสแตนซ์",
                 "public_count": "สาธารณะ {count}",
                 "private_count": "ส่วนตัว {count}",

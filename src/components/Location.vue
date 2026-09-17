@@ -10,7 +10,7 @@
                             :delay-duration="300"
                             side="top">
                             <div class="inline-flex items-center gap-1 text-muted-foreground">
-                                <Lock class="size-3.5 shrink-0" />
+                                <Lock class="size-3.5 shrink-0" style="color: #e6a23c" />
                                 <span>{{ t('dialog.user.info.instance_age_restricted') }}</span>
                             </div>
                         </TooltipWrapper>
@@ -30,7 +30,7 @@
                                 <span class="min-w-0 flex-1 truncate">
                                     <span>{{ text }}</span>
                                     <span v-if="showInstanceIdInLocation && instanceName" class="ml-1">{{
-                                        `· #${instanceName}`
+                                        `#${instanceName}`
                                     }}</span>
                                     <span v-if="groupName" class="cursor-pointer" @click.stop="handleShowGroupDialog">
                                         ({{ groupName }})
@@ -47,7 +47,7 @@
                                 <AlertTriangle class="text-orange-500 my-auto" />
                             </TooltipWrapper>
                         </div>
-                        <Lock v-if="strict" class="text-muted-foreground" />
+                        <Lock v-if="strict" style="color: #e6a23c" />
                     </template>
                 </div>
             </div>
@@ -161,12 +161,16 @@
 
     const isAgeRestricted = computed(() => !isAgeGatedInstancesVisible.value && ageGate.value);
     const isLocationLink = computed(() => props.link && props.location !== 'private' && props.location !== 'offline');
-    const locationClasses = computed(() => [
-        'x-location',
-        {
-            'cursor-pointer': isLocationLink.value
+    const locationClasses = computed(() => {
+        const classes = ['x-location'];
+        if (isLocationLink.value) {
+            classes.push('cursor-pointer');
         }
-    ]);
+        if (props.location === 'private') {
+            classes.push('text-muted-foreground');
+        }
+        return classes;
+    });
     const tooltipContent = computed(() => `${t('dialog.new_instance.instance_id')}: #${instanceName.value}`);
     const tooltipDisabled = computed(
         () => props.disableTooltip || !instanceName.value || showInstanceIdInLocation.value

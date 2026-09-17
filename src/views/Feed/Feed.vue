@@ -70,9 +70,13 @@
                         <ToggleGroupItem value="All">
                             {{ t('view.search.avatar.all') }}
                         </ToggleGroupItem>
-                        <ToggleGroupItem v-for="type in feedFilterTypes" :key="type" :value="type">
-                            {{ t('view.feed.filters.' + type) }}
-                        </ToggleGroupItem>
+                        <template v-for="type in feedFilterTypes" :key="type">
+                            <ToggleGroupItem
+                                :value="type"
+                                :variant="'feed-' + type.toLowerCase()">
+                                {{ t('view.feed.filters.' + type) }}
+                            </ToggleGroupItem>
+                        </template>
                     </ToggleGroup>
                     <InputGroupField
                         class="ml-2"

@@ -58,11 +58,11 @@ function getLocationText(L, { hint, worldName, accessTypeLabel, t }) {
         return t('location.traveling');
     }
     if (typeof hint === 'string' && hint !== '') {
-        return L.instanceId ? `${hint} · ${accessTypeLabel}` : hint;
+        return L.instanceId ? `${hint} ${accessTypeLabel}` : hint;
     }
     if (L.worldId) {
         const name = worldName || L.worldId;
-        return L.instanceId ? `${name} · ${accessTypeLabel}` : name;
+        return L.instanceId ? `${name} ${accessTypeLabel}` : name;
     }
     return '';
 }

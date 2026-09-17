@@ -370,7 +370,7 @@
             "avatars": {
                 "search": "Search",
                 "vrchat_favorites": "VRChat Favorites",
-                "local_favorites": "Local Favorites (Requires VRC+)",
+                "local_favorites": "Local Favorites",
                 "new_group": "New Group",
                 "cancel_refresh": "Cancel Refresh",
                 "check_invalid": "Check for deleted/private avatars",
@@ -1615,6 +1615,7 @@
             },
             "instances": {
                 "header": "Instances",
+                "players": "Players",
                 "public_count": "Public {count}",
                 "private_count": "Private {count}",
                 "capacity_count": "Capacity {count} ({max})",
@@ -1988,7 +1989,7 @@
             "header": "Choose Group",
             "vrchat_favorites": "VRChat Favorites",
             "local_favorites": "Local Favorites",
-            "local_avatar_favorites": "Local Favorites (Requires VRC+)"
+            "local_avatar_favorites": "Local Favorites"
         },
         "social_status": {
             "header": "Social Status",

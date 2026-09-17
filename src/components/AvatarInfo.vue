@@ -1,8 +1,10 @@
 <template>
     <div @click="confirm" class="cursor-pointer align-top flex min-w-0 items-center">
-        <span v-if="avatarName" class="flex items-center mr-1"
-            >{{ avatarName }} <Lock v-if="avatarType && avatarType === '(own)'" class="h-4 w-4 ml-1"
-        /></span>
+        <span v-if="avatarName" class="flex items-center mr-1">
+            {{ avatarName }}
+            <Lock v-if="avatarType && avatarType === '(own)'" class="h-4 w-4 ml-1" style="color: #e6a23c" />
+            <Lock v-else-if="avatarType && avatarType === '(public)'" class="h-4 w-4 ml-1" style="color: #67c23a" />
+        </span>
         <span v-else class="flex items-center mr-1 text-muted-foreground">{{
             t('dialog.user.info.unknown_avatar')
         }}</span>

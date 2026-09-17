@@ -724,6 +724,7 @@
                 "delete": "Удалить"
             },
             "instances": {
+                "players": "Players",
                 "header": "Инстансы",
                 "public_count": "Публичных {count}",
                 "private_count": "Приватных {count}",

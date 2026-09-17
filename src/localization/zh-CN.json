@@ -1613,6 +1613,7 @@
                 "delete": "删除"
             },
             "instances": {
+                "players": "Players",
                 "header": "房间",
                 "public_count": "公开房间有{count}人在线",
                 "private_count": "私人房间有{count}人在线",

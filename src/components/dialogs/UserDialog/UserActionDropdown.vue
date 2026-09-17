@@ -61,26 +61,14 @@
                     <RefreshCw class="size-4" />
                     {{ t('dialog.user.actions.refresh') }}
                 </DropdownMenuItem>
-                <DropdownMenuSub>
-                    <DropdownMenuSubTrigger @click="onCommand('Copy Profile URL')">
-                        <Share2 class="size-4 mr-2" />
-                        <span>{{ t('dialog.user.actions.share') }}</span>
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent side="right" align="start" class="w-56">
-                        <DropdownMenuItem @click="onCommand('Copy Profile URL')">
-                            <Copy class="size-4" />
-                            {{ t('dialog.user.info.copy_url') }}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem @click="onCommand('Copy DisplayName')">
-                            <Copy class="size-4" />
-                            {{ t('dialog.user.info.copy_display_name') }}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem @click="onCommand('Copy UserId')">
-                            <Copy class="size-4" />
-                            {{ t('dialog.user.info.copy_id') }}
-                        </DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                </DropdownMenuSub>
+                <DropdownMenuItem @click="onCommand('Copy Profile URL')">
+                    <Link class="size-4" />
+                    {{ t('dialog.user.info.copy_url') }}
+                </DropdownMenuItem>
+                <DropdownMenuItem @click="onCommand('Copy UserId')">
+                    <Clipboard class="size-4" />
+                    {{ t('dialog.user.info.copy_id') }}
+                </DropdownMenuItem>
                 <template v-if="userDialog.ref.id === currentUser.id">
                     <DropdownMenuItem @click="onCommand('Edit Profile')">
                         <Pencil class="size-4" />
@@ -278,9 +266,11 @@
     import {
         Check,
         CheckCircle,
+        Clipboard,
         Clock,
         Copy,
         Flag,
+        Link,
         LineChart,
         Mail,
         MessageCircle,

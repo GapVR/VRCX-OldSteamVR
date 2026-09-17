@@ -1,7 +1,7 @@
 <template>
     <div class="relative h-full">
         <div ref="scrollViewportRef" class="h-full w-full overflow-auto overflow-x-hidden">
-            <div class="px-1.5 py-2.5">
+            <div class="px-[5px] py-2.5">
                 <div v-if="virtualRows.length" class="relative w-full box-border" :style="virtualContainerStyle">
                     <template v-for="item in virtualItems" :key="String(item.virtualItem.key)">
                         <div
@@ -12,7 +12,7 @@
                             :style="rowStyle(item)">
                             <template v-if="item.row.type === 'toggle-header'">
                                 <div
-                                    class="flex cursor-pointer items-center pt-4 pb-1.5 text-xs"
+                                    class="flex cursor-pointer items-center pt-2 pb-0.75 text-xs"
                                     :style="item.row.headerPadding ? { padding: item.row.headerPadding } : undefined"
                                     @click="item.row.onClick && item.row.onClick()">
                                     <ChevronDown
@@ -21,7 +21,7 @@
                                     <span class="ml-1.5">
                                         {{ item.row.label }}
                                         <template v-if="item.row.count !== null && item.row.count !== undefined">
-                                            &horbar; {{ item.row.count }}
+                                            &horbar; {{ item.row.count }}<template v-if="item.row.nonPrivateCount > 0"> ({{ item.row.nonPrivateCount }})</template>
                                         </template>
                                     </span>
                                 </div>
@@ -141,6 +141,9 @@
                                 <div class="mb-1 flex items-center">
                                     <Location class="inline text-xs" :location="item.row.location" />
                                     <span class="text-xs ml-1.5">{{ `(${item.row.count})` }}</span>
+                                    <template v-if="item.row.nonPrivateCount > 0">
+                                        <span class="text-xs ml-1 text-muted-foreground">(visible {{ item.row.nonPrivateCount }})</span>
+                                    </template>
                                 </div>
                             </template>
 
@@ -271,6 +274,7 @@
         offlineFriends,
         friendsInSameInstance
     } = storeToRefs(friendStore);
+    const { countPrivateFriends } = friendStore;
     const appearanceSettingsStore = useAppearanceSettingsStore();
     const {
         isSidebarGroupByInstance,
@@ -437,11 +441,13 @@
             : visibleFavoriteOnlineFriends.value.length;
 
         if (vipFriendCount) {
+            const vipPrivateCount = countPrivateFriends(visibleFavoriteOnlineFriends.value);
             rows.push(
                 buildToggleRow({
                     key: 'vip-header',
                     label: t('side_panel.favorite'),
                     count: vipFriendCount,
+                    nonPrivateCount: vipFriendCount - vipPrivateCount,
                     expanded: isVIPFriends.value,
                     onClick: toggleVIPFriends
                 })
@@ -455,11 +461,13 @@
                     const groupKey = group?.[0]?.key ?? groupIndex;
                     const isExpanded = !collapsedFavGroups.has(groupKey);
                     if (groupName) {
+                        const groupPrivateCount = countPrivateFriends(group);
                         rows.push(
                             buildToggleRow({
                                 key: `vip-subheader:${groupKey}`,
                                 label: groupName,
                                 count: group.length,
+                                nonPrivateCount: group.length - groupPrivateCount,
                                 expanded: isExpanded,
                                 headerPadding: '4px 0 4px 4px',
                                 onClick: () => {
@@ -492,11 +500,13 @@
 
     function buildSameInstanceRows(rows) {
         if (isSidebarGroupByInstance.value && friendsInSameInstance.value.length) {
+            const sameInstancePrivateCount = countPrivateFriends(friendsInSameInstance.value.flat());
             rows.push(
                 buildToggleRow({
                     key: 'same-instance-header',
                     label: t('side_panel.same_instance'),
                     count: friendsInSameInstance.value.length,
+                    nonPrivateCount: friendsInSameInstance.value.length - sameInstancePrivateCount,
                     expanded: !isSidebarGroupByInstanceCollapsed.value,
                     onClick: toggleSwitchGroupByInstanceCollapsed,
                     paddingBottom: 4
@@ -507,11 +517,13 @@
                 friendsInSameInstance.value.forEach((friendArr, groupIndex) => {
                     if (!friendArr || !friendArr.length) return;
                     const groupKey = friendArr?.[0]?.ref?.$location?.tag ?? `group-${groupIndex}`;
+                    const instancePrivateCount = countPrivateFriends(friendArr);
                     rows.push(
                         buildInstanceHeaderRow(
                             getFriendsLocations(friendArr, lastLocation.value),
                             friendArr.length,
-                            `instance:${groupKey}`
+                            `instance:${groupKey}`,
+                            friendArr.length - instancePrivateCount
                         )
                     );
                     friendArr.forEach((friend, idx) => {
@@ -554,11 +566,13 @@
         }
 
         if (onlineFriendsByGroupStatus.value.length) {
+            const onlinePrivateCount = countPrivateFriends(onlineFriendsByGroupStatus.value);
             rows.push(
                 buildToggleRow({
                     key: 'online-header',
                     label: t('side_panel.online'),
                     count: onlineFriendsByGroupStatus.value.length,
+                    nonPrivateCount: onlineFriendsByGroupStatus.value.length - onlinePrivateCount,
                     expanded: isOnlineFriends.value,
                     onClick: toggleOnlineFriends
                 })
@@ -572,11 +586,13 @@
         }
 
         if (activeFriends.value.length) {
+            const activePrivateCount = countPrivateFriends(activeFriends.value);
             rows.push(
                 buildToggleRow({
                     key: 'active-header',
                     label: t('side_panel.active'),
                     count: activeFriends.value.length,
+                    nonPrivateCount: activeFriends.value.length - activePrivateCount,
                     expanded: isActiveFriends.value,
                     onClick: toggleActiveFriends
                 })
@@ -590,11 +606,13 @@
         }
 
         if (offlineFriends.value.length) {
+            const offlinePrivateCount = countPrivateFriends(offlineFriends.value);
             rows.push(
                 buildToggleRow({
                     key: 'offline-header',
                     label: t('side_panel.offline'),
                     count: offlineFriends.value.length,
+                    nonPrivateCount: offlineFriends.value.length - offlinePrivateCount,
                     expanded: isOfflineFriends.value,
                     onClick: toggleOfflineFriends
                 })

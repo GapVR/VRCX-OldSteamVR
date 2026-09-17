@@ -941,6 +941,7 @@
                 "delete": "Supprimer"
             },
             "instances": {
+                "players": "Players",
                 "header": "Instances",
                 "public_count": "{count} en public",
                 "private_count": "{count} en privé",
@@ -1138,7 +1139,7 @@
             "header": "Choisir un groupe",
             "vrchat_favorites": "Favoris VRChat",
             "local_favorites": "Favoris locaux",
-            "local_avatar_favorites": "Local Favorites (Requires VRC+)"
+            "local_avatar_favorites": "Local Favorites"
         },
         "social_status": {
             "header": "Statut social",

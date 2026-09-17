@@ -28,7 +28,7 @@
                                 v-if="showUnavailable"
                                 :title="t('view.favorite.unavailable_tooltip')"
                                 class="h-4 w-4" />
-                            <Lock v-if="isPrivateAvatar" :title="t('view.favorite.private')" class="h-4 w-4" />
+                            <Lock v-if="isPrivateAvatar" :title="t('view.favorite.private')" class="h-4 w-4" style="color: #e6a23c" />
                         </ItemTitle>
                         <ItemDescription class="truncate line-clamp-1 text-xs">
                             {{ localFavFakeRef.authorName }}
@@ -38,36 +38,32 @@
                         <Checkbox v-model="isSelected" />
                     </ItemActions>
                     <ItemActions v-else-if="!editMode">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger as-child>
-                                <Button
-                                    size="icon-sm"
-                                    variant="ghost"
-                                    class="rounded-full"
-                                    @click.stop
-                                    :ariaLabel="t('nav_tooltip.manage')">
-                                    <MoreHorizontal class="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem @click="handleViewDetails">
-                                    {{ t('common.actions.view_details') }}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    v-if="canSelectAvatar"
-                                    :disabled="currentUser.currentAvatar === favorite.id"
-                                    @click="selectAvatarWithConfirmation(favorite.id)">
-                                    {{ t('view.favorite.select_avatar_tooltip') }}
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator v-if="canSelectAvatar" />
-                                <DropdownMenuItem @click="showFavoriteDialog('avatar', favorite.id)">
-                                    {{ t('view.favorite.edit_favorite_tooltip') }}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem variant="destructive" @click="handleDeleteFavorite">
-                                    {{ deleteMenuLabel }}
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <TooltipWrapper
+                            v-if="canSelectAvatar"
+                            side="top"
+                            :content="t('view.favorite.select_avatar_tooltip')">
+                            <Button
+                                size="icon-sm"
+                                variant="outline"
+                                class="rounded-full w-6 h-6"
+                                @click.stop="selectAvatarWithConfirmation(favorite.id)"
+                                :disabled="currentUser.currentAvatar === favorite.id"
+                                :ariaLabel="t('view.favorite.select_avatar_tooltip')">
+                                <Check class="h-4 w-4" />
+                            </Button>
+                        </TooltipWrapper>
+                        <TooltipWrapper
+                            side="top"
+                            :content="t('view.favorite.edit_favorite_tooltip')">
+                            <Button
+                                size="icon-sm"
+                                variant="outline"
+                                class="rounded-full w-6 h-6"
+                                @click.stop="showFavoriteDialog('avatar', favorite.id)"
+                                :ariaLabel="t('view.favorite.edit_favorite_tooltip')">
+                                <Star class="h-4 w-4" />
+                            </Button>
+                        </TooltipWrapper>
                     </ItemActions>
                 </Item>
             </ContextMenuTrigger>
@@ -105,10 +101,11 @@
 </template>
 
 <script setup>
-    import { AlertTriangle, Image, Lock, MoreHorizontal, Trash2 } from 'lucide-vue-next';
+    import { AlertTriangle, Check, Image, Lock, Star, Trash2 } from 'lucide-vue-next';
     import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
     import { Button } from '@/components/ui/button';
     import { Checkbox } from '@/components/ui/checkbox';
+    import TooltipWrapper from '@/components/ui/tooltip/TooltipWrapper.vue';
     import {
         ContextMenu,
         ContextMenuContent,

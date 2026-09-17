@@ -1,6 +1,6 @@
 <template>
     <div
-        class="relative isolate box-border flex items-center overflow-hidden rounded-lg p-1.5 text-[13px] cursor-pointer hover:bg-muted/50"
+        class="relative isolate box-border flex items-center overflow-hidden rounded-lg px-1.5 py-1 text-[13px] cursor-pointer hover:bg-muted/50"
         @click="showUserDialog(friend.id)">
         <template v-if="friend.ref">
             <div class="relative inline-block flex-none size-9 mr-2.5" :class="friendStatusClass">

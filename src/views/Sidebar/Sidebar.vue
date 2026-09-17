@@ -306,7 +306,7 @@
             style="height: calc(100% - 70px); margin-top: 6px">
             <template #label-friends>
                 <span>{{ t('side_panel.friends') }}</span>
-                <span class="sidebar-tab-count"> ({{ onlineFriendCount }}/{{ friends.size }}) </span>
+                <span class="sidebar-tab-count"> ({{ onlineFriendCount }}/{{ friends.size }}) <span class="ml-1 text-muted-foreground">{{ nonPrivateOnlinePct }}</span></span>
             </template>
             <template #label-groups>
                 <span>{{ t('side_panel.groups') }}</span>
@@ -345,6 +345,7 @@
     import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
     import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
     import { computed, ref } from 'vue';
+    import { isRealInstance } from '../../shared/utils';
     import { useMagicKeys, whenever } from '@vueuse/core';
     import { Button } from '@/components/ui/button';
     import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -375,7 +376,14 @@
     import GroupsSidebar from './components/GroupsSidebar.vue';
     import NotificationCenterSheet from './components/NotificationCenterSheet.vue';
 
-    const { friends, isRefreshFriendsLoading, onlineFriendCount } = storeToRefs(useFriendStore());
+    const { friends, isRefreshFriendsLoading, onlineFriendCount, onlineFriends } = storeToRefs(useFriendStore());
+    const nonPrivateOnlinePct = computed(() => {
+        if (onlineFriendCount.value === 0) return '';
+        const visible = Array.from(friends.value.values()).filter(
+            (f) => f.state === 'online' && isRealInstance(f.ref?.location)
+        ).length;
+        return `${Math.round((visible / onlineFriendCount.value) * 100)}%`;
+    });
     const { groupInstances } = storeToRefs(useGroupStore());
     const notificationStore = useNotificationStore();
     const { isNotificationCenterOpen, hasUnseenNotifications } = storeToRefs(notificationStore);

@@ -210,13 +210,11 @@
                                 </div>
                                 <TooltipWrapper
                                     v-if="!isCreatingLocalGroup"
-                                    :disabled="isLocalUserVrcPlusSupporter"
                                     :content="t('view.favorite.avatars.local_favorites')">
                                     <div
                                         :class="[
                                             'group-item x-hover-card hover:shadow-sm',
-                                            'border-dashed flex items-center justify-center gap-2 text-sm',
-                                            { 'opacity-50 cursor-not-allowed': !isLocalUserVrcPlusSupporter }
+                                            'border-dashed flex items-center justify-center gap-2 text-sm'
                                         ]"
                                         @click="startLocalGroupCreation">
                                         <Plus />
@@ -728,8 +726,7 @@
         handleLocalGroupCreationConfirm
     } = useFavoritesLocalGroups({
         createGroup: newLocalAvatarFavoriteGroup,
-        selectGroup,
-        canCreate: () => isLocalUserVrcPlusSupporter.value
+        selectGroup
     });
 
     /**
