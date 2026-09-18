@@ -24,9 +24,9 @@
         <img
             v-if="!userDialog.loading && (userDialog.ref.currentAvatarThumbnailImageUrl || userDialog.publicProfileRef?.iconUrl)"
             class="cursor-pointer flex-none object-cover"
-            :src="userDialog.ref.currentAvatarThumbnailImageUrl || userDialog.publicProfileRef?.iconUrl"
+            :src="userDialog.ref.currentAvatarThumbnailImageUrl || userDialog.ref.bannerUrl || userDialog.publicProfileRef?.iconUrl"
             style="height: 120px; width: 160px; border-radius: 12px"
-            @click="showFullscreenImageDialog(userDialog.ref.currentAvatarImageUrl || userDialog.publicProfileRef?.iconUrl)"
+            @click="showFullscreenImageDialog(userDialog.ref.currentAvatarImageUrl || userDialog.ref.bannerUrl || userDialog.publicProfileRef?.iconUrl)"
             loading="lazy" />
 
         <!-- User info (center) -->
