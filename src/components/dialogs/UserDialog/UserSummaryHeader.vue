@@ -4,9 +4,9 @@
         <img
             v-if="!userDialog.loading && (userDialog.ref.currentAvatarThumbnailImageUrl || userDialog.publicProfileRef?.iconUrl)"
             class="cursor-pointer flex-none object-cover"
-            :src="userDialog.ref.currentAvatarThumbnailImageUrl || userDialog.ref.bannerUrl || userDialog.publicProfileRef?.iconUrl"
+            :src="getAvatarFallbackUrl()"
             style="height: 120px; width: 160px; border-radius: 12px"
-            @click="showFullscreenImageDialog(userDialog.ref.currentAvatarImageUrl || userDialog.ref.bannerUrl || userDialog.publicProfileRef?.iconUrl)"
+            @click="showFullscreenImageDialog(getAvatarFullUrl())"
             loading="lazy" />
 
         <!-- User info (center) -->
@@ -258,6 +258,15 @@
 
     const { t } = useI18n();
     const { userDialog, currentUser } = storeToRefs(useUserStore());
+
+    function getAvatarFallbackUrl() {
+        return userDialog.ref.currentAvatarThumbnailImageUrl || userDialog.ref.bannerUrl || userDialog.publicProfileRef?.iconUrl;
+    }
+
+    function getAvatarFullUrl() {
+        return userDialog.ref.currentAvatarImageUrl || getAvatarFallbackUrl();
+    }
+
     const { showFullscreenImageDialog } = useGalleryStore();
     const { userStatusClass } = useUserDisplay();
 </script>
