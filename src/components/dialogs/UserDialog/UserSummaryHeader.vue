@@ -1,5 +1,25 @@
 <template>
-    <div class="flex items-center gap-3 px-2 py-1">
+    <div class="rounded-b-lg rounded-t-[15px] bg-(--profile-card) overflow-hidden flex flex-col relative">
+        <!-- Banner image -->
+        <div
+            v-if="userDialog.ref.bannerType === 'color' || !userDialog.ref.bannerUrl"
+            class="relative aspect-17/6"
+            :style="{
+                backgroundColor: userDialog.ref.bannerColor ? `#${userDialog.ref.bannerColor}` : 'hsl(var(--muted))'
+            }">
+        </div>
+        <div v-else class="relative aspect-17/6">
+            <img
+                class="absolute inset-0 block h-full w-full cursor-pointer object-cover"
+                :src="userDialog.ref.bannerUrl"
+                @click="showFullscreenImageDialog(userDialog.ref.bannerUrl)"
+                @error="profileImageError = true"
+                loading="lazy" />
+        </div>
+
+        <!-- User info section -->
+        <div class="relative isolate px-3 pb-3 pt-15">
+            <div class="flex items-center gap-3">
         <!-- Avatar thumbnail (left) -->
         <img
             v-if="!userDialog.loading && (userDialog.ref.currentAvatarThumbnailImageUrl || userDialog.publicProfileRef?.iconUrl)"
@@ -223,6 +243,7 @@
 
         <!-- Action menu -->
         <UserActionDropdown class="flex-none" :user-dialog-command="userDialogCommand" />
+        </div>
     </div>
 </template>
 
@@ -237,6 +258,7 @@
         UserPlus,
         Users
     } from 'lucide-vue-next';
+    import { ref } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useI18n } from 'vue-i18n';
 
@@ -258,6 +280,7 @@
 
     const { t } = useI18n();
     const { userDialog, currentUser } = storeToRefs(useUserStore());
+    const profileImageError = ref(false);
     const { showFullscreenImageDialog } = useGalleryStore();
     const { userStatusClass } = useUserDisplay();
 </script>
