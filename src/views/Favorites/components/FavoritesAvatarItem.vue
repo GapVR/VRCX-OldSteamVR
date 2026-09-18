@@ -92,16 +92,31 @@
                 <ItemTitle class="truncate max-w-full">{{ favorite.name || favorite.id }}</ItemTitle>
             </ItemContent>
             <ItemActions>
-                <Button class="rounded-full h-6 w-6" size="icon-sm" variant="ghost" @click.stop="handleDeleteFavorite">
-                    <Trash2 class="h-4 w-4" />
-                </Button>
+                <TooltipWrapper side="top" content="Copy ID">
+                    <Button
+                        class="rounded-full h-6 w-6"
+                        size="icon-sm"
+                        variant="outline"
+                        @click.stop="copyToClipboard(favorite.id)">
+                        <Clipboard class="h-4 w-4" />
+                    </Button>
+                </TooltipWrapper>
+                <TooltipWrapper side="top" :content="deleteMenuLabel">
+                    <Button
+                        class="rounded-full h-6 w-6"
+                        size="icon-sm"
+                        variant="outline"
+                        @click.stop="handleDeleteFavorite">
+                        <Trash2 class="h-4 w-4" />
+                    </Button>
+                </TooltipWrapper>
             </ItemActions>
         </Item>
     </template>
 </template>
 
 <script setup>
-    import { AlertTriangle, Check, Image, Lock, Star, Trash2 } from 'lucide-vue-next';
+    import { AlertTriangle, Check, Clipboard, Image, Lock, Star, Trash2 } from 'lucide-vue-next';
     import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
     import { Button } from '@/components/ui/button';
     import { Checkbox } from '@/components/ui/checkbox';
@@ -126,6 +141,7 @@
     import { useI18n } from 'vue-i18n';
 
     import { favoriteRequest } from '../../../api';
+    import { copyToClipboard } from '../../../shared/utils/appActions';
     import { selectAvatarWithConfirmation, showAvatarDialog } from '../../../coordinators/avatarCoordinator';
     import { removeLocalAvatarFavorite } from '../../../coordinators/favoriteCoordinator';
     import { useFavoriteStore, useUserStore } from '../../../stores';

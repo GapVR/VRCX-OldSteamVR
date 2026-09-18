@@ -68,6 +68,8 @@
                             variant="dropdown"
                             :can-open-instance-in-game="canOpenInstanceInGame"
                             @view-details="handleViewDetails"
+                            @copy-id="copyWorldId(favorite.id)"
+                            @copy-url="copyWorldUrl(favorite.id)"
                             @new-instance="handleNewInstance"
                             @self-invite="handleSelfInvite">
                             <template #append>
@@ -90,6 +92,8 @@
             <WorldActionMenuItems
                 :can-open-instance-in-game="canOpenInstanceInGame"
                 @view-details="handleViewDetails"
+                @copy-id="copyWorldId(favorite.id)"
+                @copy-url="copyWorldUrl(favorite.id)"
                 @new-instance="handleNewInstance"
                 @self-invite="handleSelfInvite">
                 <template #append>
@@ -108,7 +112,7 @@
 </template>
 
 <script setup>
-    import { AlertTriangle, Image, Lock, MoreHorizontal, Star } from 'lucide-vue-next';
+    import { AlertTriangle, Clipboard, Image, Lock, MoreHorizontal, Star } from 'lucide-vue-next';
     import { Button } from '@/components/ui/button';
     import { Checkbox } from '@/components/ui/checkbox';
     import TooltipWrapper from '@/components/ui/tooltip/TooltipWrapper.vue';
@@ -131,8 +135,10 @@
     import { computed, nextTick, ref } from 'vue';
     import { useI18n } from 'vue-i18n';
     import { storeToRefs } from 'pinia';
+    import { toast } from 'vue-sonner';
 
     import { favoriteRequest } from '../../../api';
+    import { copyToClipboard } from '../../../shared/utils/appActions';
     import WorldActionMenuItems from '../../../components/WorldActionMenuItems.vue';
     import { removeLocalWorldFavorite } from '../../../coordinators/favoriteCoordinator';
     import { runNewInstanceSelfInviteFlow as newInstanceSelfInvite } from '../../../coordinators/inviteCoordinator';
@@ -205,6 +211,16 @@
 
     function handleSelfInvite() {
         newInstanceSelfInvite(props.favorite.id);
+    }
+
+    function copyWorldId(id) {
+        navigator.clipboard.writeText(id);
+        toast.success(t('message.world.id_copied'));
+    }
+
+    function copyWorldUrl(id) {
+        navigator.clipboard.writeText(`https://vrchat.com/home/world/${id}`);
+        toast.success(t('message.world.url_copied'));
     }
 
     function handleDeleteFavorite() {

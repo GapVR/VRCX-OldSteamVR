@@ -3,6 +3,14 @@
         <ExternalLink class="size-4" />
         {{ t('common.actions.view_details') }}
     </component>
+    <component :is="itemComponent" @click="$emit('copy-id')">
+        <Clipboard class="size-4" />
+        {{ t('dialog.world.info.copy_id') }}
+    </component>
+    <component :is="itemComponent" v-if="showCopyUrl" @click="$emit('copy-url')">
+        <Link class="size-4" />
+        {{ t('dialog.world.info.copy_url') }}
+    </component>
     <component :is="itemComponent" v-if="showShare" @click="$emit('share')">
         <Share2 class="size-4" />
         {{ t('dialog.world.actions.share') }}
@@ -27,7 +35,7 @@
 <script setup>
     import { computed } from 'vue';
     import { useI18n } from 'vue-i18n';
-    import { ExternalLink, Flag, LineChart, MessageSquare, Share2 } from 'lucide-vue-next';
+    import { Clipboard, ExternalLink, Flag, LineChart, Link, MessageSquare, Share2 } from 'lucide-vue-next';
 
     import { ContextMenuItem, ContextMenuSeparator } from './ui/context-menu';
     import { DropdownMenuItem, DropdownMenuSeparator } from './ui/dropdown-menu';
@@ -62,10 +70,14 @@
         showPreviousInstances: {
             type: Boolean,
             default: false
+        },
+        showCopyUrl: {
+            type: Boolean,
+            default: true
         }
     });
 
-    defineEmits(['view-details', 'share', 'new-instance', 'self-invite', 'show-previous-instances']);
+    defineEmits(['view-details', 'copy-id', 'copy-url', 'share', 'new-instance', 'self-invite', 'show-previous-instances']);
 
     const selfInviteLabel = computed(() =>
         props.canOpenInstanceInGame

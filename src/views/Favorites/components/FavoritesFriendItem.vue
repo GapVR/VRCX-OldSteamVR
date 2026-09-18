@@ -122,20 +122,31 @@
                 <ItemDescription class="truncate line-clamp-1">{{ favorite.id }}</ItemDescription>
             </ItemContent>
             <ItemActions>
-                <Button
-                    class="rounded-full h-6 w-6"
-                    size="icon-sm"
-                    variant="outline"
-                    @click.stop="handleDeleteFavorite">
-                    <Trash2 class="h-4 w-4" />
-                </Button>
+                <TooltipWrapper side="top" content="Copy ID">
+                    <Button
+                        class="rounded-full h-6 w-6"
+                        size="icon-sm"
+                        variant="outline"
+                        @click.stop="copyToClipboard(favorite.id)">
+                        <Clipboard class="h-4 w-4" />
+                    </Button>
+                </TooltipWrapper>
+                <TooltipWrapper side="top" :content="deleteMenuLabel">
+                    <Button
+                        class="rounded-full h-6 w-6"
+                        size="icon-sm"
+                        variant="outline"
+                        @click.stop="handleDeleteFavorite">
+                        <Trash2 class="h-4 w-4" />
+                    </Button>
+                </TooltipWrapper>
             </ItemActions>
         </Item>
     </template>
 </template>
 
 <script setup>
-    import { MoreHorizontal, Star, Trash2, User } from 'lucide-vue-next';
+    import { Clipboard, MoreHorizontal, Star, Trash2, User } from 'lucide-vue-next';
     import { Button } from '@/components/ui/button';
     import { Checkbox } from '@/components/ui/checkbox';
     import { ContextMenuItem, ContextMenuSeparator } from '@/components/ui/context-menu';
@@ -151,6 +162,7 @@
     import { computed } from 'vue';
     import { storeToRefs } from 'pinia';
     import { toast } from 'vue-sonner';
+    import { copyToClipboard } from '../../../shared/utils/appActions';
     import { useI18n } from 'vue-i18n';
 
     import { favoriteRequest, instanceRequest, notificationRequest, queryRequest } from '../../../api';
