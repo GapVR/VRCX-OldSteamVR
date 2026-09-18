@@ -245,6 +245,7 @@
         <UserActionDropdown class="flex-none" :user-dialog-command="userDialogCommand" />
         </div>
     </div>
+    </div>
 </template>
 
 <script setup>
