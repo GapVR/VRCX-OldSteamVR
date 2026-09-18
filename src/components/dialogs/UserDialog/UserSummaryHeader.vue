@@ -2,11 +2,11 @@
     <div class="flex items-center gap-3 px-2 py-1">
         <!-- Avatar thumbnail (left) -->
         <img
-            v-if="!userDialog.loading && (userDialog.ref.currentAvatarThumbnailImageUrl || userDialog.publicProfileRef?.iconUrl)"
+            v-if="!userDialog.loading && userDialog.ref.currentAvatarThumbnailImageUrl"
             class="cursor-pointer flex-none object-cover"
-            :src="getAvatarFallbackUrl()"
+            :src="userDialog.ref.currentAvatarThumbnailImageUrl"
             style="height: 120px; width: 160px; border-radius: 12px"
-            @click="showFullscreenImageDialog(getAvatarFullUrl())"
+            @click="showFullscreenImageDialog(userDialog.ref.currentAvatarImageUrl)"
             loading="lazy" />
 
         <!-- User info (center) -->
@@ -258,15 +258,6 @@
 
     const { t } = useI18n();
     const { userDialog, currentUser } = storeToRefs(useUserStore());
-
-    function getAvatarFallbackUrl() {
-        return userDialog.ref.currentAvatarThumbnailImageUrl || userDialog.ref.bannerUrl || userDialog.publicProfileRef?.iconUrl;
-    }
-
-    function getAvatarFullUrl() {
-        return userDialog.ref.currentAvatarImageUrl || getAvatarFallbackUrl();
-    }
-
     const { showFullscreenImageDialog } = useGalleryStore();
     const { userStatusClass } = useUserDisplay();
 </script>
