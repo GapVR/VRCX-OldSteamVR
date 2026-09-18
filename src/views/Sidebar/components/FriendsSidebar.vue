@@ -139,7 +139,7 @@
 
                             <template v-else-if="item.row.type === 'instance-header'">
                                 <div class="mb-1 flex items-center">
-                                    <Location class="inline text-xs" :location="item.row.location" />
+                                    <Location class="inline text-xs" :location="item.row.location" exclude-group-name />
                                     <span class="text-xs ml-1.5">{{ `(${item.row.count})` }}</span>
                                     <template v-if="item.row.nonPrivateCount > 0">
                                         <span class="text-xs ml-1 text-muted-foreground">(visible {{ item.row.nonPrivateCount }})</span>
