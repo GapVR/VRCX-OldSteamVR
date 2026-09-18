@@ -2,9 +2,9 @@
     <div class="flex items-center gap-3 px-2 py-1">
         <!-- Avatar thumbnail (left) -->
         <img
-            v-if="!userDialog.loading && userDialog.ref.currentAvatarThumbnailImageUrl || (!userDialog.ref.currentAvatarThumbnailImageUrl && userDialog.publicProfileRef?.iconUrl)"
+            v-if="!userDialog.loading && (userDialog.ref.currentAvatarThumbnailImageUrl || userDialog.publicProfileRef?.iconUrl)"
             class="cursor-pointer flex-none object-cover"
-            :src="userDialog.ref.currentAvatarThumbnailImageUrl || getAvatarThumbnail(userDialog)"
+            :src="userDialog.ref.currentAvatarThumbnailImageUrl || userDialog.publicProfileRef?.iconUrl"
             style="height: 120px; width: 160px; border-radius: 12px"
             @click="showFullscreenImageDialog(userDialog.ref.currentAvatarImageUrl || userDialog.publicProfileRef?.iconUrl)"
             loading="lazy" />
@@ -259,12 +259,5 @@
     const { t } = useI18n();
     const { userDialog, currentUser } = storeToRefs(useUserStore());
     const { showFullscreenImageDialog } = useGalleryStore();
-
-    function getAvatarThumbnail(user) {
-        if (user.id === currentUser.value.id && currentUser.value.currentAvatarThumbnailImageUrl) {
-            return currentUser.value.currentAvatarThumbnailImageUrl;
-        }
-        return null;
-    }
     const { userStatusClass } = useUserDisplay();
 </script>
