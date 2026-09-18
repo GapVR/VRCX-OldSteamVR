@@ -442,52 +442,52 @@ describe('Location Utils', () => {
 
         test('returns offline label', () => {
             const L = parseLocation('offline');
-            expect(getLocationText(L, opts())).toBe('location.offline');
+            expect(getLocationText(L, opts())).toEqual(['location.offline', '']);
         });
 
         test('returns private label', () => {
             const L = parseLocation('private');
-            expect(getLocationText(L, opts())).toBe('location.private');
+            expect(getLocationText(L, opts())).toEqual(['location.private', '']);
         });
 
         test('returns traveling label', () => {
             const L = parseLocation('traveling');
-            expect(getLocationText(L, opts())).toBe('location.traveling');
+            expect(getLocationText(L, opts())).toEqual(['location.traveling', '']);
         });
 
         test('returns hint with access type when instance exists', () => {
             const L = parseLocation('wrld_12345:67890');
-            expect(getLocationText(L, opts({ hint: 'My World' }))).toBe('My World · Public');
+            expect(getLocationText(L, opts({ hint: 'My World' }))).toEqual(['My World', 'Public']);
         });
 
         test('returns hint alone when no instance', () => {
             const L = parseLocation('wrld_12345');
-            expect(getLocationText(L, opts({ hint: 'My World' }))).toBe('My World');
+            expect(getLocationText(L, opts({ hint: 'My World' }))).toEqual(['My World', '']);
         });
 
         test('returns world name with access type when cached', () => {
             const L = parseLocation('wrld_12345:67890');
-            expect(getLocationText(L, opts({ worldName: 'Cool World' }))).toBe('Cool World · Public');
+            expect(getLocationText(L, opts({ worldName: 'Cool World' }))).toEqual(['Cool World', 'Public']);
         });
 
         test('returns world name alone when no instance', () => {
             const L = parseLocation('wrld_12345');
-            expect(getLocationText(L, opts({ worldName: 'Cool World' }))).toBe('Cool World');
+            expect(getLocationText(L, opts({ worldName: 'Cool World' }))).toEqual(['Cool World', '']);
         });
 
         test('falls back to worldId when no cached name', () => {
             const L = parseLocation('wrld_12345:67890');
-            expect(getLocationText(L, opts())).toBe('wrld_12345 · Public');
+            expect(getLocationText(L, opts())).toEqual(['wrld_12345', 'Public']);
         });
 
         test('returns empty string for empty location', () => {
             const L = parseLocation('');
-            expect(getLocationText(L, opts())).toBe('');
+            expect(getLocationText(L, opts())).toEqual(['', '']);
         });
 
         test('hint takes priority over worldName', () => {
             const L = parseLocation('wrld_12345:67890');
-            expect(getLocationText(L, opts({ hint: 'Hint Text', worldName: 'World Name' }))).toBe('Hint Text · Public');
+            expect(getLocationText(L, opts({ hint: 'Hint Text', worldName: 'World Name' }))).toEqual(['Hint Text', 'Public']);
         });
     });
 });

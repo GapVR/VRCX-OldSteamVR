@@ -2,8 +2,8 @@
     <component :is="enableContextMenu ? ContextMenu : Passthrough">
         <component :is="enableContextMenu ? ContextMenuTrigger : Passthrough" as-child>
             <div class="cursor-pointer" v-bind="$attrs">
-                <div v-if="!text" class="text-transparent">-</div>
-                <div v-show="text" class="flex items-center gap-2">
+                <div v-if="!locationParts[0]" class="text-transparent">-</div>
+                <div v-show="locationParts[0] || locationParts[1]" class="flex items-center gap-2">
                     <template v-if="isAgeRestricted">
                         <TooltipWrapper
                             :content="t('dialog.user.info.instance_age_restricted_tooltip')"
@@ -28,8 +28,9 @@
                                 @click="handleShowWorldDialog">
                                 <Spinner v-if="isTraveling" class="mr-1 shrink-0" />
                                 <span class="min-w-0 flex-1 truncate">
-                                    <span>{{ text }}</span>
-                                    <span v-if="showInstanceIdInLocation && instanceName" class="ml-1">{{
+                                    <span>{{ locationParts[0] }}</span>
+                                    <span v-if="locationParts[1]" class="ml-1 text-muted-foreground">{{ locationParts[1] }}</span>
+                                    <span v-if="showInstanceIdInLocation && instanceName" class="ml-1 text-muted-foreground">{{
                                         `#${instanceName}`
                                     }}</span>
                                     <span v-if="groupName" class="cursor-pointer" @click.stop="handleShowGroupDialog">
@@ -148,7 +149,7 @@
         }
     });
 
-    const text = ref('');
+    const locationParts = ref(['', '']);
     const region = ref('');
     const strict = ref(false);
     const ageGate = ref(false);
@@ -202,7 +203,7 @@
     }
 
     function resetState() {
-        text.value = '';
+        locationParts.value = ['', ''];
         region.value = '';
         strict.value = false;
         ageGate.value = false;
@@ -302,7 +303,7 @@
         const cachedRef = L.worldId ? cachedWorlds.get(L.worldId) : undefined;
         const worldName = typeof cachedRef !== 'undefined' ? cachedRef.name : undefined;
 
-        text.value = getLocationText(L, {
+        locationParts.value = getLocationText(L, {
             hint: props.hint,
             worldName,
             accessTypeLabel,
@@ -312,7 +313,7 @@
         if (L.worldId && typeof cachedRef === 'undefined') {
             getWorldName(L.worldId).then((name) => {
                 if (!isDisposed && name && currentInstanceId() === L.tag) {
-                    text.value = getLocationText(L, {
+                    locationParts.value = getLocationText(L, {
                         hint: props.hint,
                         worldName: name,
                         accessTypeLabel: getAccessTypeLabel(L.accessTypeName),

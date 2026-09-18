@@ -45,26 +45,26 @@ export { getFriendsLocations };
  * @param {string | undefined} [options.worldName] - Cached world name, if available
  * @param {string} options.accessTypeLabel - Translated access type label
  * @param {Function} options.t - I18n translate function
- * @returns {string} Display text for the location
+ * @returns {[string, string]} [worldName, accessType]
  */
 function getLocationText(L, { hint, worldName, accessTypeLabel, t }) {
     if (L.isOffline) {
-        return t('location.offline');
+        return [t('location.offline'), ''];
     }
     if (L.isPrivate) {
-        return t('location.private');
+        return [t('location.private'), ''];
     }
     if (L.isTraveling) {
-        return t('location.traveling');
+        return [t('location.traveling'), ''];
     }
     if (typeof hint === 'string' && hint !== '') {
-        return L.instanceId ? `${hint} ${accessTypeLabel}` : hint;
+        return [hint, L.instanceId ? accessTypeLabel : ''];
     }
     if (L.worldId) {
         const name = worldName || L.worldId;
-        return L.instanceId ? `${name} ${accessTypeLabel}` : name;
+        return [name, L.instanceId ? accessTypeLabel : ''];
     }
-    return '';
+    return ['', ''];
 }
 
 export { getLocationText };

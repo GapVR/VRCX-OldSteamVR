@@ -2,7 +2,7 @@
     <div
         :class="
             cn(
-                'flex min-w-0 items-center gap-2 overflow-hidden text-muted-foreground rounded-full border border-muted-foreground/10 py-0.5 px-2',
+                'flex min-w-0 items-center gap-2 overflow-hidden text-muted-foreground',
                 props.class
             )
         ">
@@ -10,9 +10,9 @@
         <span
             @click="showLaunchDialog"
             class="min-w-0 flex-1 cursor-pointer truncate text-muted-foreground"
-            :title="`${accessTypeName} ⋅ #${instanceName}`">
+            :title="`${accessTypeName} #${instanceName}`">
             <Unlock v-if="isUnlocked" :class="['inline-block', 'mr-1.25']" />
-            <span>{{ accessTypeName }} ⋅ #{{ instanceName }}</span>
+            <span>{{ accessTypeName }} #{{ instanceName }}</span>
         </span>
         <span
             v-if="groupName"
