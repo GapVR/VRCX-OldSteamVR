@@ -51,7 +51,7 @@ export const useAppearanceSettingsStore = defineStore(
         const { locale } = useI18n();
 
         const MAX_TABLE_PAGE_SIZE = 1000;
-        const DEFAULT_TABLE_PAGE_SIZES = [10, 15, 20, 25, 50, 100];
+        const DEFAULT_TABLE_PAGE_SIZES = [10, 100];
 
         const appLanguage = ref('en');
         const themeMode = ref('');

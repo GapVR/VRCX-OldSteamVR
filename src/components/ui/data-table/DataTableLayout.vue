@@ -263,18 +263,28 @@
         </div>
 
         <div v-if="showPagination" class="dt-pagination mt-4 flex w-full items-center gap-3 mb-1">
-            <div v-if="pageSizes.length" class="dt-pagination-sizes inline-flex items-center flex-1 justify-end gap-2">
-                <span class="text-xs text-muted-foreground truncate">{{ t('table.pagination.rows_per_page') }}</span>
-                <Select v-model="pageSizeValue">
-                    <SelectTrigger size="sm">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem v-for="size in pageSizes" :key="String(size)" :value="String(size)">
-                            {{ size }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+            <div v-if="pageSizes.length" class="dt-pagination-sizes inline-flex items-center flex-1 justify-end gap-3">
+                <span class="text-xs text-muted-foreground whitespace-nowrap">{{ t('table.pagination.rows_per_page') }}</span>
+                <Popover>
+                    <PopoverTrigger as-child>
+                        <Button variant="ghost" size="sm" class="h-7 px-2 gap-1.5">
+                            <span class="text-xs font-mono tabular-nums">{{ pageSizeProxy }}</span>
+                            <ChevronDown class="size-3 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent class="w-48 p-3" align="end">
+                        <div class="flex flex-col gap-2">
+                            <Slider
+                                v-model="sliderModelValue"
+                                :min="0"
+                                :max="100"
+                                :step="1"
+                                class="w-full"
+                                @update:model-value="handlePageSizeChange(logScale($event[0], 0, 100))" />
+                            <span class="text-xs font-mono tabular-nums text-center">{{ pageSizeProxy }}</span>
+                        </div>
+                    </PopoverContent>
+                </Popover>
             </div>
             <Pagination
                 v-model:page="currentPage"
@@ -331,7 +341,10 @@
         PaginationPrevious
     } from '../pagination';
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../table';
-    import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
+    import { Slider } from '../slider';
+    import { Popover, PopoverContent, PopoverTrigger } from '../popover';
+    import { Button } from '../button';
+    import { ChevronDown } from 'lucide-vue-next';
     import {
         getColStyle,
         getToggleableColumns,
@@ -584,12 +597,31 @@
         );
     };
 
+    const PAGE_SIZE_MIN = 10;
+    const PAGE_SIZE_MAX = 100;
+
+    function logScale(value, min, max) {
+        if (max === min) return min;
+        const ratio = (value - min) / (max - min);
+        return Math.round(Math.exp(Math.log(PAGE_SIZE_MIN) + ratio * (Math.log(PAGE_SIZE_MAX) - Math.log(PAGE_SIZE_MIN))));
+    }
+
+    function logScaleInverse(pageSize, min, max) {
+        const ratio = (Math.log(pageSize) - Math.log(PAGE_SIZE_MIN)) / (Math.log(PAGE_SIZE_MAX) - Math.log(PAGE_SIZE_MIN));
+        return Math.round(min + ratio * (max - min));
+    }
+
     const handlePageSizeChange = (size) => {
         if (props.onPageSizeChange) {
             props.onPageSizeChange(size);
         }
         props.table.setPageSize(size);
     };
+
+    const sliderModelValue = computed({
+        get: () => [logScaleInverse(pageSizeProxy.value, 0, 100)],
+        set: ([val]) => handlePageSizeChange(logScale(val, 0, 100))
+    });
 
     const pageSizeProxy = computed({
         get: () => props.table.getState?.().pagination?.pageSize ?? 0,
@@ -600,7 +632,7 @@
     watch(
         [pageSizeProxy, () => props.pageSizes],
         ([current, sizes]) => {
-            if (!sizes?.length || sizes.includes(current)) {
+            if (!sizes?.length || sizes.includes(current) || sizes.length <= 2) {
                 return;
             }
             const nearest = sizes.reduce((prev, s) => (Math.abs(s - current) < Math.abs(prev - current) ? s : prev));
