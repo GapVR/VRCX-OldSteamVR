@@ -57,6 +57,50 @@
                 </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
+                <template v-if="userDialog.ref.id === currentUser.id">
+                    <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>
+                            <User class="size-4 mr-2" />
+                            <span>{{ t('dialog.user.actions.edit_status') }}</span>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent side="right" align="start">
+                            <DropdownMenuCheckboxItem
+                                v-for="option in statusOptions"
+                                :key="option.value"
+                                :model-value="currentUser.status === option.value"
+                                @click="changeStatus(option.value)">
+                                <i class="x-user-status" :class="option.statusClass" />
+                                {{ option.label }}
+                            </DropdownMenuCheckboxItem>
+                        </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                    <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>
+                            <Clock class="size-4 mr-2" />
+                            <span>{{ t('dialog.social_status.history') }}</span>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent side="right" align="start">
+                            <DropdownMenuCheckboxItem
+                                :model-value="!currentUser.statusDescription"
+                                @click="setStatusFromHistory('')">
+                                {{ t('dialog.gallery_select.none') }}
+                            </DropdownMenuCheckboxItem>
+                            <DropdownMenuSeparator v-if="recentStatuses.length" />
+                            <DropdownMenuCheckboxItem
+                                v-for="(item, idx) in recentStatuses"
+                                :key="idx"
+                                :model-value="currentUser.statusDescription === item"
+                                @click="setStatusFromHistory(item)">
+                                {{ item }}
+                            </DropdownMenuCheckboxItem>
+                        </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                    <DropdownMenuItem @click="onCommand('Edit Profile')">
+                        <Pencil class="size-4" />
+                        {{ t('dialog.user.actions.edit_profile') }}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                </template>
                 <DropdownMenuItem @click="onCommand('Refresh')">
                     <RefreshCw class="size-4" />
                     {{ t('dialog.user.actions.refresh') }}
@@ -70,10 +114,6 @@
                     {{ t('dialog.user.info.copy_id') }}
                 </DropdownMenuItem>
                 <template v-if="userDialog.ref.id === currentUser.id">
-                    <DropdownMenuItem @click="onCommand('Edit Profile')">
-                        <Pencil class="size-4" />
-                        {{ t('dialog.user.actions.edit_profile') }}
-                    </DropdownMenuItem>
                     <DropdownMenuItem @click="onCommand('Show Fallback Avatar Details')">
                         <User class="size-4" />
                         {{ t('dialog.user.actions.show_fallback_avatar') }}
@@ -304,12 +344,15 @@
         DropdownMenuSubContent,
         DropdownMenuSubTrigger,
         DropdownMenuShortcut,
+        DropdownMenuCheckboxItem,
         DropdownMenuTrigger
     } from '../../ui/dropdown-menu';
     import { useGameStore, useLocationStore, useUserStore } from '../../../stores';
     import { useInviteChecks } from '../../../composables/useInviteChecks';
     import { isActionRecent } from '../../../composables/useRecentActions';
     import { invertHexColor } from '@/shared/utils';
+    import { userRequest } from '../../../api';
+    import { toast } from 'vue-sonner';
 
     const props = defineProps({
         userDialogCommand: {
@@ -324,6 +367,47 @@
     const { isGameRunning } = storeToRefs(useGameStore());
     const { lastLocation } = storeToRefs(useLocationStore());
     const { checkCanInvite } = useInviteChecks();
+
+    const statusOptions = computed(() => [
+        {
+            value: 'join me',
+            statusClass: 'joinme',
+            label: t('dialog.user.status.join_me')
+        },
+        {
+            value: 'active',
+            statusClass: 'online',
+            label: t('dialog.user.status.online')
+        },
+        {
+            value: 'ask me',
+            statusClass: 'askme',
+            label: t('dialog.user.status.ask_me')
+        },
+        {
+            value: 'busy',
+            statusClass: 'busy',
+            label: t('dialog.user.status.busy')
+        }
+    ]);
+
+    const recentStatuses = computed(() => {
+        const history = currentUser.value?.statusHistory;
+        if (!history || !history.length) return [];
+        return history.slice(0, 10);
+    });
+
+    function changeStatus(value) {
+        userRequest.saveCurrentUser({ status: value }).then(() => {
+            toast.success('Status updated');
+        });
+    }
+
+    function setStatusFromHistory(status) {
+        userRequest.saveCurrentUser({ statusDescription: status }).then(() => {
+            toast.success('Status updated');
+        });
+    }
 
     const hasRequest = computed(() => userDialog.value.incomingRequest || userDialog.value.outgoingRequest);
     const hasRisk = computed(
