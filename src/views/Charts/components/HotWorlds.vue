@@ -216,6 +216,7 @@
 
     import { showUserDialog } from '@/coordinators/userCoordinator';
     import { showWorldDialog } from '@/coordinators/worldCoordinator';
+    import { watchState } from '@/services/watchState';
     import { database } from '@/services/database';
     import { useAppearanceSettingsStore } from '@/stores';
 
@@ -282,6 +283,10 @@
     }
 
     async function loadData() {
+        if (!watchState.isLoggedIn) {
+            isLoading.value = false;
+            return;
+        }
         isLoading.value = true;
         try {
             hotWorlds.value = await database.getHotWorlds(selectedDays.value);
@@ -294,6 +299,9 @@
     }
 
     async function openDetail(world) {
+        if (!watchState.isLoggedIn) {
+            return;
+        }
         selectedWorld.value = world;
         isSheetOpen.value = true;
         isLoadingDetail.value = true;
