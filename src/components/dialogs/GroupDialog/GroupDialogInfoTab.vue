@@ -7,43 +7,19 @@
             </div>
         </div>
         <div v-for="room in groupDialog.instances" :key="room.tag" class="flex flex-col gap-2 mb-4">
-            <div style="margin: 1px 0">
-                <div class="flex flex-wrap items-center gap-1 whitespace-nowrap overflow-hidden text-ellipsis">
-                    <Location
-                        class="text-sm"
-                        :location="room.tag"
-                        exclude-group-name />
-                    <template v-if="room.ref && room.ref.userCount !== undefined">
-                        <span class="text-sm flex items-center gap-1 font-semibold" :class="!room.ref.hasCapacityForYou ? 'text-red-500' : 'text-foreground'">
-                            <UsersRound class="size-3.5" /><span>{{ room.ref.userCount }}/{{ room.ref.capacity }}</span>
-                        </span>
-                    </template>
-                    <template v-if="room.friendCount">
-                        <span class="text-sm flex items-center gap-1 font-semibold text-foreground"><UserPlus2 class="size-3.5" /><span>{{ room.friendCount }}</span></span>
-                    </template>
-                    <TooltipWrapper v-if="checkCanInviteSelf(room.tag)" :content="t('dialog.user.info.launch_invite_tooltip')" side="top">
-                        <Button size="icon-sm" variant="outline" class="rounded-full h-5 w-5 text-muted-foreground hover:text-foreground" @click="launchStore.showLaunchDialog(room.tag)">
-                            <LogIn class="size-3" />
-                        </Button>
-                    </TooltipWrapper>
-                    <template v-if="checkCanInviteSelf(room.tag)">
-                        <TooltipWrapper v-if="!canOpenInstanceInGame" :content="t('dialog.user.info.self_invite_tooltip')" side="top">
-                            <Button size="icon-sm" variant="outline" class="rounded-full h-5 w-5 text-muted-foreground hover:text-foreground" @click="selfInvite(room.tag, room.$location?.shortName)">
-                                <Mail class="size-3" />
-                            </Button>
-                        </TooltipWrapper>
-                        <TooltipWrapper v-else :content="t('dialog.user.info.open_in_vrchat_tooltip')" side="top">
-                            <Button size="icon-sm" variant="outline" class="rounded-full h-5 w-5 text-muted-foreground hover:text-foreground" @click="launchStore.tryOpenInstanceInVrc(room.tag, room.$location?.shortName)">
-                                <Mail class="size-3" />
-                            </Button>
-                        </TooltipWrapper>
-                    </template>
-                    <TooltipWrapper :content="t('dialog.world.instances.refresh_instance_info')" side="top">
-                        <Button size="icon-sm" variant="outline" class="rounded-full h-5 w-5 text-muted-foreground hover:text-foreground" @click="refreshInstancePlayerCount(room.tag)">
-                            <RefreshCw class="size-3" />
-                        </Button>
-                    </TooltipWrapper>
-                </div>
+            <div class="flex flex-wrap gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
+                <Location
+                    :location="room.tag"
+                    exclude-group-name
+                    class="text-sm text-muted-foreground rounded-full border py-0.5 px-2" />
+                <InstanceActionBar
+                    class="text-sm"
+                    :location="room.tag"
+                    :currentlocation="lastLocation.location"
+                    :instance="room.ref"
+                    :friendcount="room.friendCount"
+                    refresh-tooltip="Refresh player count"
+                    :on-refresh="() => refreshInstancePlayerCount(room.tag)" />
             </div>
             <div v-if="room.users.length" class="flex flex-wrap items-start" style="margin: 2px 0; max-height: unset">
                 <div
@@ -241,7 +217,7 @@
 </template>
 
 <script setup>
-    import { Eye, History, Image, LogIn, Mail, Pencil, RefreshCw, Trash2, User, UsersRound, UserPlus2 } from 'lucide-vue-next';
+    import { Eye, History, Image, Pencil, Trash2, User } from 'lucide-vue-next';
     import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
     import IconFrame from '@/components/IconFrame.vue';
     import { Button } from '@/components/ui/button';
@@ -253,12 +229,14 @@
     import { formatDateFilter, hasGroupPermission } from '../../../shared/utils';
     import { useUserDisplay } from '../../../composables/useUserDisplay';
     import { refreshInstancePlayerCount } from '../../../coordinators/instanceCoordinator';
-    import { useGalleryStore, useGroupStore, useInviteStore, useLaunchStore, useLocationStore } from '../../../stores';
+    import { useGalleryStore, useGroupStore, useLocationStore } from '../../../stores';
     import { useGroupCalendarEvents } from './useGroupCalendarEvents';
 
+    import Location from '@/components/Location.vue';
+    import InstanceActionBar from '@/components/InstanceActionBar.vue';
     import GroupCalendarEventCard from '../../../views/Tools/components/GroupCalendarEventCard.vue';
     import { showUserDialog } from '../../../coordinators/userCoordinator';
-    import { useInviteChecks } from '../../../composables/useInviteChecks';
+
 
     defineProps({
         showGroupPostEditDialog: {
@@ -277,20 +255,6 @@
     const { groupDialog } = storeToRefs(useGroupStore());
     const { lastLocation } = storeToRefs(useLocationStore());
     const { showFullscreenImageDialog } = useGalleryStore();
-    const launchStore = useLaunchStore();
-    const inviteStore = useInviteStore();
-    const { canOpenInstanceInGame } = storeToRefs(inviteStore);
-    const { checkCanInviteSelf } = useInviteChecks();
-
-    function selfInvite(tag, shortName) {
-        const parts = tag.split('/');
-        const worldId = parts[0];
-        const instanceId = parts[1]?.split('?')[0];
-        if (!worldId || !instanceId) return;
-        import('../../../api').then(({ instanceRequest }) => {
-            instanceRequest.selfInvite({ instanceId, worldId, shortName });
-        });
-    }
 
     const { pastCalenderEvents, upcomingCalenderEvents, updateFollowingCalendarData } =
         useGroupCalendarEvents(groupDialog);
