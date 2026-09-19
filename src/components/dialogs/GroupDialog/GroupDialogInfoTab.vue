@@ -11,7 +11,7 @@
                 <Location
                     :location="room.tag"
                     exclude-group-name
-                    class="text-sm text-muted-foreground rounded-full border py-0.5 px-2" />
+                    class="text-sm" />
                 <InstanceActionBar
                     class="text-sm"
                     :location="room.tag"
