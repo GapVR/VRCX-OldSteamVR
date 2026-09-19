@@ -409,7 +409,7 @@
                     </div>
                     <Avatar
                         v-if="userDialog.representedGroup && userDialog.representedGroup.isRepresenting"
-                        class="cursor-pointer shrink-0 size-9 rounded-lg self-start"
+                        class="cursor-pointer shrink-0 size-9 rounded-lg mt-1"
                         @click.stop="showFullscreenImageDialog(userDialog.representedGroup.iconUrl)">
                         <AvatarImage :src="userDialog.representedGroup.$thumbnailUrl" class="object-cover" />
                         <AvatarFallback>
@@ -428,8 +428,8 @@
                         </div>
                         <span v-else class="text-xs text-muted-foreground mt-1">—</span>
                     </div>
-                    <img v-if="avatarImageUrl" class="h-12 w-16 rounded-lg object-cover cursor-pointer flex-none self-start" :src="avatarImageUrl" @click="showFullscreenImageDialog(avatarImageUrl)" loading="lazy" />
-                    <span v-else class="text-xs text-muted-foreground self-start">—</span>
+                    <img v-if="avatarImageUrl" class="h-12 w-16 rounded-lg object-cover cursor-pointer flex-none mt-1" :src="avatarImageUrl" @click="showFullscreenImageDialog(avatarImageUrl)" loading="lazy" />
+                    <span v-else class="text-xs text-muted-foreground mt-1">—</span>
                 </div>
             </div>
         </div>
