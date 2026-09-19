@@ -46,6 +46,33 @@
 
                         <div class="mx-1 h-5 w-px bg-border" />
 
+                        <span class="text-xs text-muted-foreground">Version</span>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            class="h-6 w-6"
+                            :disabled="!imageUrl || imageVersion <= 1"
+                            @click="changeVersion(-1)">
+                            <span class="text-xs">-</span>
+                        </Button>
+                        <span class="text-xs min-w-[1.5rem] text-center">{{ imageVersion }}</span>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            class="h-6 w-6"
+                            :disabled="!imageUrl"
+                            @click="changeVersion(1)">
+                            <span class="text-xs">+</span>
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            class="h-6 w-6"
+                            :disabled="!imageUrl"
+                            @click="fullSize">
+                            <span class="text-xs">Fullsize</span>
+                        </Button>
+
                         <Button
                             variant="ghost"
                             size="icon"
@@ -158,6 +185,33 @@
     const startTy = ref(0);
 
     const imageUrl = computed(() => fullscreenImageDialog.value.imageUrl || '');
+
+    const imageVersion = computed(() => {
+        const match = imageUrl.value.match(/\/image\/[^/]+\/(\d+)/);
+        return match ? parseInt(match[1], 10) : 1;
+    });
+
+    function updateImageUrl(version, resolution) {
+        const match = imageUrl.value.match(/^(https:\/\/api\.vrchat\.cloud\/api\/1\/image\/[^/]+)\/\d+\/\d+$/);
+        if (!match) return;
+        const base = match[1];
+        fullscreenImageDialog.value.imageUrl = `${base}/${version}/${resolution}`;
+        resetTransform();
+    }
+
+    function changeVersion(delta) {
+        const newVersion = imageVersion.value + delta;
+        if (newVersion < 1) return;
+        const match = imageUrl.value.match(/\/image\/[^/]+\/\d+\/(\d+)$/);
+        const resolution = match ? match[1] : '256';
+        updateImageUrl(newVersion, resolution);
+    }
+
+    function fullSize() {
+        const match = imageUrl.value.match(/\/image\/[^/]+\/\d+\/(\d+)$/);
+        const currentRes = match ? parseInt(match[1], 10) : 256;
+        updateImageUrl(imageVersion.value, Math.max(currentRes * 2, 1024));
+    }
 
     const open = computed({
         get: () => fullscreenImageDialog.value.visible,
