@@ -611,10 +611,8 @@ export function useUserDialogCommands(
             },
             'Clear Persistent Data': {
                 confirm: () => ({
-                    title: t('confirm.title'),
-                    description: t('confirm.command_question', {
-                        command: t('dialog.user.actions.clear_persistent_data')
-                    }),
+                    title: t('dialog.user.actions.clear_persistent_data'),
+                    description: t('confirm.clear_persistent_data_description'),
                     destructive: true
                 }),
                 handler: async () => {

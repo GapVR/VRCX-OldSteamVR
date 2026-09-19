@@ -2695,6 +2695,7 @@
         "restore_backup": "Continue? Restore Backup",
         "delete_vrc_registry": "Continue? Delete VRC Registry Settings",
         "clear_cache": "Continue? Clear all VRChat cache",
+        "clear_persistent_data": "Clear all persistent world data? This will reset world settings, game achievements, and other per-world progress.",
         "close_instance": "Continue? Close Instance, nobody will be able to join",
         "bulk_unfavorite": "Are you sure you want to unfavorite {count} favorites?\nThis action cannot be undone.",
         "bulk_unfavorite_title": "Delete {count} favorites?",
