@@ -1146,7 +1146,8 @@
                     },
                     "auto_clear_persistent_data": {
                         "header": "Clear Persistent Data on Exit",
-                        "description": "Delete all persistent world data when closing VRChat."
+                        "description": "Delete all persistent world data when closing VRChat.",
+                        "confirm_description": "All persistent world data will be deleted when VRChat closes. This includes world settings, game achievements, and other per-world progress."
                     },
                     "self_invite": {
                         "header": "Self Invite Action",

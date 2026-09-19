@@ -34,7 +34,7 @@
                 <Switch
                     :model-value="autoClearPersistentData"
                     :ariaLabel="t('view.settings.advanced.advanced.auto_clear_persistent_data.header')"
-                    @update:modelValue="setAutoClearPersistentData" />
+                    @update:modelValue="(value) => setAutoClearPersistentData(value)" />
             </SettingsItem>
 
             <SettingsItem

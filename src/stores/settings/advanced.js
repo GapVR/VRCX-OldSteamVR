@@ -238,8 +238,21 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
         autoSweepVRChatCache.value = !autoSweepVRChatCache.value;
         configRepository.setBool('VRCX_autoSweepVRChatCache', autoSweepVRChatCache.value);
     }
-    function setAutoClearPersistentData() {
-        autoClearPersistentData.value = !autoClearPersistentData.value;
+    async function setAutoClearPersistentData(value) {
+        if (value && !autoClearPersistentData.value) {
+            autoClearPersistentData.value = true;
+            const { ok } = await modalStore.confirm({
+                title: t('view.settings.advanced.advanced.auto_clear_persistent_data.header'),
+                description: t('view.settings.advanced.advanced.auto_clear_persistent_data.confirm_description'),
+                destructive: true
+            });
+            if (!ok) {
+                autoClearPersistentData.value = false;
+                configRepository.setBool('VRCXOldSteamVR_autoClearPersistentData', false);
+                return;
+            }
+        }
+        autoClearPersistentData.value = value;
         configRepository.setBool('VRCXOldSteamVR_autoClearPersistentData', autoClearPersistentData.value);
     }
     function setSelfInviteOverride() {
