@@ -4,8 +4,9 @@
         <template v-if="isAgeGatedInstancesVisible || !(room.ageGate || room.location?.includes('~ageGate'))">
             <div class="flex flex-col gap-2">
                 <div class="flex flex-wrap items-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
-                    <Location
-                        :location="room.tag"
+                    <LocationWorld
+                        :locationobject="room.$location"
+                        :worlddialogshortname="room.$location?.shortName"
                         class="text-sm" />
                     <InstanceActionBar
                         class="text-sm"
@@ -101,7 +102,7 @@
     import { useI18n } from 'vue-i18n';
 
     import InstanceActionBar from '@/components/InstanceActionBar.vue';
-    import Location from '@/components/Location.vue';
+    import LocationWorld from '@/components/LocationWorld.vue';
     import { refreshInstancePlayerCount } from '../../../coordinators/instanceCoordinator';
     import { useUserDisplay } from '../../../composables/useUserDisplay';
     import { useAppearanceSettingsStore, useLocationStore, useUserStore, useWorldStore } from '../../../stores';
