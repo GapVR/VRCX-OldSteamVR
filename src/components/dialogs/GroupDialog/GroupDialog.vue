@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-1 min-h-0 min-w-0 flex flex-row">
+    <div class="flex-1 min-h-0 min-w-0 flex flex-col">
         <DialogHeader class="sr-only">
             <DialogTitle>{{ groupDialog.ref?.name || t('dialog.group.info.header') }}</DialogTitle>
             <DialogDescription>
@@ -7,562 +7,378 @@
             </DialogDescription>
         </DialogHeader>
 
-        <!-- Summary card -->
-        <div class="flex-none w-77 pr-4 overflow-y-auto">
-            <div class="rounded-xl bg-(--profile-card) overflow-hidden flex flex-col">
-                <!-- Banner with icon -->
-                <div class="relative aspect-17/6">
-                    <img
-                        v-if="!groupDialog.loading && !bannerError && groupDialog.ref.bannerUrl"
-                        class="absolute inset-0 block h-full w-full cursor-pointer object-cover"
-                        :src="groupDialog.ref.bannerUrl"
-                        @click="showFullscreenImageDialog(groupDialog.ref.bannerUrl)"
-                        @error="bannerError = true"
-                        loading="lazy" />
-                    <div
-                        class="absolute bottom-0 left-3 z-10 translate-y-1/2 overflow-hidden rounded-lg"
-                        style="
-                            width: 96px;
-                            height: 96px;
-                            filter: drop-shadow(0 0 1px rgb(0 0 0 / 0.95)) drop-shadow(0 0 4px rgb(0 0 0 / 0.75))
-                                drop-shadow(0 2px 8px rgb(0 0 0 / 0.55));
-                        ">
-                        <Image
-                            v-if="groupDialog.loading || imageError"
-                            class="w-full! h-full! object-cover text-muted-foreground bg-accent" />
-                        <img
-                            v-else
-                            class="w-full h-full object-cover cursor-pointer"
-                            :src="groupDialog.ref.iconUrl"
-                            @click.stop="showFullscreenImageDialog(groupDialog.ref.iconUrl)"
-                            @error="imageError = true"
-                            loading="lazy" />
-                    </div>
-                </div>
-
-                <!-- Card content -->
-                <div class="flex flex-col p-3 mt-10">
-                    <!-- Name and buttons -->
-                    <div class="flex w-full min-w-0 max-w-full items-start justify-between gap-2">
-                        <div class="flex min-w-0 flex-1 flex-col">
-                            <span
-                                class="font-bold cursor-pointer block min-w-0"
-                                @click="copyToClipboard(groupDialog.ref.name)">
-                                <span class="flex min-w-0 items-center gap-1">
-                                    <span v-if="groupDialog.ref.ownerId === currentUser.id" class="shrink-0">👑</span>
-                                    <span class="truncate">{{ groupDialog.ref.name }}</span>
-                                </span>
-                            </span>
-                            <span
-                                class="x-grey font-mono text-xs truncate block min-w-0 cursor-pointer"
-                                @click="showUserDialog(groupDialog.ref.ownerId)"
-                                v-text="groupDialog.ownerDisplayName"></span>
-                        </div>
-                        <div class="ml-2 flex shrink-0 items-center justify-end gap-2">
-                            <template v-if="groupDialog.inGroup && groupDialog.ref?.myMember">
-                                <TooltipWrapper
-                                    v-if="groupDialog.ref.myMember?.isRepresenting"
-                                    side="top"
-                                    :content="t('dialog.group.actions.unrepresent_tooltip')">
-                                    <Button
-                                        class="rounded-lg"
-                                        variant="secondary"
-                                        size="icon"
-                                        style="margin-left: 6px"
-                                        :ariaLabel="t('dialog.group.actions.unrepresent_tooltip')"
-                                        @click="clearGroupRepresentation(groupDialog.id)">
-                                        <BookmarkCheck />
-                                    </Button>
-                                </TooltipWrapper>
-                                <TooltipWrapper
-                                    v-else
-                                    side="top"
-                                    :content="t('dialog.group.actions.represent_tooltip')">
-                                    <span>
-                                        <Button
-                                            class="rounded-lg"
-                                            variant="outline"
-                                            size="icon"
-                                            :ariaLabel="t('dialog.group.actions.represent_tooltip')"
-                                            :disabled="groupDialog.ref.privacy === 'private'"
-                                            @click="setGroupRepresentation(groupDialog.id)">
-                                            <Bookmark />
-                                        </Button>
-                                    </span>
-                                </TooltipWrapper>
-                            </template>
-                            <template v-else-if="groupDialog.ref.myMember?.membershipStatus === 'requested'">
-                                <TooltipWrapper
-                                    side="top"
-                                    :content="t('dialog.group.actions.cancel_join_request_tooltip')">
-                                    <span>
-                                        <Button
-                                            class="rounded-lg"
-                                            variant="outline"
-                                            size="icon"
-                                            :ariaLabel="t('dialog.group.actions.cancel_join_request_tooltip')"
-                                            @click="cancelGroupRequest(groupDialog.id)">
-                                            <X />
-                                        </Button>
-                                    </span>
-                                </TooltipWrapper>
-                            </template>
-                            <template v-else-if="groupDialog.ref.myMember?.membershipStatus === 'invited'">
-                                <TooltipWrapper side="top" :content="t('dialog.group.actions.pending_request_tooltip')">
-                                    <span>
-                                        <Button
-                                            class="rounded-lg"
-                                            variant="outline"
-                                            size="icon"
-                                            :ariaLabel="t('dialog.group.actions.pending_request_tooltip')"
-                                            @click="joinGroup(groupDialog.id)">
-                                            <Check />
-                                        </Button>
-                                    </span>
-                                </TooltipWrapper>
-                            </template>
-                            <template v-else>
-                                <TooltipWrapper
-                                    v-if="groupDialog.ref.joinState === 'request'"
-                                    side="top"
-                                    :content="t('dialog.group.actions.request_join_tooltip')">
-                                    <Button
-                                        class="rounded-lg"
-                                        variant="outline"
-                                        size="icon"
-                                        :ariaLabel="t('dialog.group.actions.request_join_tooltip')"
-                                        @click="joinGroup(groupDialog.id)">
-                                        <MessageSquare />
-                                    </Button>
-                                </TooltipWrapper>
-                                <TooltipWrapper
-                                    v-if="groupDialog.ref.joinState === 'invite'"
-                                    side="top"
-                                    :content="t('dialog.group.actions.invite_required_tooltip')">
-                                    <span>
-                                        <Button
-                                            class="rounded-lg"
-                                            variant="outline"
-                                            size="icon"
-                                            :ariaLabel="t('dialog.group.actions.invite_required_tooltip')"
-                                            disabled>
-                                            <MessageSquare />
-                                        </Button>
-                                    </span>
-                                </TooltipWrapper>
-                                <TooltipWrapper
-                                    v-if="groupDialog.ref.joinState === 'open'"
-                                    side="top"
-                                    :content="t('dialog.group.actions.join_group_tooltip')">
-                                    <Button
-                                        class="rounded-lg"
-                                        variant="outline"
-                                        size="icon"
-                                        :ariaLabel="t('dialog.group.actions.join_group_tooltip')"
-                                        @click="joinGroup(groupDialog.id)">
-                                        <Check />
-                                    </Button>
-                                </TooltipWrapper>
-                            </template>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger as-child>
-                                    <Button
-                                        class="rounded-lg"
-                                        :variant="
-                                            groupDialog.ref.membershipStatus === 'userblocked'
-                                                ? 'destructive'
-                                                : 'outline'
-                                        "
-                                        size="icon"
-                                        :ariaLabel="t('nav_tooltip.manage')">
-                                        <MoreHorizontal />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                    <DropdownMenuItem @click="groupDialogCommand('Refresh')">
-                                        <RefreshCw class="size-4" />
-                                        {{ t('dialog.group.actions.refresh') }}
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSub>
-                                        <DropdownMenuSubTrigger @click="groupDialogCommand('Share')">
-                                            <Share2 class="size-4 mr-2" />
-                                            <span>{{ t('dialog.group.actions.share') }}</span>
-                                        </DropdownMenuSubTrigger>
-                                        <DropdownMenuSubContent side="right" class="w-56">
-                                            <DropdownMenuItem @click="groupDialogCommand('Share')">
-                                                <Copy class="size-4" />
-                                                {{ t('dialog.user.info.copy_url') }}
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem @click="groupDialogCommand('Copy Group Name')">
-                                                <Copy class="size-4" />
-                                                {{ t('dialog.world.info.copy_name') }}
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem @click="groupDialogCommand('Copy Group ID')">
-                                                <Copy class="size-4" />
-                                                {{ t('dialog.user.info.copy_id') }}
-                                            </DropdownMenuItem>
-                                        </DropdownMenuSubContent>
-                                    </DropdownMenuSub>
-
-                                    <template v-if="hasGroupModerationPermission(groupDialog.ref)">
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem
-                                            v-if="hasGroupPermission(groupDialog.ref, 'group-data-manage')"
-                                            @click="showEditGroupDialog(groupDialog.ref)">
-                                            <Pencil class="size-4" />
-                                            {{ t('dialog.group_edit.edit_header') }}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            :disabled="!hasGroupModerationPermission(groupDialog.ref)"
-                                            @click="groupDialogCommand('Moderation Tools')">
-                                            <Settings class="size-4" />
-                                            {{ t('dialog.group.actions.moderation_tools') }}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            v-if="hasGroupPermission(groupDialog.ref, 'group-invites-manage')"
-                                            @click="groupDialogCommand('Invite To Group')">
-                                            <MessageSquare class="size-4" />
-                                            {{ t('dialog.group.actions.invite_to_group') }}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            v-if="hasGroupPermission(groupDialog.ref, 'group-announcement-manage')"
-                                            @click="groupDialogCommand('Create Post')">
-                                            <Ticket class="size-4" />
-                                            {{ t('dialog.group.actions.create_post') }}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            v-if="hasGroupPermission(groupDialog.ref, 'group-calendar-manage')"
-                                            @click="showCreateGroupEventDialog(groupDialog.ref)">
-                                            <CalendarPlus class="size-4" />
-                                            {{ t('dialog.group.actions.create_event') }}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            v-if="groupDialog.ref.ownerId === currentUser.id"
-                                            @click="groupDialogCommand('Transfer Group')">
-                                            <ArrowRightLeft class="size-4" />
-                                            {{ t('dialog.group.actions.transfer') }}
-                                        </DropdownMenuItem>
-                                    </template>
-
-                                    <template v-if="groupDialog.inGroup">
-                                        <template v-if="groupDialog.ref.myMember">
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem
-                                                v-if="groupDialog.ref.myMember.isSubscribedToAnnouncements"
-                                                @click="groupDialogCommand('Unsubscribe To Announcements')">
-                                                <BellOff class="size-4" />
-                                                {{ t('dialog.group.actions.unsubscribe') }}
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                v-else
-                                                @click="groupDialogCommand('Subscribe To Announcements')">
-                                                <Bell class="size-4" />
-                                                {{ t('dialog.group.actions.subscribe') }}
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                v-if="
-                                                    groupDialog.ref.myMember.isSubscribedToEventAnnouncements ||
-                                                    typeof groupDialog.ref.myMember.isSubscribedToEventAnnouncements ===
-                                                        'undefined'
-                                                "
-                                                @click="groupDialogCommand('Unsubscribe To Event Announcements')">
-                                                <MessageCircleOff class="size-4" />
-                                                {{ t('dialog.group.actions.unsubscribe_event') }}
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                v-else
-                                                @click="groupDialogCommand('Subscribe To Event Announcements')">
-                                                <MessageCircle class="size-4" />
-                                                {{ t('dialog.group.actions.subscribe_event') }}
-                                            </DropdownMenuItem>
-                                            <template
-                                                v-if="
-                                                    groupDialog.ref.myMember && groupDialog.ref.privacy === 'default'
-                                                ">
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem @click="groupDialogCommand('Visibility Everyone')">
-                                                    <Eye class="size-4" />
-                                                    <Check
-                                                        v-if="groupDialog.ref.myMember.visibility === 'visible'"
-                                                        class="size-4" />
-                                                    {{ t('dialog.group.actions.visibility_everyone') }}
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem @click="groupDialogCommand('Visibility Friends')">
-                                                    <Eye class="size-4" />
-                                                    <Check
-                                                        v-if="groupDialog.ref.myMember.visibility === 'friends'"
-                                                        class="size-4" />
-                                                    {{ t('dialog.group.actions.visibility_friends') }}
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem @click="groupDialogCommand('Visibility Hidden')">
-                                                    <Eye class="size-4" />
-                                                    <Check
-                                                        v-if="groupDialog.ref.myMember.visibility === 'hidden'"
-                                                        class="size-4" />
-                                                    {{ t('dialog.group.actions.visibility_hidden') }}
-                                                </DropdownMenuItem>
-                                            </template>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem @click="groupDialogCommand('Previous Instances')">
-                                                <LineChart class="size-4" />
-                                                {{ t('dialog.world.actions.show_previous_instances') }}
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                variant="destructive"
-                                                @click="groupDialogCommand('Leave Group')">
-                                                <Trash2 class="size-4" />
-                                                {{
-                                                    isSoleGroupOwner(groupDialog.ref, currentUser.id)
-                                                        ? t('dialog.group.actions.delete')
-                                                        : t('dialog.group.actions.leave')
-                                                }}
-                                            </DropdownMenuItem>
-                                        </template>
-                                    </template>
-                                    <template v-else>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem @click="groupDialogCommand('Previous Instances')">
-                                            <LineChart class="size-4" />
-                                            {{ t('dialog.world.actions.show_previous_instances') }}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem
-                                            v-if="groupDialog.ref.membershipStatus === 'userblocked'"
-                                            variant="destructive"
-                                            @click="groupDialogCommand('Unblock Group')">
-                                            <CheckCircle class="size-4" />
-                                            {{ t('dialog.group.actions.unblock') }}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem v-else @click="groupDialogCommand('Block Group')">
-                                            <XCircle class="size-4" />
-                                            {{ t('dialog.group.actions.block') }}
-                                        </DropdownMenuItem>
-                                    </template>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col gap-1 mt-2">
-                        <!-- Languages -->
-                        <div
-                            v-if="groupDialog.ref.$languages && groupDialog.ref.$languages.length"
-                            class="flex flex-wrap gap-1">
-                            <Badge
-                                v-for="item in groupDialog.ref.$languages"
-                                :key="item.key"
-                                variant="outline"
-                                class="h-5 px-1.5 inline-flex items-center gap-1 text-[11px] leading-none">
-                                <span
-                                    class="flags inline-block shrink-0 self-center"
-                                    :class="languageClass(item.key)"></span>
-                                <span class="inline-flex items-center leading-none"
-                                    >{{ item.value }} ({{ item.key }})</span
-                                >
-                            </Badge>
-                        </div>
-
-                        <!-- Tags -->
-                        <div class="flex flex-wrap gap-1">
-                            <Badge v-if="groupDialog.ref.isVerified" variant="outline">
-                                {{ t('dialog.group.tags.verified') }}
-                            </Badge>
-                            <Badge v-if="groupDialog.ref.privacy === 'private'" variant="outline">
-                                {{ t('dialog.group.tags.private') }}
-                            </Badge>
-                            <Badge v-if="groupDialog.ref.privacy === 'default'" variant="outline">
-                                {{ t('dialog.group.tags.public') }}
-                            </Badge>
-                            <Badge v-if="groupDialog.ref.joinState === 'open'" variant="outline">
-                                {{ t('dialog.group.tags.open') }}
-                            </Badge>
-                            <Badge v-else-if="groupDialog.ref.joinState === 'request'" variant="outline">
-                                {{ t('dialog.group.tags.request') }}
-                            </Badge>
-                            <Badge v-else-if="groupDialog.ref.joinState === 'invite'" variant="outline">
-                                {{ t('dialog.group.tags.invite') }}
-                            </Badge>
-                            <Badge v-else-if="groupDialog.ref.joinState === 'closed'" variant="outline">
-                                {{ t('dialog.group.tags.closed') }}
-                            </Badge>
-                            <Badge v-if="groupDialog.inGroup" variant="outline">
-                                {{ t('dialog.group.tags.joined') }}
-                            </Badge>
-                            <Badge v-if="groupDialog.ref.myMember?.bannedAt" variant="outline">
-                                {{ t('dialog.group.tags.banned') }}
-                            </Badge>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stats card -->
-            <div class="rounded-xl bg-(--profile-card) p-3 mt-2.5">
+        <!-- Header row: Banner/icon | Details | Buttons -->
+        <div class="flex items-start gap-3 px-1">
+            <!-- Banner -->
+            <div class="relative flex-none">
+                <img
+                    v-if="!groupDialog.loading && !bannerError && groupDialog.ref.bannerUrl"
+                    class="w-[160px] h-[120px] rounded-lg cursor-pointer object-cover"
+                    :src="groupDialog.ref.bannerUrl"
+                    @click="showFullscreenImageDialog(groupDialog.ref.bannerUrl)"
+                    @error="bannerError = true"
+                    loading="lazy" />
                 <div
-                    class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-2 pb-2 border-b border-border">
-                    {{ t('dialog.group.info.header') }}
-                </div>
-                <div class="flex flex-col gap-1.5">
-                    <div class="flex justify-between items-start gap-2 text-xs">
-                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.short_code') }}</span>
-                        <span class="text-right text-muted-foreground">
-                            {{ groupDialog.ref.shortCode }}.{{ groupDialog.ref.discriminator }}
-                        </span>
-                    </div>
-                    <div class="flex justify-between items-start gap-2 text-xs">
-                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.members') }}</span>
-                        <span class="text-right text-muted-foreground">
-                            {{ groupDialog.ref.memberCount }}
-                        </span>
-                    </div>
-                    <div class="flex justify-between items-start gap-2 text-xs">
-                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.online_members') }}</span>
-                        <span class="text-right text-muted-foreground">
-                            {{ groupDialog.ref.onlineMemberCount }}
-                        </span>
-                    </div>
-                    <TooltipWrapper
-                        side="right"
-                        :content="formatDateFilter(groupDialog.ref.createdAt, 'long')"
-                        :disabled="!groupDialog.ref.createdAt">
-                        <div class="flex justify-between items-start gap-2 text-xs">
-                            <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.created') }}</span>
-                            <span class="text-right text-muted-foreground">{{
-                                timeAgo(groupDialog.ref.createdAt)
-                            }}</span>
-                        </div>
-                    </TooltipWrapper>
-                    <div v-if="groupDialog.ref.links?.length" class="flex justify-between items-start gap-2 text-xs">
-                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.links') }}</span>
-                        <div class="flex gap-1">
-                            <template v-for="(link, index) in groupDialog.ref.links" :key="index">
-                                <TooltipWrapper v-if="link">
-                                    <template #content>
-                                        <span v-text="link" />
-                                    </template>
-                                    <img
-                                        :src="getFaviconUrl(link)"
-                                        style="width: 16px; height: 16px; vertical-align: middle; cursor: pointer"
-                                        @click.stop="openExternalLink(link)"
-                                        loading="lazy" />
-                                </TooltipWrapper>
-                            </template>
-                        </div>
-                    </div>
+                    v-else-if="!groupDialog.loading"
+                    class="w-[160px] h-[120px] rounded-lg flex items-center justify-center bg-muted">
+                    <Image class="size-8 text-muted-foreground" />
                 </div>
             </div>
 
-            <div class="rounded-xl bg-(--profile-card) p-3 mt-2.5">
-                <div class="flex items-center justify-between mb-2 pb-2 border-b border-muted-foreground/20">
+            <!-- Details: name, author, tags, description -->
+            <div class="flex-1 min-w-0 flex flex-col gap-1 py-0.5">
+                <span
+                    class="font-bold cursor-pointer"
+                    @click="copyToClipboard(groupDialog.ref.name)"
+                    :title="groupDialog.ref.name">
+                    <span v-if="groupDialog.ref.ownerId === currentUser.id" class="shrink-0">👑</span>
+                    {{ groupDialog.ref.name }}
+                </span>
+                <span
+                    class="cursor-pointer x-grey font-mono text-xs"
+                    @click="showUserDialog(groupDialog.ref.ownerId)"
+                    v-text="groupDialog.ownerDisplayName" />
+                <div class="flex flex-wrap items-center gap-1">
+                    <Badge v-if="groupDialog.ref.isVerified" variant="outline">{{ t('dialog.group.tags.verified') }}</Badge>
+                    <Badge v-if="groupDialog.ref.privacy === 'private'" variant="outline">{{ t('dialog.group.tags.private') }}</Badge>
+                    <Badge v-if="groupDialog.ref.privacy === 'default'" variant="outline">{{ t('dialog.group.tags.public') }}</Badge>
+                    <Badge v-if="groupDialog.ref.joinState === 'open'" variant="outline">{{ t('dialog.group.tags.open') }}</Badge>
+                    <Badge v-else-if="groupDialog.ref.joinState === 'request'" variant="outline">{{ t('dialog.group.tags.request') }}</Badge>
+                    <Badge v-else-if="groupDialog.ref.joinState === 'invite'" variant="outline">{{ t('dialog.group.tags.invite') }}</Badge>
+                    <Badge v-else-if="groupDialog.ref.joinState === 'closed'" variant="outline">{{ t('dialog.group.tags.closed') }}</Badge>
+                    <Badge v-if="groupDialog.inGroup" variant="outline">{{ t('dialog.group.tags.joined') }}</Badge>
+                    <Badge v-if="groupDialog.ref.myMember?.bannedAt" variant="outline">{{ t('dialog.group.tags.banned') }}</Badge>
+                </div>
+                <div v-if="groupDialog.ref.$languages && groupDialog.ref.$languages.length" class="flex flex-wrap gap-1">
+                    <Badge
+                        v-for="item in groupDialog.ref.$languages"
+                        :key="item.key"
+                        variant="outline"
+                        class="h-5 px-1.5 inline-flex items-center gap-1 text-[11px] leading-none">
+                        <span
+                            class="flags inline-block shrink-0 self-center"
+                            :class="languageClass(item.key)"></span>
+                        <span class="inline-flex items-center leading-none">{{ item.value }} ({{ item.key }})</span>
+                    </Badge>
+                </div>
+                <template v-if="groupDialog.ref.description">
                     <span
-                        class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                        {{ t('dialog.user.info.vrcx_info') }}
-                        <TooltipWrapper side="right" :content="t('dialog.user.info.vrcx_info_tooltip')">
-                            <Info class="h-3 w-3 shrink-0" />
-                        </TooltipWrapper>
+                        class="text-xs text-muted-foreground cursor-pointer"
+                        :class="{ 'line-clamp-2': !descExpanded }"
+                        @click="descExpanded = !descExpanded">
+                        {{ groupDialog.ref.description }}
                     </span>
-                </div>
-                <div class="flex flex-col gap-1.5">
-                    <TooltipWrapper
-                        side="right"
-                        :content="formatDateFilter(groupDialog.lastVisit, 'long')"
-                        :disabled="!groupDialog.lastVisit">
-                        <div class="flex justify-between items-start gap-2 text-xs">
-                            <span class="text-muted-foreground shrink-0">{{
-                                t('dialog.group.info.last_visited')
-                            }}</span>
-                            <span class="text-right text-muted-foreground">{{ timeAgo(groupDialog.lastVisit) }}</span>
-                        </div>
-                    </TooltipWrapper>
-                    <TooltipWrapper side="right" :content="t('dialog.user.info.open_previous_instance')">
-                        <div
-                            class="flex justify-between items-start gap-2 text-xs cursor-pointer hover:text-foreground"
-                            @click="showPreviousInstancesListDialog(groupDialog.ref)">
-                            <span class="text-muted-foreground shrink-0">{{ t('dialog.user.info.join_count') }}</span>
-                            <span class="text-right text-muted-foreground">{{ groupDialog.joinCount || '—' }}</span>
-                        </div>
-                    </TooltipWrapper>
-                </div>
+                </template>
             </div>
 
-            <div
-                v-if="groupDialog.ref.membershipStatus === 'member' && groupDialog.ref.myMember"
-                class="rounded-xl bg-(--profile-card) p-3 mt-2.5">
+            <!-- Group Icon + Action Buttons -->
+            <div class="flex-none flex items-center gap-2">
+                <!-- Group icon -->
                 <div
-                    class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-2 pb-2 border-b border-border">
-                    {{ t('dialog.group.info.member_info') }}
+                    class="overflow-hidden rounded-lg cursor-pointer shrink-0"
+                    style="
+                        width: 48px;
+                        height: 48px;
+                        filter: drop-shadow(0 0 1px rgb(0 0 0 / 0.95)) drop-shadow(0 0 4px rgb(0 0 0 / 0.75))
+                            drop-shadow(0 2px 8px rgb(0 0 0 / 0.55));
+                    "
+                    @click="showFullscreenImageDialog(groupDialog.ref.iconUrl)">
+                    <Image
+                        v-if="groupDialog.loading || imageError"
+                        class="w-full! h-full! object-cover text-muted-foreground bg-accent" />
+                    <img
+                        v-else
+                        class="w-full h-full object-cover"
+                        :src="groupDialog.ref.iconUrl"
+                        @error="imageError = true"
+                        loading="lazy" />
                 </div>
-                <div class="flex flex-col gap-1.5">
-                    <div class="flex justify-between items-start gap-2 text-xs">
-                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.visibility') }}</span>
-                        <span class="text-right text-muted-foreground">
-                            <template v-if="groupDialog.ref.myMember.visibility === 'visible'">
-                                {{ t('dialog.group.tags.everyone') }}
-                            </template>
-                            <template v-else-if="groupDialog.ref.myMember.visibility === 'friends'">
-                                {{ t('dialog.group.tags.friends') }}
-                            </template>
-                            <template v-else-if="groupDialog.ref.myMember.visibility === 'hidden'">
-                                {{ t('dialog.group.tags.hidden') }}
-                            </template>
-                        </span>
-                    </div>
+                <template v-if="groupDialog.inGroup && groupDialog.ref?.myMember">
                     <TooltipWrapper
-                        side="right"
-                        :content="formatDateFilter(groupDialog.ref.myMember.joinedAt, 'long')"
-                        @click="showPreviousInstancesListDialog(groupDialog.ref)">
-                        <div class="flex justify-between items-start gap-2 text-xs cursor-pointer">
-                            <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.joined_at') }}</span>
-                            <span class="text-right text-muted-foreground">{{
-                                timeAgo(groupDialog.ref.myMember.joinedAt)
-                            }}</span>
-                        </div>
+                        v-if="groupDialog.ref.myMember?.isRepresenting"
+                        side="top"
+                        :content="t('dialog.group.actions.unrepresent_tooltip')">
+                        <Button
+                            class="rounded-lg"
+                            variant="secondary"
+                            size="icon"
+                            style="margin-left: 6px"
+                            :ariaLabel="t('dialog.group.actions.unrepresent_tooltip')"
+                            @click="clearGroupRepresentation(groupDialog.id)">
+                            <BookmarkCheck />
+                        </Button>
                     </TooltipWrapper>
-                    <div class="flex justify-between items-start gap-2 text-xs">
-                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.roles') }}</span>
-                        <span v-if="groupDialog.memberRoles.length === 0" class="text-right text-muted-foreground"
-                            >—</span
-                        >
-                        <span v-else class="text-right text-muted-foreground">
-                            <template v-for="(role, rIndex) in groupDialog.memberRoles" :key="rIndex">
-                                <TooltipWrapper side="right">
-                                    <template #content>
-                                        <span>{{ t('dialog.group.info.role') }} {{ role.name }}</span>
-                                        <br />
-                                        <span
-                                            >{{ t('dialog.group.info.role_description') }} {{ role.description }}</span
-                                        >
-                                        <br />
-                                        <span v-if="role.updatedAt">
-                                            {{ t('dialog.group.info.role_updated_at') }}
-                                            {{ formatDateFilter(role.updatedAt, 'long') }}
-                                        </span>
-                                        <span v-else>
-                                            {{ t('dialog.group.info.role_created_at') }}
-                                            {{ formatDateFilter(role.createdAt, 'long') }}
-                                        </span>
-                                        <br />
-                                        <span>{{ t('dialog.group.info.role_permissions') }}</span>
-                                        <br />
-                                        <template v-for="(permission, pIndex) in role.permissions" :key="pIndex">
-                                            <span>{{ permission }}</span>
-                                            <br />
-                                        </template>
-                                    </template>
-                                    <span
-                                        >{{ role.name
-                                        }}{{ rIndex < groupDialog.memberRoles.length - 1 ? ', ' : '' }}</span
-                                    >
-                                </TooltipWrapper>
-                            </template>
+                    <TooltipWrapper
+                        v-else
+                        side="top"
+                        :content="t('dialog.group.actions.represent_tooltip')">
+                        <span>
+                            <Button
+                                class="rounded-lg"
+                                variant="outline"
+                                size="icon"
+                                :ariaLabel="t('dialog.group.actions.represent_tooltip')"
+                                :disabled="groupDialog.ref.privacy === 'private'"
+                                @click="setGroupRepresentation(groupDialog.id)">
+                                <Bookmark />
+                            </Button>
                         </span>
-                    </div>
-                </div>
+                    </TooltipWrapper>
+                </template>
+                <template v-else-if="groupDialog.ref.myMember?.membershipStatus === 'requested'">
+                    <TooltipWrapper
+                        side="top"
+                        :content="t('dialog.group.actions.cancel_join_request_tooltip')">
+                        <span>
+                            <Button
+                                class="rounded-lg"
+                                variant="outline"
+                                size="icon"
+                                :ariaLabel="t('dialog.group.actions.cancel_join_request_tooltip')"
+                                @click="cancelGroupRequest(groupDialog.id)">
+                                <X />
+                            </Button>
+                        </span>
+                    </TooltipWrapper>
+                </template>
+                <template v-else-if="groupDialog.ref.myMember?.membershipStatus === 'invited'">
+                    <TooltipWrapper side="top" :content="t('dialog.group.actions.pending_request_tooltip')">
+                        <span>
+                            <Button
+                                class="rounded-lg"
+                                variant="outline"
+                                size="icon"
+                                :ariaLabel="t('dialog.group.actions.pending_request_tooltip')"
+                                @click="joinGroup(groupDialog.id)">
+                                <Check />
+                            </Button>
+                        </span>
+                    </TooltipWrapper>
+                </template>
+                <template v-else>
+                    <TooltipWrapper
+                        v-if="groupDialog.ref.joinState === 'request'"
+                        side="top"
+                        :content="t('dialog.group.actions.request_join_tooltip')">
+                        <Button
+                            class="rounded-lg"
+                            variant="outline"
+                            size="icon"
+                            :ariaLabel="t('dialog.group.actions.request_join_tooltip')"
+                            @click="joinGroup(groupDialog.id)">
+                            <MessageSquare />
+                        </Button>
+                    </TooltipWrapper>
+                    <TooltipWrapper
+                        v-if="groupDialog.ref.joinState === 'invite'"
+                        side="top"
+                        :content="t('dialog.group.actions.invite_required_tooltip')">
+                        <span>
+                            <Button
+                                class="rounded-lg"
+                                variant="outline"
+                                size="icon"
+                                :ariaLabel="t('dialog.group.actions.invite_required_tooltip')"
+                                disabled>
+                                <MessageSquare />
+                            </Button>
+                        </span>
+                    </TooltipWrapper>
+                    <TooltipWrapper
+                        v-if="groupDialog.ref.joinState === 'open'"
+                        side="top"
+                        :content="t('dialog.group.actions.join_group_tooltip')">
+                        <Button
+                            class="rounded-lg"
+                            variant="outline"
+                            size="icon"
+                            :ariaLabel="t('dialog.group.actions.join_group_tooltip')"
+                            @click="joinGroup(groupDialog.id)">
+                            <Check />
+                        </Button>
+                    </TooltipWrapper>
+                </template>
+                <DropdownMenu>
+                    <DropdownMenuTrigger as-child>
+                        <Button
+                            class="rounded-lg"
+                            :variant="
+                                groupDialog.ref.membershipStatus === 'userblocked'
+                                    ? 'destructive'
+                                    : 'outline'
+                            "
+                            size="icon"
+                            :ariaLabel="t('nav_tooltip.manage')">
+                            <MoreHorizontal />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem @click="groupDialogCommand('Refresh')">
+                            <RefreshCw class="size-4" />
+                            {{ t('dialog.group.actions.refresh') }}
+                        </DropdownMenuItem>
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger @click="groupDialogCommand('Share')">
+                                <Share2 class="size-4 mr-2" />
+                                <span>{{ t('dialog.group.actions.share') }}</span>
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent side="right" class="w-56">
+                                <DropdownMenuItem @click="groupDialogCommand('Share')">
+                                    <Copy class="size-4" />
+                                    {{ t('dialog.user.info.copy_url') }}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem @click="groupDialogCommand('Copy Group Name')">
+                                    <Copy class="size-4" />
+                                    {{ t('dialog.world.info.copy_name') }}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem @click="groupDialogCommand('Copy Group ID')">
+                                    <Copy class="size-4" />
+                                    {{ t('dialog.user.info.copy_id') }}
+                                </DropdownMenuItem>
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+
+                        <template v-if="hasGroupModerationPermission(groupDialog.ref)">
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                                v-if="hasGroupPermission(groupDialog.ref, 'group-data-manage')"
+                                @click="showEditGroupDialog(groupDialog.ref)">
+                                <Pencil class="size-4" />
+                                {{ t('dialog.group_edit.edit_header') }}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                :disabled="!hasGroupModerationPermission(groupDialog.ref)"
+                                @click="groupDialogCommand('Moderation Tools')">
+                                <Settings class="size-4" />
+                                {{ t('dialog.group.actions.moderation_tools') }}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                v-if="hasGroupPermission(groupDialog.ref, 'group-invites-manage')"
+                                @click="groupDialogCommand('Invite To Group')">
+                                <MessageSquare class="size-4" />
+                                {{ t('dialog.group.actions.invite_to_group') }}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                v-if="hasGroupPermission(groupDialog.ref, 'group-announcement-manage')"
+                                @click="groupDialogCommand('Create Post')">
+                                <Ticket class="size-4" />
+                                {{ t('dialog.group.actions.create_post') }}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                v-if="hasGroupPermission(groupDialog.ref, 'group-calendar-manage')"
+                                @click="showCreateGroupEventDialog(groupDialog.ref)">
+                                <CalendarPlus class="size-4" />
+                                {{ t('dialog.group.actions.create_event') }}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                v-if="groupDialog.ref.ownerId === currentUser.id"
+                                @click="groupDialogCommand('Transfer Group')">
+                                <ArrowRightLeft class="size-4" />
+                                {{ t('dialog.group.actions.transfer') }}
+                            </DropdownMenuItem>
+                        </template>
+
+                        <template v-if="groupDialog.inGroup">
+                            <template v-if="groupDialog.ref.myMember">
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    v-if="groupDialog.ref.myMember.isSubscribedToAnnouncements"
+                                    @click="groupDialogCommand('Unsubscribe To Announcements')">
+                                    <BellOff class="size-4" />
+                                    {{ t('dialog.group.actions.unsubscribe') }}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    v-else
+                                    @click="groupDialogCommand('Subscribe To Announcements')">
+                                    <Bell class="size-4" />
+                                    {{ t('dialog.group.actions.subscribe') }}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    v-if="
+                                        groupDialog.ref.myMember.isSubscribedToEventAnnouncements ||
+                                        typeof groupDialog.ref.myMember.isSubscribedToEventAnnouncements ===
+                                            'undefined'
+                                    "
+                                    @click="groupDialogCommand('Unsubscribe To Event Announcements')">
+                                    <MessageCircleOff class="size-4" />
+                                    {{ t('dialog.group.actions.unsubscribe_event') }}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    v-else
+                                    @click="groupDialogCommand('Subscribe To Event Announcements')">
+                                    <MessageCircle class="size-4" />
+                                    {{ t('dialog.group.actions.subscribe_event') }}
+                                </DropdownMenuItem>
+                                <template
+                                    v-if="
+                                        groupDialog.ref.myMember && groupDialog.ref.privacy === 'default'
+                                    ">
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem @click="groupDialogCommand('Visibility Everyone')">
+                                        <Eye class="size-4" />
+                                        <Check
+                                            v-if="groupDialog.ref.myMember.visibility === 'visible'"
+                                            class="size-4" />
+                                        {{ t('dialog.group.actions.visibility_everyone') }}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem @click="groupDialogCommand('Visibility Friends')">
+                                        <Eye class="size-4" />
+                                        <Check
+                                            v-if="groupDialog.ref.myMember.visibility === 'friends'"
+                                            class="size-4" />
+                                        {{ t('dialog.group.actions.visibility_friends') }}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem @click="groupDialogCommand('Visibility Hidden')">
+                                        <Eye class="size-4" />
+                                        <Check
+                                            v-if="groupDialog.ref.myMember.visibility === 'hidden'"
+                                            class="size-4" />
+                                        {{ t('dialog.group.actions.visibility_hidden') }}
+                                    </DropdownMenuItem>
+                                </template>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem @click="groupDialogCommand('Previous Instances')">
+                                    <LineChart class="size-4" />
+                                    {{ t('dialog.world.actions.show_previous_instances') }}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    variant="destructive"
+                                    @click="groupDialogCommand('Leave Group')">
+                                    <Trash2 class="size-4" />
+                                    {{
+                                        isSoleGroupOwner(groupDialog.ref, currentUser.id)
+                                            ? t('dialog.group.actions.delete')
+                                            : t('dialog.group.actions.leave')
+                                    }}
+                                </DropdownMenuItem>
+                            </template>
+                        </template>
+                        <template v-else>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem @click="groupDialogCommand('Previous Instances')">
+                                <LineChart class="size-4" />
+                                {{ t('dialog.world.actions.show_previous_instances') }}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                                v-if="groupDialog.ref.membershipStatus === 'userblocked'"
+                                variant="destructive"
+                                @click="groupDialogCommand('Unblock Group')">
+                                <CheckCircle class="size-4" />
+                                {{ t('dialog.group.actions.unblock') }}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem v-else @click="groupDialogCommand('Block Group')">
+                                <XCircle class="size-4" />
+                                {{ t('dialog.group.actions.block') }}
+                            </DropdownMenuItem>
+                        </template>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
         </div>
 
-        <!-- Right side Tabs -->
-        <div class="flex-1 min-w-0 flex flex-col min-h-0 pl-4">
+        <!-- Tabs -->
+        <div class="flex-1 min-h-0 mt-2 overflow-y-auto">
             <TabsUnderline
                 v-model="groupDialog.activeTab"
                 :background="true"
@@ -570,10 +386,372 @@
                 :unmount-on-hide="false"
                 fill
                 @update:modelValue="groupDialogTabClick">
+                <template #Instances>
+                    <div v-if="groupDialog.instances.length" class="rounded-xl bg-(--profile-card) p-3 mb-2.5">
+                        <div v-for="room in groupDialog.instances" :key="room.tag" class="flex flex-col gap-2 mb-1.5">
+                            <div class="flex flex-wrap gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
+                                <Location
+                                    :location="room.tag"
+                                    exclude-group-name
+                                    class="text-sm" />
+                                <InstanceActionBar
+                                    class="text-sm"
+                                    :location="room.tag"
+                                    :currentlocation="lastLocation.location"
+                                    :instance="room.ref"
+                                    :friendcount="room.friendCount"
+                                    refresh-tooltip="Refresh player count"
+                                    :on-refresh="() => refreshInstancePlayerCount(room.tag)" />
+                            </div>
+                            <div v-if="room.users.length" class="flex flex-wrap items-start" style="margin: 2px 0; max-height: unset">
+                                <div
+                                    v-for="user in room.users"
+                                    :key="user.id"
+                                    class="box-border flex items-center p-1.5 text-[13px] cursor-pointer w-[167px] hover:rounded-[25px_5px_5px_25px]"
+                                    @click="showUserDialog(user.id)">
+                                    <div class="relative inline-block flex-none size-9 mr-2.5" :class="userStatusClass(user)">
+                                        <Avatar class="size-9">
+                                            <AvatarImage :src="userImage(user)" class="object-cover" />
+                                            <AvatarFallback>
+                                                <User class="size-4 text-muted-foreground" />
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <IconFrame :icon-frame="user.iconFrame" />
+                                    </div>
+                                    <div class="flex-1 overflow-hidden">
+                                        <span
+                                            class="block truncate font-medium leading-[18px]"
+                                            :style="{ color: user.$userColour }"
+                                            v-text="user.displayName" />
+                                        <span v-if="user.location === 'traveling'" class="block truncate text-xs">
+                                            <Spinner class="inline-block mr-1" />
+                                            <Timer :epoch="user.$travelingToTime" />
+                                        </span>
+                                        <span v-else class="block truncate text-xs">
+                                            <Timer :epoch="user.$location_at" />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else class="text-muted-foreground text-xs p-3">—</div>
+                </template>
                 <template #Info>
-                    <GroupDialogInfoTab
-                        :show-group-post-edit-dialog="showGroupPostEditDialog"
-                        :confirm-delete-group-post="confirmDeleteGroupPost" />
+                    <div class="flex flex-col gap-2.5">
+                        <!-- Info card -->
+                        <div class="rounded-xl bg-(--profile-card) p-3">
+                            <div
+                                class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-2 pb-2 border-b border-border">
+                                {{ t('dialog.group.info.header') }}
+                            </div>
+                            <div class="flex flex-col gap-1.5">
+                                <div class="flex justify-between items-start gap-2 text-xs">
+                                    <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.short_code') }}</span>
+                                    <span class="text-right text-muted-foreground">
+                                        {{ groupDialog.ref.shortCode }}.{{ groupDialog.ref.discriminator }}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-start gap-2 text-xs">
+                                    <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.members') }}</span>
+                                    <span class="text-right text-muted-foreground">
+                                        {{ groupDialog.ref.memberCount }}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-start gap-2 text-xs">
+                                    <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.online_members') }}</span>
+                                    <span class="text-right text-muted-foreground">
+                                        {{ groupDialog.ref.onlineMemberCount }}
+                                    </span>
+                                </div>
+                                <TooltipWrapper
+                                    side="right"
+                                    :content="formatDateFilter(groupDialog.ref.createdAt, 'long')"
+                                    :disabled="!groupDialog.ref.createdAt">
+                                    <div class="flex justify-between items-start gap-2 text-xs">
+                                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.created') }}</span>
+                                        <span class="text-right text-muted-foreground">{{
+                                            timeAgo(groupDialog.ref.createdAt)
+                                        }}</span>
+                                    </div>
+                                </TooltipWrapper>
+                                <div v-if="groupDialog.ref.links?.length" class="flex justify-between items-start gap-2 text-xs">
+                                    <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.links') }}</span>
+                                    <div class="flex gap-1">
+                                        <template v-for="(link, index) in groupDialog.ref.links" :key="index">
+                                            <TooltipWrapper v-if="link">
+                                                <template #content>
+                                                    <span v-text="link" />
+                                                </template>
+                                                <img
+                                                    :src="getFaviconUrl(link)"
+                                                    style="width: 16px; height: 16px; vertical-align: middle; cursor: pointer"
+                                                    @click.stop="openExternalLink(link)"
+                                                    loading="lazy" />
+                                            </TooltipWrapper>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- VRCX Info card -->
+                        <div class="rounded-xl bg-(--profile-card) p-3">
+                            <div class="flex items-center justify-between mb-2 pb-2 border-b border-muted-foreground/20">
+                                <span
+                                    class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                                    {{ t('dialog.user.info.vrcx_info') }}
+                                    <TooltipWrapper side="right" :content="t('dialog.user.info.vrcx_info_tooltip')">
+                                        <Info class="h-3 w-3 shrink-0" />
+                                    </TooltipWrapper>
+                                </span>
+                            </div>
+                            <div class="flex flex-col gap-1.5">
+                                <TooltipWrapper
+                                    side="right"
+                                    :content="formatDateFilter(groupDialog.lastVisit, 'long')"
+                                    :disabled="!groupDialog.lastVisit">
+                                    <div class="flex justify-between items-start gap-2 text-xs">
+                                        <span class="text-muted-foreground shrink-0">{{
+                                            t('dialog.group.info.last_visited')
+                                        }}</span>
+                                        <span class="text-right text-muted-foreground">{{ timeAgo(groupDialog.lastVisit) }}</span>
+                                    </div>
+                                </TooltipWrapper>
+                                <TooltipWrapper side="right" :content="t('dialog.user.info.open_previous_instance')">
+                                    <div
+                                        class="flex justify-between items-start gap-2 text-xs cursor-pointer hover:text-foreground"
+                                        @click="showPreviousInstancesListDialog(groupDialog.ref)">
+                                        <span class="text-muted-foreground shrink-0">{{ t('dialog.user.info.join_count') }}</span>
+                                        <span class="text-right text-muted-foreground">{{ groupDialog.joinCount || '—' }}</span>
+                                    </div>
+                                </TooltipWrapper>
+                            </div>
+                        </div>
+
+                        <!-- Member Info card -->
+                        <div
+                            v-if="groupDialog.ref.membershipStatus === 'member' && groupDialog.ref.myMember"
+                            class="rounded-xl bg-(--profile-card) p-3">
+                            <div
+                                class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-2 pb-2 border-b border-border">
+                                {{ t('dialog.group.info.member_info') }}
+                            </div>
+                            <div class="flex flex-col gap-1.5">
+                                <div class="flex justify-between items-start gap-2 text-xs">
+                                    <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.visibility') }}</span>
+                                    <span class="text-right text-muted-foreground">
+                                        <template v-if="groupDialog.ref.myMember.visibility === 'visible'">
+                                            {{ t('dialog.group.tags.everyone') }}
+                                        </template>
+                                        <template v-else-if="groupDialog.ref.myMember.visibility === 'friends'">
+                                            {{ t('dialog.group.tags.friends') }}
+                                        </template>
+                                        <template v-else-if="groupDialog.ref.myMember.visibility === 'hidden'">
+                                            {{ t('dialog.group.tags.hidden') }}
+                                        </template>
+                                    </span>
+                                </div>
+                                <TooltipWrapper
+                                    side="right"
+                                    :content="formatDateFilter(groupDialog.ref.myMember.joinedAt, 'long')"
+                                    @click="showPreviousInstancesListDialog(groupDialog.ref)">
+                                    <div class="flex justify-between items-start gap-2 text-xs cursor-pointer">
+                                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.joined_at') }}</span>
+                                        <span class="text-right text-muted-foreground">{{
+                                            timeAgo(groupDialog.ref.myMember.joinedAt)
+                                        }}</span>
+                                    </div>
+                                </TooltipWrapper>
+                                <div class="flex justify-between items-start gap-2 text-xs">
+                                    <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.roles') }}</span>
+                                    <span v-if="groupDialog.memberRoles.length === 0" class="text-right text-muted-foreground"
+                                        >—</span
+                                    >
+                                    <span v-else class="text-right text-muted-foreground">
+                                        <template v-for="(role, rIndex) in groupDialog.memberRoles" :key="rIndex">
+                                            <TooltipWrapper side="right">
+                                                <template #content>
+                                                    <span>{{ t('dialog.group.info.role') }} {{ role.name }}</span>
+                                                    <br />
+                                                    <span
+                                                        >{{ t('dialog.group.info.role_description') }} {{ role.description }}</span
+                                                    >
+                                                    <br />
+                                                    <span v-if="role.updatedAt">
+                                                        {{ t('dialog.group.info.role_updated_at') }}
+                                                        {{ formatDateFilter(role.updatedAt, 'long') }}
+                                                    </span>
+                                                    <span v-else>
+                                                        {{ t('dialog.group.info.role_created_at') }}
+                                                        {{ formatDateFilter(role.createdAt, 'long') }}
+                                                    </span>
+                                                    <br />
+                                                    <span>{{ t('dialog.group.info.role_permissions') }}</span>
+                                                    <br />
+                                                    <template v-for="(permission, pIndex) in role.permissions" :key="pIndex">
+                                                        <span>{{ permission }}</span>
+                                                        <br />
+                                                    </template>
+                                                </template>
+                                                <span
+                                                    >{{ role.name
+                                                    }}{{ rIndex < groupDialog.memberRoles.length - 1 ? ', ' : '' }}</span
+                                                >
+                                            </TooltipWrapper>
+                                        </template>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Announcement card -->
+                        <div class="rounded-xl bg-(--profile-card) p-3">
+                            <div class="flex items-center justify-between mb-2 pb-2 border-b border-border">
+                                <span class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                                    {{ t('dialog.group.info.announcement') }}
+                                </span>
+                                <div
+                                    v-if="
+                                        groupDialog.announcement.id && hasGroupPermission(groupDialog.ref, 'group-announcement-manage')
+                                    "
+                                    class="flex gap-1">
+                                    <Button
+                                        class="h-5 w-5 text-muted-foreground"
+                                        size="icon-sm"
+                                        variant="ghost"
+                                        @click="showGroupPostEditDialog(groupDialog.id, groupDialog.announcement)">
+                                        <Pencil class="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                        class="h-5 w-5 text-muted-foreground"
+                                        size="icon-sm"
+                                        variant="ghost"
+                                        @click="confirmDeleteGroupPost(groupDialog.announcement)">
+                                        <Trash2 class="h-3 w-3" />
+                                    </Button>
+                                </div>
+                            </div>
+                            <div v-if="groupDialog.announcement.id">
+                                <div v-if="groupDialog.announcement.title" class="text-xs font-medium mb-1">
+                                    {{ groupDialog.announcement.title }}
+                                </div>
+                                <div v-if="groupDialog.announcement.imageUrl" class="mb-2">
+                                    <img
+                                        v-if="!announcementPhotoError"
+                                        :src="groupDialog.announcement.imageUrl"
+                                        class="cursor-pointer rounded-md object-cover"
+                                        style="width: 60px; height: 60px"
+                                        @click="showFullscreenImageDialog(groupDialog.announcement.imageUrl)"
+                                        @error="announcementPhotoError = true"
+                                        loading="lazy" />
+                                    <div
+                                        v-else
+                                        class="flex items-center justify-center bg-muted rounded-md"
+                                        style="width: 60px; height: 60px">
+                                        <Image class="size-5 text-muted-foreground" />
+                                    </div>
+                                </div>
+                                <pre class="text-xs font-[inherit]" style="white-space: pre-wrap">{{
+                                    groupDialog.announcement.text
+                                }}</pre>
+                                <div class="flex flex-row justify-end gap-2 mt-2 text-xs text-muted-foreground">
+                                    <TooltipWrapper v-if="groupDialog.announcement.roleIds?.length" side="top">
+                                        <template #content>
+                                            <span>{{ t('dialog.group.posts.visibility') }}</span>
+                                            <br />
+                                            <template v-for="roleId in groupDialog.announcement.roleIds" :key="roleId">
+                                                <template v-for="role in groupDialog.ref.roles" :key="roleId + role.id">
+                                                    <span v-if="role.id === roleId" v-text="role.name" />
+                                                </template>
+                                                <span
+                                                    v-if="
+                                                        groupDialog.announcement.roleIds.indexOf(roleId) <
+                                                        groupDialog.announcement.roleIds.length - 1
+                                                    ">
+                                                    ,&nbsp;
+                                                </span>
+                                            </template>
+                                        </template>
+                                        <Eye class="h-3 w-3" />
+                                    </TooltipWrapper>
+                                    <DisplayName :userid="groupDialog.announcement.authorId" />
+                                    <span v-if="groupDialog.announcement.editorId">
+                                        ({{ t('dialog.group.posts.edited_by') }}
+                                        <DisplayName :userid="groupDialog.announcement.editorId" />)
+                                    </span>
+                                    <TooltipWrapper side="bottom">
+                                        <template #content>
+                                            <span>
+                                                {{ t('dialog.group.posts.created_at') }}
+                                                {{ formatDateFilter(groupDialog.announcement.createdAt, 'long') }}
+                                            </span>
+                                            <template v-if="groupDialog.announcement.updatedAt !== groupDialog.announcement.createdAt">
+                                                <br />
+                                                <span>
+                                                    {{ t('dialog.group.posts.edited_at') }}
+                                                    {{ formatDateFilter(groupDialog.announcement.updatedAt, 'long') }}
+                                                </span>
+                                            </template>
+                                        </template>
+                                        <Timer :epoch="Date.parse(groupDialog.announcement.updatedAt)" />
+                                    </TooltipWrapper>
+                                </div>
+                            </div>
+                            <pre v-else class="text-xs font-[inherit] text-muted-foreground">—</pre>
+                        </div>
+
+                        <!-- Upcoming Events card -->
+                        <div v-if="upcomingCalenderEvents.length" class="rounded-xl bg-(--profile-card) p-3">
+                            <div
+                                class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-2 pb-2 border-b border-border">
+                                {{ t('dialog.group.info.upcoming_events') }}
+                            </div>
+                            <div v-if="upcomingCalenderEvents.length" class="flex flex-wrap gap-4 overflow-y-auto max-h-[360px] py-2.5">
+                                <GroupCalendarEventCard
+                                    v-for="value in upcomingCalenderEvents"
+                                    :key="value.id"
+                                    :event="value"
+                                    :is-following="value.userInterest?.isFollowing"
+                                    @update-following-calendar-data="updateFollowingCalendarData"
+                                    mode="grid"
+                                    card-class="group-dialog-grid-card" />
+                            </div>
+                            <span v-else class="text-xs text-muted-foreground">—</span>
+                        </div>
+
+                        <!-- Past Events card -->
+                        <div v-if="pastCalenderEvents.length" class="rounded-xl bg-(--profile-card) p-3">
+                            <div
+                                class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-2 pb-2 border-b border-border">
+                                {{ t('dialog.group.info.past_events') }}
+                            </div>
+                            <div
+                                v-if="pastCalenderEvents.length"
+                                class="flex flex-wrap gap-4 overflow-y-auto overflow-x-hidden max-h-[230px] py-2.5">
+                                <GroupCalendarEventCard
+                                    v-for="value in pastCalenderEvents"
+                                    :key="value.id"
+                                    :event="value"
+                                    :is-following="value.userInterest?.isFollowing"
+                                    @update-following-calendar-data="updateFollowingCalendarData"
+                                    mode="grid"
+                                    card-class="group-dialog-grid-card" />
+                            </div>
+                            <span v-else class="text-xs text-muted-foreground">—</span>
+                        </div>
+
+                        <!-- Rules card -->
+                        <div class="rounded-xl bg-(--profile-card) p-3">
+                            <div
+                                class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-2 pb-2 border-b border-border">
+                                {{ t('dialog.group.info.rules') }}
+                            </div>
+                            <pre class="text-xs font-[inherit]" style="white-space: pre-wrap; max-height: 210px; overflow-y: auto">{{
+                                groupDialog.ref.rules || '—'
+                            }}</pre>
+                        </div>
+                    </div>
                 </template>
                 <template #Posts>
                     <GroupDialogPostsTab
@@ -597,8 +775,11 @@
                 </template>
             </TabsUnderline>
         </div>
-        <GroupPostEditDialog :dialog-data="groupPostEditDialog" :selected-gallery-file="selectedGalleryFile" />
-        <GroupTransferDialog :dialog-data="groupTransferDialog" @close="groupTransferDialog.visible = false" />
+
+        <template v-if="isDialogVisible">
+            <GroupPostEditDialog :dialog-data="groupPostEditDialog" :selected-gallery-file="selectedGalleryFile" />
+            <GroupTransferDialog :dialog-data="groupTransferDialog" @close="groupTransferDialog.visible = false" />
+        </template>
     </div>
 </template>
 
@@ -660,7 +841,8 @@
         timeAgo,
         timeToText
     } from '../../../shared/utils';
-    import { useGalleryStore, useGroupStore, useInstanceStore, useModalStore, useUserStore } from '../../../stores';
+    import { useGalleryStore, useGroupStore, useInstanceStore, useLocationStore, useModalStore, useUserStore } from '../../../stores';
+    import { useGroupCalendarEvents } from './useGroupCalendarEvents';
     import {
         getGroupDialogGroup,
         isSoleGroupOwner,
@@ -677,7 +859,6 @@
     import { formatJsonVars } from '../../../shared/utils/base/ui';
 
     import DialogJsonTab from '../DialogJsonTab.vue';
-    import GroupDialogInfoTab from './GroupDialogInfoTab.vue';
     import { useGroupDialogCommands } from './useGroupDialogCommands';
     import GroupDialogMembersTab from './GroupDialogMembersTab.vue';
     import GroupDialogPhotosTab from './GroupDialogPhotosTab.vue';
@@ -688,7 +869,10 @@
     import { showGroupMemberModerationDialog } from '../../../coordinators/groupCoordinator';
 
     const { t } = useI18n();
+    const descExpanded = ref(false);
+    const announcementPhotoError = ref(false);
     const groupDialogTabs = computed(() => [
+        { value: 'Instances', label: t('dialog.group.info.instances') },
         { value: 'Info', label: t('dialog.group.info.header') },
         { value: 'Posts', label: t('dialog.group.posts.header') },
         { value: 'Members', label: t('dialog.group.members.header') },
@@ -700,7 +884,10 @@
 
     const { currentUser } = storeToRefs(useUserStore());
     const { groupDialog, inviteGroupDialog } = storeToRefs(useGroupStore());
+    const { lastLocation } = storeToRefs(useLocationStore());
     const { showCreateGroupEventDialog, showEditGroupDialog, updateGroupPostSearch } = useGroupStore();
+    const { pastCalenderEvents, upcomingCalenderEvents, updateFollowingCalendarData } =
+        useGroupCalendarEvents(groupDialog);
     const { groupEventRevision } = storeToRefs(useGroupStore());
 
     const { showFullscreenImageDialog } = useGalleryStore();
@@ -751,6 +938,7 @@
         () => {
             imageError.value = false;
             bannerError.value = false;
+            announcementPhotoError.value = false;
         }
     );
     const membersTabRef = ref(null);
