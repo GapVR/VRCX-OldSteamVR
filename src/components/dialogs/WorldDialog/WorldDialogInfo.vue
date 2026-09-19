@@ -14,7 +14,7 @@
 
         <!-- World ID, File Size, Cached Size -->
         <div style="display: flex; flex-direction: column; padding-bottom: 4px">
-            <div class="grid grid-cols-3 gap-2 text-xs">
+            <div class="grid grid-cols-[2fr_1fr_1fr] gap-2 text-xs">
                 <div>
                     <span class="text-muted-foreground font-semibold">{{ t('dialog.world.info.id') }}</span>
                     <div class="flex items-center gap-2 mt-0.5">
