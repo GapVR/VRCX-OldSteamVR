@@ -193,11 +193,11 @@
             <!-- RIGHT column: VRCX Info and User Info -->
             <div class="flex flex-col gap-1.25">
                 <!-- Represented Group — flat, no card wrapper -->
-                <div style="padding-bottom: 4px; border-bottom: 1px solid #e4e7ed14">
+                <div v-if="userDialog.representedGroup" style="padding-bottom: 4px; border-bottom: 1px solid #e4e7ed14">
                 <div class="flex gap-2">
                     <div class="flex-1 min-w-0">
                         <span class="text-xs font-semibold text-muted-foreground">{{ t('dialog.user.info.represented_group') }}</span>
-                        <div v-if="userDialog.representedGroup && userDialog.representedGroup.isRepresenting" class="flex items-center gap-2.5 mt-1 cursor-pointer" @click="showGroupDialog(userDialog.representedGroup.groupId)">
+                        <div v-if="userDialog.representedGroup.isRepresenting" class="flex items-center gap-2.5 mt-1 cursor-pointer" @click="showGroupDialog(userDialog.representedGroup.groupId)">
                             <div class="flex-1 min-w-0">
                                 <div class="text-xs font-medium truncate">
                                     <span v-if="userDialog.representedGroup.ownerId === userDialog.id" class="mr-1">👑</span>
@@ -206,10 +206,10 @@
                                 <div class="text-xs text-muted-foreground">({{ userDialog.representedGroup.memberCount }})</div>
                             </div>
                         </div>
-                        <div v-else-if="userDialog.representedGroup" class="text-xs text-muted-foreground mt-1">—</div>
                     </div>
+                    <span v-if="!userDialog.representedGroup.isRepresenting" class="text-xs text-muted-foreground mt-1">—</span>
                     <Avatar
-                        v-if="userDialog.representedGroup && userDialog.representedGroup.isRepresenting"
+                        v-if="userDialog.representedGroup.isRepresenting"
                         class="cursor-pointer shrink-0 rounded-lg mt-1" :style="{ height: '72px', width: '72px' }"
                         @click.stop="showFullscreenImageDialog(userDialog.representedGroup.iconUrl)">
                         <AvatarImage :src="userDialog.representedGroup.$thumbnailUrl" class="object-cover" />
