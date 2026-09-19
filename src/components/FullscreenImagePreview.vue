@@ -192,11 +192,22 @@
     const imageUrl = computed(() => fullscreenImageDialog.value.imageUrl || '');
 
     const imageVersion = computed(() => {
+        const fileMatch = imageUrl.value.match(/\/file\/([^/]+)\/([0-9]+)\/file$/);
+        if (fileMatch) {
+            return parseInt(fileMatch[2], 10);
+        }
         const match = imageUrl.value.match(/\/image\/[^/]+\/(\d+)/);
         return match ? parseInt(match[1], 10) : 1;
     });
 
     function updateImageUrl(version, resolution) {
+        const fileMatch = imageUrl.value.match(/^(https:\/\/api\.vrchat\.cloud\/api\/1\/file\/)([^/]+)\/\d+\/file$/);
+        if (fileMatch) {
+            const [, base, fileId] = fileMatch;
+            fullscreenImageDialog.value.imageUrl = `${base}${fileId}/${version}/${resolution}`;
+            resetTransform();
+            return;
+        }
         const match = imageUrl.value.match(/^(https:\/\/api\.vrchat\.cloud\/api\/1\/image\/[^/]+)\/\d+\/\d+$/);
         if (!match) return;
         const base = match[1];
@@ -207,15 +218,17 @@
     function changeVersion(delta) {
         const newVersion = imageVersion.value + delta;
         if (newVersion < 1) return;
+        const isFileEndpoint = imageUrl.value.endsWith('/file');
         const match = imageUrl.value.match(/\/image\/[^/]+\/\d+\/(\d+)$/);
-        const resolution = match ? match[1] : '256';
+        const resolution = match ? match[1] : (isFileEndpoint ? 'file' : '256');
         updateImageUrl(newVersion, resolution);
     }
 
     function fullSize() {
-        const match = imageUrl.value.match(/^(https:\/\/api\.vrchat\.cloud\/api\/1\/image\/[^/]+)\/\d+\/\d+$/);
+        const match = imageUrl.value.match(/^(https:\/\/api\.vrchat\.cloud\/api\/1\/image\/)([^/]+)\/\d+\/\d+$/);
         if (!match) return;
-        fullscreenImageDialog.value.imageUrl = `${match[1]}/${imageVersion.value}/file`;
+        const [, base, fileId] = match;
+        fullscreenImageDialog.value.imageUrl = `https://api.vrchat.cloud/api/1/file/${fileId}/${imageVersion.value}/file`;
         resetTransform();
     }
 
@@ -402,24 +415,43 @@
         if (!url) return;
         const msg = toast.info(t('message.image.downloading'));
         try {
-            const response = await webApiService.execute({ url, method: 'GET' });
-            if (response.status !== 200 || !String(response.data).startsWith('data:image/png')) {
-                throw new Error(`Error: ${response.data}`);
+            const isFileEndpoint = url.endsWith('/file');
+
+            if (isFileEndpoint) {
+                const response = await webApiService.execute({ url, method: 'GET' });
+                if (response.status !== 200) throw new Error(`Error: ${response.data}`);
+                const fileData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+                const link = document.createElement('a');
+                link.href = fileData.downloadUrl;
+                const fileId = extractFileId(url);
+                let name = fileName;
+                if (!name && fileId) name = `${fileId}.png`;
+                if (!name) name = `${url.split('/').pop()}.png`;
+                if (!name) name = 'image.png';
+                link.setAttribute('download', name);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                const response = await webApiService.execute({ url, method: 'GET' });
+                if (response.status !== 200 || !String(response.data).startsWith('data:image/png')) {
+                    throw new Error(`Error: ${response.data}`);
+                }
+
+                const link = document.createElement('a');
+                link.href = response.data;
+
+                const fileId = extractFileId(url);
+                let name = fileName;
+                if (!name && fileId) name = `${fileId}.png`;
+                if (!name) name = `${url.split('/').pop()}.png`;
+                if (!name) name = 'image.png';
+
+                link.setAttribute('download', name);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
-
-            const link = document.createElement('a');
-            link.href = response.data;
-
-            const fileId = extractFileId(url);
-            let name = fileName;
-            if (!name && fileId) name = `${fileId}.png`;
-            if (!name) name = `${url.split('/').pop()}.png`;
-            if (!name) name = 'image.png';
-
-            link.setAttribute('download', name);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
         } catch (error) {
             console.error('Error downloading image:', error);
             toast.error(`Failed to download image. ${url}`);
