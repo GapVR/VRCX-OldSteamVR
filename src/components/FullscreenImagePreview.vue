@@ -33,6 +33,8 @@
                             <span class="text-xs">+</span>
                         </Button>
 
+                        <div class="mx-1 h-5 w-px bg-border" />
+
                         <Button
                             variant="ghost"
                             size="icon"
