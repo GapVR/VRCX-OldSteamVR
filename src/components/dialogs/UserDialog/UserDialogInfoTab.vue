@@ -433,8 +433,6 @@
                         </div>
                         <span v-else class="text-xs text-muted-foreground mt-1">—</span>
                     </div>
-                    <img v-if="avatarImageUrl" class="rounded-lg object-cover cursor-pointer flex-none mt-1" :style="{ height: '72px', width: '72px' }" :src="avatarImageUrl" @click="showFullscreenImageDialog(avatarImageUrl)" loading="lazy" />
-                    <span v-else class="text-xs text-muted-foreground mt-1">—</span>
                 </div>
             </div>
         </div>
