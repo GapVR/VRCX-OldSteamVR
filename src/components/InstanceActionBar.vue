@@ -4,7 +4,7 @@
             v-if="showInstanceInfo"
             :class="
                 cn(
-                    'flex items-center gap-1.5 text-muted-foreground',
+                    'flex items-center gap-1.5',
                     props.class
                 )
             ">
@@ -54,8 +54,8 @@
                         </TooltipWrapper>
                     </div>
                 </template>
-                <div :class="cn('flex items-center gap-0.5', !instance?.hasCapacityForYou ? 'text-red-400' : null)">
-                    <UsersRound class="h-4 w-4" />
+                <div :class="cn('flex items-center gap-0.5', !instance?.hasCapacityForYou ? 'text-red-400' : 'text-foreground')">
+                    <UsersRound class="h-4 w-4 text-muted-foreground" />
                     <span v-if="resolvedInstanceLocation === locationStore.lastLocation.location">
                         {{ locationStore.lastLocation.playerList.size }}/{{ instance?.capacity }}
                     </span>
@@ -75,7 +75,7 @@
                     <template #content>
                         <span>{{ t('dialog.user.info.last_join') }} </span>
                     </template>
-                    <span class="flex items-center gap-0.5">
+                    <span class="flex items-center gap-0.5 text-muted-foreground">
                         <MapPin class="h-4 w-4" />
                         <Timer :epoch="lastJoin" />
                     </span>

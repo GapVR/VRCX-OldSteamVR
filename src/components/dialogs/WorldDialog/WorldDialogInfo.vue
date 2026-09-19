@@ -1,6 +1,7 @@
 <template>
-    <div class="flex flex-col gap-2.5">
-        <!-- Memo row -->
+    <div class="rounded-xl bg-(--profile-card) p-3">
+        <div class="flex flex-col gap-2.5">
+            <!-- Memo row -->
         <div style="display: flex; flex-direction: column; padding-bottom: 4px">
             <span class="text-xs font-semibold text-muted-foreground">{{ t('dialog.world.info.memo') }}</span>
             <textarea
@@ -187,6 +188,7 @@
                     </TooltipWrapper>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 </template>

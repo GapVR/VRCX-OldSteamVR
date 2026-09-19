@@ -21,10 +21,8 @@
                         :show-instance-info="true"
                         :show-buttons="true"
                         :show-refresh="true"
-                        :show-history="true"
                         :show-launch="true"
-                        :show-invite="true"
-                        :on-history="() => showPreviousInstancesInfoDialog(room.location)" />
+                        :show-invite="true" />
                 </div>
                 <div v-if="room.$location.userId || room.users.length" class="flex flex-wrap items-start" style="margin: 2px 0; max-height: unset">
                     <div
@@ -107,7 +105,7 @@
     import Location from '@/components/Location.vue';
     import { refreshInstancePlayerCount } from '../../../coordinators/instanceCoordinator';
     import { useUserDisplay } from '../../../composables/useUserDisplay';
-    import { useAdvancedSettingsStore, useAppearanceSettingsStore, useInstanceStore, useLaunchStore, useLocationStore, useUserStore, useWorldStore } from '../../../stores';
+    import { useAppearanceSettingsStore, useLocationStore, useUserStore, useWorldStore } from '../../../stores';
     import { showUserDialog } from '../../../coordinators/userCoordinator';
 
     const { t } = useI18n();
@@ -116,5 +114,5 @@
     const { isAgeGatedInstancesVisible } = storeToRefs(useAppearanceSettingsStore());
     const { worldDialog } = storeToRefs(useWorldStore());
     const { lastLocation } = storeToRefs(useLocationStore());
-    const { showPreviousInstancesInfoDialog } = useInstanceStore();
+
 </script>

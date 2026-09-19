@@ -146,14 +146,14 @@
         </div>
 
         <!-- Tabs -->
-        <TabsUnderline
-            v-model="worldDialog.activeTab"
-            :background="true"
-            :items="worldDialogTabs"
-            :unmount-on-hide="false"
-            class="mt-2"
-            fill
-            @update:modelValue="worldDialogTabClick">
+        <div class="flex-1 min-h-0 mt-2">
+            <TabsUnderline
+                v-model="worldDialog.activeTab"
+                :background="true"
+                :items="worldDialogTabs"
+                :unmount-on-hide="false"
+                fill
+                @update:modelValue="worldDialogTabClick">
             <template #Instances>
                 <div class="flex flex-col">
                     <!-- Capacity + summary info bar -->
@@ -192,6 +192,7 @@
                     @refresh="refreshWorldDialogTreeData()" />
             </template>
         </TabsUnderline>
+        </div>
 
         <template v-if="isDialogVisible">
             <WorldAllowedDomainsDialog :world-allowed-domains-dialog="worldAllowedDomainsDialog" />
