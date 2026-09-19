@@ -429,10 +429,10 @@
                             </TooltipWrapper>
                         </span>
                     </div>
-                    <div v-if="avatarImageUrl" class="text-xs">
+                    <div v-if="avatarImageUrl" class="text-xs mt-1">
                         <AvatarInfo :key="avatarImageUrl" :imageurl="avatarImageUrl" :userid="userDialog.id" :avatartags="userDialog.ref.currentAvatarTags" style="display: inline-block" />
                     </div>
-                    <span v-else class="text-xs">—</span>
+                    <span v-else class="text-xs mt-1">—</span>
                 </div>
             </div>
         </div>
