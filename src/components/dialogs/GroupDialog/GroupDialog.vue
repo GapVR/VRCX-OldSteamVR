@@ -497,168 +497,170 @@
                 </template>
                 <template #Info>
                     <div class="flex flex-col gap-2.5">
-                        <!-- Info card -->
-                        <div class="rounded-xl bg-(--profile-card) p-3">
-                            <div
-                                class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-2 pb-2 border-b border-border">
-                                {{ t('dialog.group.info.header') }}
-                            </div>
-                            <div class="flex flex-col gap-1.5">
-                                <div class="flex justify-between items-start gap-2 text-xs">
-                                    <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.short_code') }}</span>
-                                    <span class="text-right text-muted-foreground">
-                                        {{ groupDialog.ref.shortCode }}.{{ groupDialog.ref.discriminator }}
-                                    </span>
+                        <div class="grid grid-cols-3 gap-2.5">
+                            <!-- Info card -->
+                            <div class="rounded-xl bg-(--profile-card) p-3">
+                                <div
+                                    class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-2 pb-2 border-b border-border">
+                                    {{ t('dialog.group.info.header') }}
                                 </div>
-                                <div class="flex justify-between items-start gap-2 text-xs">
-                                    <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.members') }}</span>
-                                    <span class="text-right text-muted-foreground">
-                                        {{ groupDialog.ref.memberCount }}
-                                    </span>
-                                </div>
-                                <div class="flex justify-between items-start gap-2 text-xs">
-                                    <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.online_members') }}</span>
-                                    <span class="text-right text-muted-foreground">
-                                        {{ groupDialog.ref.onlineMemberCount }}
-                                    </span>
-                                </div>
-                                <TooltipWrapper
-                                    side="right"
-                                    :content="formatDateFilter(groupDialog.ref.createdAt, 'long')"
-                                    :disabled="!groupDialog.ref.createdAt">
+                                <div class="flex flex-col gap-1.5">
                                     <div class="flex justify-between items-start gap-2 text-xs">
-                                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.created') }}</span>
-                                        <span class="text-right text-muted-foreground">{{
-                                            timeAgo(groupDialog.ref.createdAt)
-                                        }}</span>
+                                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.short_code') }}</span>
+                                        <span class="text-right text-muted-foreground">
+                                            {{ groupDialog.ref.shortCode }}.{{ groupDialog.ref.discriminator }}
+                                        </span>
                                     </div>
-                                </TooltipWrapper>
-                                <div v-if="groupDialog.ref.links?.length" class="flex justify-between items-start gap-2 text-xs">
-                                    <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.links') }}</span>
-                                    <div class="flex gap-1">
-                                        <template v-for="(link, index) in groupDialog.ref.links" :key="index">
-                                            <TooltipWrapper v-if="link">
-                                                <template #content>
-                                                    <span v-text="link" />
-                                                </template>
-                                                <img
-                                                    :src="getFaviconUrl(link)"
-                                                    style="width: 16px; height: 16px; vertical-align: middle; cursor: pointer"
-                                                    @click.stop="openExternalLink(link)"
-                                                    loading="lazy" />
-                                            </TooltipWrapper>
-                                        </template>
+                                    <div class="flex justify-between items-start gap-2 text-xs">
+                                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.members') }}</span>
+                                        <span class="text-right text-muted-foreground">
+                                            {{ groupDialog.ref.memberCount }}
+                                        </span>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- VRCX Info card -->
-                        <div class="rounded-xl bg-(--profile-card) p-3">
-                            <div class="flex items-center justify-between mb-2 pb-2 border-b border-muted-foreground/20">
-                                <span
-                                    class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                                    {{ t('dialog.user.info.vrcx_info') }}
-                                    <TooltipWrapper side="right" :content="t('dialog.user.info.vrcx_info_tooltip')">
-                                        <Info class="h-3 w-3 shrink-0" />
+                                    <div class="flex justify-between items-start gap-2 text-xs">
+                                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.online_members') }}</span>
+                                        <span class="text-right text-muted-foreground">
+                                            {{ groupDialog.ref.onlineMemberCount }}
+                                        </span>
+                                    </div>
+                                    <TooltipWrapper
+                                        side="right"
+                                        :content="formatDateFilter(groupDialog.ref.createdAt, 'long')"
+                                        :disabled="!groupDialog.ref.createdAt">
+                                        <div class="flex justify-between items-start gap-2 text-xs">
+                                            <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.created') }}</span>
+                                            <span class="text-right text-muted-foreground">{{
+                                                timeAgo(groupDialog.ref.createdAt)
+                                            }}</span>
+                                        </div>
                                     </TooltipWrapper>
-                                </span>
-                            </div>
-                            <div class="flex flex-col gap-1.5">
-                                <TooltipWrapper
-                                    side="right"
-                                    :content="formatDateFilter(groupDialog.lastVisit, 'long')"
-                                    :disabled="!groupDialog.lastVisit">
-                                    <div class="flex justify-between items-start gap-2 text-xs">
-                                        <span class="text-muted-foreground shrink-0">{{
-                                            t('dialog.group.info.last_visited')
-                                        }}</span>
-                                        <span class="text-right text-muted-foreground">{{ timeAgo(groupDialog.lastVisit) }}</span>
+                                    <div v-if="groupDialog.ref.links?.length" class="flex justify-between items-start gap-2 text-xs">
+                                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.links') }}</span>
+                                        <div class="flex gap-1">
+                                            <template v-for="(link, index) in groupDialog.ref.links" :key="index">
+                                                <TooltipWrapper v-if="link">
+                                                    <template #content>
+                                                        <span v-text="link" />
+                                                    </template>
+                                                    <img
+                                                        :src="getFaviconUrl(link)"
+                                                        style="width: 16px; height: 16px; vertical-align: middle; cursor: pointer"
+                                                        @click.stop="openExternalLink(link)"
+                                                        loading="lazy" />
+                                                </TooltipWrapper>
+                                            </template>
+                                        </div>
                                     </div>
-                                </TooltipWrapper>
-                                <TooltipWrapper side="right" :content="t('dialog.user.info.open_previous_instance')">
-                                    <div
-                                        class="flex justify-between items-start gap-2 text-xs cursor-pointer hover:text-foreground"
-                                        @click="showPreviousInstancesListDialog(groupDialog.ref)">
-                                        <span class="text-muted-foreground shrink-0">{{ t('dialog.user.info.join_count') }}</span>
-                                        <span class="text-right text-muted-foreground">{{ groupDialog.joinCount || '—' }}</span>
-                                    </div>
-                                </TooltipWrapper>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Member Info card -->
-                        <div
-                            v-if="groupDialog.ref.membershipStatus === 'member' && groupDialog.ref.myMember"
-                            class="rounded-xl bg-(--profile-card) p-3">
-                            <div
-                                class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-2 pb-2 border-b border-border">
-                                {{ t('dialog.group.info.member_info') }}
-                            </div>
-                            <div class="flex flex-col gap-1.5">
-                                <div class="flex justify-between items-start gap-2 text-xs">
-                                    <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.visibility') }}</span>
-                                    <span class="text-right text-muted-foreground">
-                                        <template v-if="groupDialog.ref.myMember.visibility === 'visible'">
-                                            {{ t('dialog.group.tags.everyone') }}
-                                        </template>
-                                        <template v-else-if="groupDialog.ref.myMember.visibility === 'friends'">
-                                            {{ t('dialog.group.tags.friends') }}
-                                        </template>
-                                        <template v-else-if="groupDialog.ref.myMember.visibility === 'hidden'">
-                                            {{ t('dialog.group.tags.hidden') }}
-                                        </template>
+                            <!-- VRCX Info card -->
+                            <div class="rounded-xl bg-(--profile-card) p-3">
+                                <div class="flex items-center justify-between mb-2 pb-2 border-b border-muted-foreground/20">
+                                    <span
+                                        class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                                        {{ t('dialog.user.info.vrcx_info') }}
+                                        <TooltipWrapper side="right" :content="t('dialog.user.info.vrcx_info_tooltip')">
+                                            <Info class="h-3 w-3 shrink-0" />
+                                        </TooltipWrapper>
                                     </span>
                                 </div>
-                                <TooltipWrapper
-                                    side="right"
-                                    :content="formatDateFilter(groupDialog.ref.myMember.joinedAt, 'long')"
-                                    @click="showPreviousInstancesListDialog(groupDialog.ref)">
-                                    <div class="flex justify-between items-start gap-2 text-xs cursor-pointer">
-                                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.joined_at') }}</span>
-                                        <span class="text-right text-muted-foreground">{{
-                                            timeAgo(groupDialog.ref.myMember.joinedAt)
-                                        }}</span>
+                                <div class="flex flex-col gap-1.5">
+                                    <TooltipWrapper
+                                        side="right"
+                                        :content="formatDateFilter(groupDialog.lastVisit, 'long')"
+                                        :disabled="!groupDialog.lastVisit">
+                                        <div class="flex justify-between items-start gap-2 text-xs">
+                                            <span class="text-muted-foreground shrink-0">{{
+                                                t('dialog.group.info.last_visited')
+                                            }}</span>
+                                            <span class="text-right text-muted-foreground">{{ timeAgo(groupDialog.lastVisit) }}</span>
+                                        </div>
+                                    </TooltipWrapper>
+                                    <TooltipWrapper side="right" :content="t('dialog.user.info.open_previous_instance')">
+                                        <div
+                                            class="flex justify-between items-start gap-2 text-xs cursor-pointer hover:text-foreground"
+                                            @click="showPreviousInstancesListDialog(groupDialog.ref)">
+                                            <span class="text-muted-foreground shrink-0">{{ t('dialog.user.info.join_count') }}</span>
+                                            <span class="text-right text-muted-foreground">{{ groupDialog.joinCount || '—' }}</span>
+                                        </div>
+                                    </TooltipWrapper>
+                                </div>
+                            </div>
+
+                            <!-- Member Info card -->
+                            <div
+                                v-if="groupDialog.ref.membershipStatus === 'member' && groupDialog.ref.myMember"
+                                class="rounded-xl bg-(--profile-card) p-3">
+                                <div
+                                    class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-2 pb-2 border-b border-border">
+                                    {{ t('dialog.group.info.member_info') }}
+                                </div>
+                                <div class="flex flex-col gap-1.5">
+                                    <div class="flex justify-between items-start gap-2 text-xs">
+                                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.visibility') }}</span>
+                                        <span class="text-right text-muted-foreground">
+                                            <template v-if="groupDialog.ref.myMember.visibility === 'visible'">
+                                                {{ t('dialog.group.tags.everyone') }}
+                                            </template>
+                                            <template v-else-if="groupDialog.ref.myMember.visibility === 'friends'">
+                                                {{ t('dialog.group.tags.friends') }}
+                                            </template>
+                                            <template v-else-if="groupDialog.ref.myMember.visibility === 'hidden'">
+                                                {{ t('dialog.group.tags.hidden') }}
+                                            </template>
+                                        </span>
                                     </div>
-                                </TooltipWrapper>
-                                <div class="flex justify-between items-start gap-2 text-xs">
-                                    <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.roles') }}</span>
-                                    <span v-if="groupDialog.memberRoles.length === 0" class="text-right text-muted-foreground"
-                                        >—</span
-                                    >
-                                    <span v-else class="text-right text-muted-foreground">
-                                        <template v-for="(role, rIndex) in groupDialog.memberRoles" :key="rIndex">
-                                            <TooltipWrapper side="right">
-                                                <template #content>
-                                                    <span>{{ t('dialog.group.info.role') }} {{ role.name }}</span>
-                                                    <br />
-                                                    <span
-                                                        >{{ t('dialog.group.info.role_description') }} {{ role.description }}</span
-                                                    >
-                                                    <br />
-                                                    <span v-if="role.updatedAt">
-                                                        {{ t('dialog.group.info.role_updated_at') }}
-                                                        {{ formatDateFilter(role.updatedAt, 'long') }}
-                                                    </span>
-                                                    <span v-else>
-                                                        {{ t('dialog.group.info.role_created_at') }}
-                                                        {{ formatDateFilter(role.createdAt, 'long') }}
-                                                    </span>
-                                                    <br />
-                                                    <span>{{ t('dialog.group.info.role_permissions') }}</span>
-                                                    <br />
-                                                    <template v-for="(permission, pIndex) in role.permissions" :key="pIndex">
-                                                        <span>{{ permission }}</span>
+                                    <TooltipWrapper
+                                        side="right"
+                                        :content="formatDateFilter(groupDialog.ref.myMember.joinedAt, 'long')"
+                                        @click="showPreviousInstancesListDialog(groupDialog.ref)">
+                                        <div class="flex justify-between items-start gap-2 text-xs cursor-pointer">
+                                            <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.joined_at') }}</span>
+                                            <span class="text-right text-muted-foreground">{{
+                                                timeAgo(groupDialog.ref.myMember.joinedAt)
+                                            }}</span>
+                                        </div>
+                                    </TooltipWrapper>
+                                    <div class="flex justify-between items-start gap-2 text-xs">
+                                        <span class="text-muted-foreground shrink-0">{{ t('dialog.group.info.roles') }}</span>
+                                        <span v-if="groupDialog.memberRoles.length === 0" class="text-right text-muted-foreground"
+                                            >—</span
+                                        >
+                                        <span v-else class="text-right text-muted-foreground">
+                                            <template v-for="(role, rIndex) in groupDialog.memberRoles" :key="rIndex">
+                                                <TooltipWrapper side="right">
+                                                    <template #content>
+                                                        <span>{{ t('dialog.group.info.role') }} {{ role.name }}</span>
                                                         <br />
+                                                        <span
+                                                            >{{ t('dialog.group.info.role_description') }} {{ role.description }}</span
+                                                        >
+                                                        <br />
+                                                        <span v-if="role.updatedAt">
+                                                            {{ t('dialog.group.info.role_updated_at') }}
+                                                            {{ formatDateFilter(role.updatedAt, 'long') }}
+                                                        </span>
+                                                        <span v-else>
+                                                            {{ t('dialog.group.info.role_created_at') }}
+                                                            {{ formatDateFilter(role.createdAt, 'long') }}
+                                                        </span>
+                                                        <br />
+                                                        <span>{{ t('dialog.group.info.role_permissions') }}</span>
+                                                        <br />
+                                                        <template v-for="(permission, pIndex) in role.permissions" :key="pIndex">
+                                                            <span>{{ permission }}</span>
+                                                            <br />
+                                                        </template>
                                                     </template>
-                                                </template>
-                                                <span
-                                                    >{{ role.name
-                                                    }}{{ rIndex < groupDialog.memberRoles.length - 1 ? ', ' : '' }}</span
-                                                >
-                                            </TooltipWrapper>
-                                        </template>
-                                    </span>
+                                                    <span
+                                                        >{{ role.name
+                                                        }}{{ rIndex < groupDialog.memberRoles.length - 1 ? ', ' : '' }}</span
+                                                    >
+                                                </TooltipWrapper>
+                                            </template>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

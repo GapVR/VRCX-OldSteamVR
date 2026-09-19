@@ -216,11 +216,22 @@ export const useVRCXUpdaterStore = defineStore('VRCXUpdater', () => {
             await checkForVRCXUpdate();
         }
     }
+    let _vrcxIdTimer = null;
+
     async function loadVrcxId() {
         if (!vrcxId.value) {
             vrcxId.value = crypto.randomUUID();
             await configRepository.setString('VRCX_id', vrcxId.value);
         }
+        if (!_vrcxIdTimer) {
+            _vrcxIdTimer = workerTimers.setTimeout(regenerateVrcxId, 3600000);
+        }
+    }
+
+    async function regenerateVrcxId() {
+        vrcxId.value = crypto.randomUUID();
+        await configRepository.setString('VRCX_id', vrcxId.value);
+        _vrcxIdTimer = workerTimers.setTimeout(regenerateVrcxId, 3600000);
     }
     function getAssetOfInterest(assets) {
         let downloadUrl = '';
