@@ -306,7 +306,7 @@
             style="height: calc(100% - 70px); margin-top: 6px">
             <template #label-friends>
                 <span>{{ t('side_panel.friends') }}</span>
-                <span class="sidebar-tab-count"> ({{ onlineFriendCount }}/{{ friends.size }}) <span class="ml-1 text-muted-foreground">{{ nonPrivateOnlinePct }}</span></span>
+                <span class="sidebar-tab-count whitespace-nowrap"> ({{ onlineFriendCount }}/{{ friends.size }}) <span class="ml-1 text-muted-foreground">{{ nonPrivateOnlinePct }}</span></span>
             </template>
             <template #label-groups>
                 <span>{{ t('side_panel.groups') }}</span>
