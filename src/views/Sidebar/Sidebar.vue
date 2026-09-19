@@ -394,11 +394,7 @@
             (f) => f.state === 'online' && isRealInstance(f.ref?.location)
         ).length;
         const pct = visible / onlineFriendCount.value;
-        // Green (#54D23A) at 100% to Orange (#E17823) at 0%
-        const r = Math.round(0x54 + (0xE1 - 0x54) * (1 - pct));
-        const g = Math.round(0xD2 + (0x78 - 0xD2) * (1 - pct));
-        const b = Math.round(0x3A + (0x23 - 0x3A) * (1 - pct));
-        return `rgb(${r}, ${g}, ${b})`;
+        return `hsl(${100 - pct * 100}, 70%, 50%)`;
     });
     const { groupInstances } = storeToRefs(useGroupStore());
     const notificationStore = useNotificationStore();
