@@ -66,7 +66,7 @@
     }
 
     onBeforeMount(() => {
-        store.updateLoop.updateLoop();
+        // store.updateLoop.updateLoop();
     });
 
     onMounted(async () => {
