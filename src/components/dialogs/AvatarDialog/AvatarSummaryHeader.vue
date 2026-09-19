@@ -123,27 +123,27 @@
                 </Badge>
                 <TooltipWrapper v-if="avatarDialog.fileAnalysis.standalonewindows?.avatarStats?.lightCount > 0" side="top" :content="avatarDialog.fileAnalysis.standalonewindows.avatarStats.lightCount">
                     <Badge variant="outline">
-                        <Lightbulb class="h-3 w-3" />
+                        <Lightbulb class="h-3 w-3 text-foreground" />
                     </Badge>
                 </TooltipWrapper>
                 <TooltipWrapper v-if="avatarDialog.fileAnalysis.standalonewindows?.avatarStats?.audioSourceCount > 0" side="top" :content="avatarDialog.fileAnalysis.standalonewindows.avatarStats.audioSourceCount">
                     <Badge variant="outline">
-                        <Volume2 class="h-3 w-3" />
+                        <Volume2 class="h-3 w-3 text-foreground" />
                     </Badge>
                 </TooltipWrapper>
                 <TooltipWrapper v-if="avatarDialog.fileAnalysis.standalonewindows?.avatarStats?.cameraCount > 0" side="top" :content="avatarDialog.fileAnalysis.standalonewindows.avatarStats.cameraCount">
                     <Badge variant="outline">
-                        <Video class="h-3 w-3" />
+                        <Video class="h-3 w-3 text-foreground" />
                     </Badge>
                 </TooltipWrapper>
                 <TooltipWrapper v-if="avatarDialog.fileAnalysis.standalonewindows?.avatarStats?.clothCount > 0" side="top" :content="avatarDialog.fileAnalysis.standalonewindows.avatarStats.clothCount">
                     <Badge variant="outline">
-                        <Shirt class="h-3 w-3" />
+                        <Shirt class="h-3 w-3 text-foreground" />
                     </Badge>
                 </TooltipWrapper>
                 <TooltipWrapper v-if="avatarDialog.fileAnalysis.standalonewindows?.avatarStats?.particleSystemCount > 0" side="top" :content="avatarDialog.fileAnalysis.standalonewindows.avatarStats.particleSystemCount">
                     <Badge variant="outline">
-                        <PartyPopper class="h-3 w-3" />
+                        <PartyPopper class="h-3 w-3 text-foreground" />
                     </Badge>
                 </TooltipWrapper>
             </div>
