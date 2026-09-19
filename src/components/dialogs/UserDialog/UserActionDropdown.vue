@@ -273,6 +273,10 @@
                         {{ t('dialog.user.actions.group_moderation') }}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem variant="destructive" @click="onCommand('Clear Persistent Data')">
+                        <Trash2 class="size-4" />
+                        {{ t('dialog.user.actions.clear_persistent_data') }}
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                         v-if="userDialog.ref.currentAvatarThumbnailImageUrl"
                         @click="onCommand('Show Avatar Author')">

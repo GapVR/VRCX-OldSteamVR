@@ -608,6 +608,23 @@ export function useUserDialogCommands(
                     );
                     handleFriendDelete(args);
                 }
+            },
+            'Clear Persistent Data': {
+                confirm: () => ({
+                    title: t('confirm.title'),
+                    description: t('confirm.command_question', {
+                        command: t('dialog.user.actions.clear_persistent_data')
+                    }),
+                    destructive: true
+                }),
+                handler: async () => {
+                    const args = await miscRequest.deleteAllPersistentData();
+                    if (args.json.success) {
+                        toast.success(t('message.user.persistent_data_deleted'));
+                    } else {
+                        toast.error(t('message.user.persistent_data_delete_failed'));
+                    }
+                }
             }
         };
     }
