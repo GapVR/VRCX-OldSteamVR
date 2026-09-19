@@ -192,6 +192,51 @@
 
             <!-- RIGHT column: VRCX Info and User Info -->
             <div class="flex flex-col gap-1.25">
+                <!-- Represented Group — flat, no card wrapper -->
+                <div style="padding-bottom: 4px; border-bottom: 1px solid #e4e7ed14">
+                <div class="flex gap-2">
+                    <div class="flex-1 min-w-0">
+                        <span class="text-xs font-semibold text-muted-foreground">{{ t('dialog.user.info.represented_group') }}</span>
+                        <div v-if="userDialog.representedGroup && userDialog.representedGroup.isRepresenting" class="flex items-center gap-2.5 mt-1 cursor-pointer" @click="showGroupDialog(userDialog.representedGroup.groupId)">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-medium truncate">
+                                    <span v-if="userDialog.representedGroup.ownerId === userDialog.id" class="mr-1">👑</span>
+                                    <span v-text="userDialog.representedGroup.name"></span>
+                                </div>
+                                <div class="text-xs text-muted-foreground">({{ userDialog.representedGroup.memberCount }})</div>
+                            </div>
+                        </div>
+                        <div v-else-if="userDialog.representedGroup" class="text-xs text-muted-foreground mt-1">—</div>
+                    </div>
+                    <Avatar
+                        v-if="userDialog.representedGroup && userDialog.representedGroup.isRepresenting"
+                        class="cursor-pointer shrink-0 rounded-lg mt-1" :style="{ height: '72px', width: '72px' }"
+                        @click.stop="showFullscreenImageDialog(userDialog.representedGroup.iconUrl)">
+                        <AvatarImage :src="userDialog.representedGroup.$thumbnailUrl" class="object-cover" />
+                        <AvatarFallback>
+                            <User class="size-4 text-muted-foreground" />
+                        </AvatarFallback>
+                    </Avatar>
+                    <span v-else-if="userDialog.representedGroup" class="text-xs text-muted-foreground self-start">—</span>
+                </div>
+
+                <!-- Avatar Info — flat, no card wrapper -->
+                <div class="flex gap-2">
+                    <div class="flex-1 min-w-0">
+                        <span class="text-xs font-semibold text-muted-foreground">{{ t('dialog.user.info.avatar_info') }}</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                            <TooltipWrapper v-if="!hasAvatarSet" side="right" :content="t('dialog.user.info.icon_hides_avatar')">
+                                <Info class="inline-block h-3 w-3 align-middle" :style="{ color: userDialog.theme.iconColor }" />
+                            </TooltipWrapper>
+                        </span>
+                    </div>
+                    <div v-if="avatarImageUrl" class="text-xs mt-1">
+                        <AvatarInfo :key="avatarImageUrl" :imageurl="avatarImageUrl" :userid="userDialog.id" :avatartags="userDialog.ref.currentAvatarTags" style="display: inline-block" />
+                    </div>
+                    <span v-else class="text-xs mt-1">—</span>
+                </div>
+            </div>
+
                 <!-- VRCX Info — compact, no card wrapper -->
                 <div style="padding-bottom: 4px; border-bottom: 1px solid #e4e7ed14">
         <span class="text-xs font-semibold text-muted-foreground">
@@ -390,49 +435,6 @@
                 <Trash2 class="h-3 w-3" :style="{ color: userDialog.theme.iconColor }" />
             </Button>
         </div>
-                </div>
-
-                <!-- Represented Group — flat, no card wrapper -->
-                <div class="flex gap-2">
-                    <div class="flex-1 min-w-0">
-                        <span class="text-xs font-semibold text-muted-foreground">{{ t('dialog.user.info.represented_group') }}</span>
-                        <div v-if="userDialog.representedGroup && userDialog.representedGroup.isRepresenting" class="flex items-center gap-2.5 mt-1 cursor-pointer" @click="showGroupDialog(userDialog.representedGroup.groupId)">
-                            <div class="flex-1 min-w-0">
-                                <div class="text-xs font-medium truncate">
-                                    <span v-if="userDialog.representedGroup.ownerId === userDialog.id" class="mr-1">👑</span>
-                                    <span v-text="userDialog.representedGroup.name"></span>
-                                </div>
-                                <div class="text-xs text-muted-foreground">({{ userDialog.representedGroup.memberCount }})</div>
-                            </div>
-                        </div>
-                        <div v-else-if="userDialog.representedGroup" class="text-xs text-muted-foreground mt-1">—</div>
-                    </div>
-                    <Avatar
-                        v-if="userDialog.representedGroup && userDialog.representedGroup.isRepresenting"
-                        class="cursor-pointer shrink-0 rounded-lg mt-1" :style="{ height: '72px', width: '72px' }"
-                        @click.stop="showFullscreenImageDialog(userDialog.representedGroup.iconUrl)">
-                        <AvatarImage :src="userDialog.representedGroup.$thumbnailUrl" class="object-cover" />
-                        <AvatarFallback>
-                            <User class="size-4 text-muted-foreground" />
-                        </AvatarFallback>
-                    </Avatar>
-                    <span v-else-if="userDialog.representedGroup" class="text-xs text-muted-foreground self-start">—</span>
-                </div>
-
-                <!-- Avatar Info — flat, no card wrapper -->
-                <div class="flex gap-2">
-                    <div class="flex-1 min-w-0">
-                        <span class="text-xs font-semibold text-muted-foreground">{{ t('dialog.user.info.avatar_info') }}</span>
-                        <span class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                            <TooltipWrapper v-if="!hasAvatarSet" side="right" :content="t('dialog.user.info.icon_hides_avatar')">
-                                <Info class="inline-block h-3 w-3 align-middle" :style="{ color: userDialog.theme.iconColor }" />
-                            </TooltipWrapper>
-                        </span>
-                    </div>
-                    <div v-if="avatarImageUrl" class="text-xs mt-1">
-                        <AvatarInfo :key="avatarImageUrl" :imageurl="avatarImageUrl" :userid="userDialog.id" :avatartags="userDialog.ref.currentAvatarTags" style="display: inline-block" />
-                    </div>
-                    <span v-else class="text-xs mt-1">—</span>
                 </div>
             </div>
         </div>
