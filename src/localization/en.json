@@ -1733,7 +1733,8 @@
                 "memo": "Memo",
                 "memo_placeholder": "Click to add a memo",
                 "listings": "Listings",
-                "gallery": "Gallery"
+                "gallery": "Gallery",
+                "file_sizes": "File Size"
             },
             "json": {
                 "header": "JSON"
