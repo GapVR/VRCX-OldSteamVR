@@ -77,9 +77,9 @@
                             </div>
                         </template>
 
-                        <!-- Avatar ID + Platform row -->
+                        <!-- Avatar ID + Platform + File Size row -->
                         <div style="display: flex; flex-direction: column; padding-bottom: 4px">
-                            <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="grid grid-cols-3 gap-2 text-xs">
                                 <div>
                                     <span class="text-muted-foreground font-semibold">{{ t('dialog.avatar.info.id') }}</span>
                                     <div class="flex items-center gap-2 mt-0.5">
@@ -110,6 +110,10 @@
                                             {{ avatarDialogPlatform || '—' }}
                                         </div>
                                     </TooltipWrapper>
+                                </div>
+                                <div v-if="Object.keys(avatarDialog.fileAnalysis).length">
+                                    <span class="text-muted-foreground font-semibold">{{ t('dialog.avatar.info.file_sizes') }}</span>
+                                    <div class="text-muted-foreground mt-0.5">{{ avatarFileSizes }}</div>
                                 </div>
                             </div>
                         </div>
@@ -404,6 +408,16 @@
             }
         }
         return platforms.join('\n');
+    });
+
+    const avatarFileSizes = computed(() => {
+        // File sizes for each platform
+        const parts = [];
+        const fa = avatarDialog.value.fileAnalysis;
+        if (fa.standalonewindows?._fileSize) parts.push(`PC: ${fa.standalonewindows._fileSize}`);
+        if (fa.android?._fileSize) parts.push(`Quest: ${fa.android._fileSize}`);
+        if (fa.ios?._fileSize) parts.push(`iOS: ${fa.ios._fileSize}`);
+        return parts.join(', ');
     });
 
     const avatarTags = computed(() => {
