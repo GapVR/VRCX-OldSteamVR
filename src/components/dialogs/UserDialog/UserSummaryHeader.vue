@@ -3,7 +3,7 @@
         <!-- User icon (left) -->
         <img
             v-if="userDialog.publicProfileRef?.iconUrl"
-            class="cursor-pointer flex-none object-cover"
+            class="cursor-pointer flex-none object-cover rounded-md"
             :src="userDialog.publicProfileRef.iconUrl"
             style="width: 120px; height: 120px"
             @click="showFullscreenImageDialog(userDialog.publicProfileRef.iconUrl)"
@@ -215,7 +215,7 @@
         <!-- Banner image (right) -->
         <div
             v-if="!userDialog.loading && userDialog.ref.bannerUrl"
-            class="flex-none relative overflow-hidden cursor-pointer"
+            class="flex-none relative overflow-hidden cursor-pointer rounded-md"
             style="width: 220px; height: 124px"
             @click="showFullscreenImageDialog(userDialog.ref.bannerUrl)">
             <img
