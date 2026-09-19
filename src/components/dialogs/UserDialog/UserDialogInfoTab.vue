@@ -53,42 +53,28 @@
                         @click="showFullscreenImageDialog(userDialog.instance?.ref?.world?.imageUrl)"
                         loading="lazy" />
                     <div class="min-w-0 flex-1">
-                        <!-- Instance line: WORLD NAME <instance type> <#instance ID> <current users/instance limit> — all inline -->
                         <span
-                            class="text-sm cursor-pointer"
+                            class="text-md text-foreground cursor-pointer block truncate"
                             @click="showWorldDialog(userDialog.$location.tag)"
-                            :title="userDialog.instance?.ref?.world?.name">
-                            <span class="text-foreground truncate">{{ userDialog.instance?.ref?.world?.name }}</span>
-                            <span v-if="userDialog.$location.accessTypeName" class="text-sm text-muted-foreground"> · {{ userDialog.$location.accessTypeName }}</span>
-                            <span v-if="userDialog.$location.instanceName" class="text-sm text-muted-foreground"> · #{{ userDialog.$location.instanceName }}</span>
-                            <template v-if="userDialog.instance?.ref?.userCount !== undefined || userDialog.instance?.ref?.capacity">
-                                <span class="text-sm"> · </span><span :class="['text-sm font-bold', userDialog.instance?.ref?.hasCapacityForYou === false ? 'text-red-500' : userDialog.instance?.ref?.userCount <= 1 ? 'text-green-500' : 'text-foreground']">{{ userDialog.instance?.ref?.userCount ?? '—' }}</span><span class="text-sm text-muted-foreground">/{{ userDialog.instance?.ref?.capacity ?? '—' }}</span>
-                            </template>
-                        </span>
-                        <!-- Action buttons inline -->
-                        <div class="flex items-center gap-1 mt-1">
-                            <TooltipWrapper v-if="checkCanInviteSelf(userDialog.$location.tag)" :content="t('dialog.user.info.launch_invite_tooltip')" side="top">
-                                <Button size="icon-sm" variant="outline" class="rounded-full h-5 w-5 text-muted-foreground hover:text-foreground" @click="launchStore.showLaunchDialog(userDialog.$location.tag)">
-                                    <LogIn class="size-3" />
-                                </Button>
-                            </TooltipWrapper>
-                            <template v-if="checkCanInviteSelf(userDialog.$location.tag)">
-                                <TooltipWrapper v-if="!canOpenInstanceInGame" :content="t('dialog.user.info.self_invite_tooltip')" side="top">
-                                    <Button size="icon-sm" variant="outline" class="rounded-full h-5 w-5 text-muted-foreground hover:text-foreground" @click="launchStore.tryOpenInstanceInVrc(userDialog.$location.tag, userDialog.$location.shortName)">
-                                        <Mail class="size-3" />
-                                    </Button>
-                                </TooltipWrapper>
-                                <TooltipWrapper v-else :content="t('dialog.user.info.open_in_vrchat_tooltip')" side="top">
-                                    <Button size="icon-sm" variant="outline" class="rounded-full h-5 w-5 text-muted-foreground hover:text-foreground" @click="launchStore.tryOpenInstanceInVrc(userDialog.$location.tag, userDialog.$location.shortName)">
-                                        <Mail class="size-3" />
-                                    </Button>
-                                </TooltipWrapper>
-                            </template>
-                            <TooltipWrapper :content="t('dialog.user.info.refresh_instance_info')" side="top">
-                                <Button size="icon-sm" variant="outline" class="rounded-full h-5 w-5 text-muted-foreground hover:text-foreground" @click="refreshInstancePlayerCount(userDialog.$location.tag)">
-                                    <RefreshCw class="size-3" />
-                                </Button>
-                            </TooltipWrapper>
+                            :title="userDialog.instance?.ref?.world?.name"
+                            >{{ userDialog.instance?.ref?.world?.name }}</span
+                        >
+                        <div class="flex min-w-0 flex-wrap items-start gap-1.5">
+                            <LocationWorld
+                                class="text-sm inline-flex min-w-0 w-fit max-w-full border-muted-foreground/30"
+                                :locationobject="userDialog.$location"
+                                :currentuserid="currentUser.id" />
+                            <InstanceActionBar
+                                class="text-sm inline-flex max-w-full shrink-0 border-muted-foreground/30"
+                                :showButtons="true"
+                                :showInstanceInfo="true"
+                                :location="userDialog.$location.tag"
+                                :shortname="userDialog.$location.shortName"
+                                :currentlocation="lastLocation.location"
+                                :instance="userDialog.instance.ref"
+                                :friendcount="userDialog.instance.friendCount"
+                                :refresh-tooltip="t('dialog.user.info.refresh_instance_info')"
+                                :on-refresh="() => refreshInstancePlayerCount(userDialog.$location.tag)" />
                         </div>
                     </div>
                 </div>
@@ -482,6 +468,8 @@
     import { useInviteChecks } from '../../../composables/useInviteChecks';
 
     import EditNoteAndMemoDialog from './EditNoteAndMemoDialog.vue';
+    import LocationWorld from '@/components/LocationWorld.vue';
+    import InstanceActionBar from '@/components/InstanceActionBar.vue';
 
     const { t } = useI18n();
 
