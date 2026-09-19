@@ -418,16 +418,13 @@
             const isFileEndpoint = url.endsWith('/file');
 
             if (isFileEndpoint) {
-                const response = await webApiService.execute({ url, method: 'GET' });
-                if (response.status !== 200) throw new Error(`Error: ${response.data}`);
-                const fileData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
-                const link = document.createElement('a');
-                link.href = fileData.downloadUrl;
                 const fileId = extractFileId(url);
                 let name = fileName;
                 if (!name && fileId) name = `${fileId}.png`;
                 if (!name) name = `${url.split('/').pop()}.png`;
                 if (!name) name = 'image.png';
+                const link = document.createElement('a');
+                link.href = url;
                 link.setAttribute('download', name);
                 document.body.appendChild(link);
                 link.click();
