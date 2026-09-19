@@ -127,7 +127,7 @@
                 :key="it.value"
                 :value="it.value"
                 :disabled="it.disabled"
-                :class="triggerClass"
+                :class="[triggerClass, 'min-w-0']"
                 :style="innerValue === it.value ? triggerStyle : undefined">
                 <slot :name="`label-${it.value}`">{{ it.label }}</slot>
             </TabsTrigger>

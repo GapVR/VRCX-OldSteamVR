@@ -305,12 +305,16 @@
             class="zero-margin-tabs"
             style="height: calc(100% - 70px); margin-top: 6px">
             <template #label-friends>
-                <span>{{ t('side_panel.friends') }}</span>
-                <span class="sidebar-tab-count whitespace-nowrap"> ({{ onlineFriendCount }}/{{ friends.size }}) <span class="ml-1 text-muted-foreground">{{ nonPrivateOnlinePct }}</span></span>
+                <div class="flex items-center w-full">
+                    <span class="flex-1 min-w-0 overflow-hidden text-ellipsis">{{ t('side_panel.friends') }}</span>
+                    <span class="sidebar-tab-count flex-none whitespace-nowrap"> ({{ onlineFriendCount }}/{{ friends.size }}) <span class="ml-1 text-muted-foreground">{{ nonPrivateOnlinePct }}</span></span>
+                </div>
             </template>
             <template #label-groups>
-                <span>{{ t('side_panel.groups') }}</span>
-                <span class="sidebar-tab-count"> ({{ groupInstances.length }}) </span>
+                <div class="flex items-center w-full">
+                    <span class="flex-1 min-w-0 overflow-hidden text-ellipsis">{{ t('side_panel.groups') }}</span>
+                    <span class="sidebar-tab-count flex-none whitespace-nowrap"> ({{ groupInstances.length }}) </span>
+                </div>
             </template>
             <template #friends>
                 <div class="h-full overflow-hidden">
