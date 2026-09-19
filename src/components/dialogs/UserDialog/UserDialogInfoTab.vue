@@ -409,7 +409,7 @@
                     </div>
                     <Avatar
                         v-if="userDialog.representedGroup && userDialog.representedGroup.isRepresenting"
-                        class="cursor-pointer shrink-0 size-9 rounded-lg mt-1"
+                        class="cursor-pointer shrink-0 rounded-lg mt-1" :style="{ height: '72px', width: '72px' }"
                         @click.stop="showFullscreenImageDialog(userDialog.representedGroup.iconUrl)">
                         <AvatarImage :src="userDialog.representedGroup.$thumbnailUrl" class="object-cover" />
                         <AvatarFallback>
