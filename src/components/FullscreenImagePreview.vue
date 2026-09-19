@@ -423,12 +423,16 @@
                 if (!name && fileId) name = `${fileId}.png`;
                 if (!name) name = `${url.split('/').pop()}.png`;
                 if (!name) name = 'image.png';
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
                 const link = document.createElement('a');
-                link.href = url;
+                link.href = blobUrl;
                 link.setAttribute('download', name);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
             } else {
                 const response = await webApiService.execute({ url, method: 'GET' });
                 if (response.status !== 200 || !String(response.data).startsWith('data:image/png')) {
