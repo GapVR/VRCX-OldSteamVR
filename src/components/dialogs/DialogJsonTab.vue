@@ -1,5 +1,5 @@
 <script setup>
-    import { Download, RefreshCw } from 'lucide-vue-next';
+    import { Clipboard, Download, RefreshCw } from 'lucide-vue-next';
     import { Button } from '@/components/ui/button';
     import { cn } from '@/lib/utils';
     import { storeToRefs } from 'pinia';
@@ -40,6 +40,17 @@
     const emit = defineEmits(['refresh']);
     const { isDarkMode } = storeToRefs(useAppearanceSettingsStore());
     const { t } = useI18n();
+
+    function copyJsonToClipboard() {
+        const parts = [];
+        if (props.treeData && Object.keys(props.treeData).length > 0) {
+            parts.push(JSON.stringify(props.treeData, null, 2));
+        }
+        if (props.fileAnalysis && Object.keys(props.fileAnalysis).length) {
+            parts.push(JSON.stringify(props.fileAnalysis, null, 2));
+        }
+        navigator.clipboard.writeText(parts.join('\n\n'));
+    }
 </script>
 
 <template>
@@ -60,6 +71,13 @@
                 @click="downloadAndSaveJson(dialogId, dialogRef)"
                 :ariaLabel="t('dialog.vrcx_updater.download')">
                 <Download />
+            </Button>
+            <Button
+                class="rounded-full"
+                size="icon-sm"
+                variant="ghost"
+                @click="copyJsonToClipboard">
+                <Clipboard />
             </Button>
         </div>
 
