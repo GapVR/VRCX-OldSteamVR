@@ -29,6 +29,15 @@
             </SettingsItem>
 
             <SettingsItem
+                :label="t('view.settings.advanced.advanced.auto_clear_persistent_data.header')"
+                :description="t('view.settings.advanced.advanced.auto_clear_persistent_data.description')">
+                <Switch
+                    :model-value="autoClearPersistentData"
+                    :ariaLabel="t('view.settings.advanced.advanced.auto_clear_persistent_data.header')"
+                    @update:modelValue="setAutoClearPersistentData" />
+            </SettingsItem>
+
+            <SettingsItem
                 :label="t('view.settings.advanced.advanced.self_invite.header')"
                 :description="t('view.settings.advanced.advanced.self_invite.description')">
                 <Switch
@@ -474,6 +483,7 @@
         relaunchVRChatAfterCrash,
         vrcQuitFix,
         autoSweepVRChatCache,
+        autoClearPersistentData,
         selfInviteOverride,
         enableAppLauncher,
         enableAppLauncherAutoClose,
@@ -490,6 +500,7 @@
         setRelaunchVRChatAfterCrash,
         setVrcQuitFix,
         setAutoSweepVRChatCache,
+        setAutoClearPersistentData,
         setSelfInviteOverride,
         setEnableAppLauncher,
         setEnableAppLauncherAutoClose,

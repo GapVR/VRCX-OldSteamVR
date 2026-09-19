@@ -130,6 +130,20 @@ const miscReq = {
     },
 
     /**
+     * @returns {Promise<{ json: any; params }>}
+     */
+    deleteAllPersistentData() {
+        return request(`users/${getCurrentUserId()}/persist`, {
+            method: 'DELETE'
+        }).then((json) => {
+            const args = {
+                json
+            };
+            return args;
+        });
+    },
+
+    /**
      * @param {{
      *     worldId: string;
      * }} params

@@ -2,6 +2,7 @@ import { toast } from 'vue-sonner';
 
 import { deleteVRChatCache as _deleteVRChatCache, isRealInstance } from '../shared/utils';
 import { database } from '../services/database';
+import miscRequest from '../api/misc';
 import { useAdvancedSettingsStore } from '../stores/settings/advanced';
 import { useAvatarStore } from '../stores/avatar';
 import { addAvatarWearTime } from './avatarCoordinator';
@@ -116,6 +117,9 @@ function runAutoVRChatCacheManagementFlow() {
     if (advancedSettingsStore.autoSweepVRChatCache) {
         runSweepVRChatCacheFlow();
     }
+    if (advancedSettingsStore.autoClearPersistentData) {
+        runClearPersistentDataFlow();
+    }
 }
 
 /**
@@ -133,6 +137,18 @@ export async function runSweepVRChatCacheFlow() {
     }
     if (advancedSettingsStore.isVRChatConfigDialogVisible) {
         gameStore.getVRChatCacheSize();
+    }
+}
+
+/**
+ * Clears all persistent world data when closing VRChat.
+ */
+async function runClearPersistentDataFlow() {
+    try {
+        await miscRequest.deleteAllPersistentData();
+        console.log('ClearPersistentData', 'success');
+    } catch (e) {
+        console.error('ClearPersistentData failed', e);
     }
 }
 

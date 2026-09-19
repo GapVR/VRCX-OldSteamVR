@@ -34,6 +34,7 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
     const relaunchVRChatAfterCrash = ref(false);
     const vrcQuitFix = ref(true);
     const autoSweepVRChatCache = ref(false);
+    const autoClearPersistentData = ref(false);
     const selfInviteOverride = ref(false);
     const saveInstancePrints = ref(false);
     const cropInstancePrints = ref(false);
@@ -86,6 +87,7 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
             relaunchVRChatAfterCrashConfig,
             vrcQuitFixConfig,
             autoSweepVRChatCacheConfig,
+            autoClearPersistentDataConfig,
             selfInviteOverrideConfig,
             saveInstancePrintsConfig,
             cropInstancePrintsConfig,
@@ -123,6 +125,7 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
             configRepository.getBool('VRCX_relaunchVRChatAfterCrash', false),
             configRepository.getBool('VRCX_vrcQuitFix', true),
             configRepository.getBool('VRCX_autoSweepVRChatCache', false),
+            configRepository.getBool('VRCX_autoClearPersistentData', false),
             configRepository.getBool('VRCX_selfInviteOverride', false),
             configRepository.getBool('VRCX_saveInstancePrints', false),
             configRepository.getBool('VRCX_cropInstancePrints', false),
@@ -166,6 +169,7 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
         relaunchVRChatAfterCrash.value = relaunchVRChatAfterCrashConfig;
         vrcQuitFix.value = vrcQuitFixConfig;
         autoSweepVRChatCache.value = autoSweepVRChatCacheConfig;
+        autoClearPersistentData.value = autoClearPersistentDataConfig;
         selfInviteOverride.value = selfInviteOverrideConfig;
         saveInstancePrints.value = saveInstancePrintsConfig;
         cropInstancePrints.value = cropInstancePrintsConfig;
@@ -233,6 +237,10 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
     function setAutoSweepVRChatCache() {
         autoSweepVRChatCache.value = !autoSweepVRChatCache.value;
         configRepository.setBool('VRCX_autoSweepVRChatCache', autoSweepVRChatCache.value);
+    }
+    function setAutoClearPersistentData() {
+        autoClearPersistentData.value = !autoClearPersistentData.value;
+        configRepository.setBool('VRCX_autoClearPersistentData', autoClearPersistentData.value);
     }
     function setSelfInviteOverride() {
         selfInviteOverride.value = !selfInviteOverride.value;
@@ -914,6 +922,7 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
         relaunchVRChatAfterCrash,
         vrcQuitFix,
         autoSweepVRChatCache,
+        autoClearPersistentData,
         selfInviteOverride,
         saveInstancePrints,
         cropInstancePrints,
@@ -956,6 +965,7 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
         setRelaunchVRChatAfterCrash,
         setVrcQuitFix,
         setAutoSweepVRChatCache,
+        setAutoClearPersistentData,
         setSelfInviteOverride,
         setSaveInstancePrints,
         setCropInstancePrints,
