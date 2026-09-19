@@ -420,6 +420,26 @@
                     <div v-else class="text-xs text-muted-foreground mt-1">—</div>
                 </div>
 
+                <!-- Avatar Info Panel -->
+                <div class="rounded-xl bg-(--profile-card) p-3 flex flex-col mt-2">
+                    <div class="text-[10px] font-bold uppercase tracking-wide mb-2 pb-2 border-b border-muted-foreground/20" :style="{ color: userDialog.theme.subtextColor }">
+                        {{ t('dialog.user.info.avatar_info') }}
+                        <span class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                            <TooltipWrapper v-if="!hasAvatarSet" side="right" :content="t('dialog.user.info.icon_hides_avatar')">
+                                <Info class="inline-block h-3 w-3 align-middle" :style="{ color: userDialog.theme.iconColor }" />
+                            </TooltipWrapper>
+                        </span>
+                    </div>
+                    <div class="text-xs flex justify-between gap-2">
+                        <template v-if="avatarImageUrl">
+                            <AvatarInfo :key="avatarImageUrl" :imageurl="avatarImageUrl" :userid="userDialog.id" :avatartags="userDialog.ref.currentAvatarTags" style="display: inline-block" />
+                            <img class="h-12 w-16 rounded-lg object-cover cursor-pointer flex-none" :src="avatarImageUrl" @click="showFullscreenImageDialog(avatarImageUrl)" loading="lazy" />
+                        </template>
+                        <template v-else>
+                            <div class="text-xs text-muted-foreground">—</div>
+                        </template>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -429,8 +449,9 @@
 <script setup>
     import { Info, Languages, LogIn, Mail, Pencil, RefreshCw, Trash2, User, UsersRound, UserPlus2 } from 'lucide-vue-next';
     import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+    import AvatarInfo from '@/components/AvatarInfo.vue';
     import IconFrame from '@/components/IconFrame.vue';
-    import { ref, watch } from 'vue';
+    import { computed, ref, watch } from 'vue';
     import { Button } from '@/components/ui/button';
     import { Spinner } from '@/components/ui/spinner';
     import { storeToRefs } from 'pinia';
@@ -465,6 +486,7 @@
 
     import { showUserDialog } from '../../../coordinators/userCoordinator';
     import { showGroupDialog } from '../../../coordinators/groupCoordinator';
+    import { getAvatarName } from '@/coordinators/avatarCoordinator';
     import { useInviteChecks } from '../../../composables/useInviteChecks';
 
     import EditNoteAndMemoDialog from './EditNoteAndMemoDialog.vue';
@@ -498,6 +520,13 @@
     const isEditNoteAndMemoDialogVisible = ref(false);
     const vrchatCredit = ref(null);
     const translateLoading = ref(false);
+    const hasAvatarSet = ref(false);
+    const avatarImageUrl = computed(() => {
+        if (userDialog.value.id === currentUser.value.id) {
+            return currentUser.value.currentAvatarImageUrl;
+        }
+        return hasAvatarSet.value ? userDialog.value.publicProfileRef?.iconUrl : '';
+    });
 
     watch(
         () => userDialog.value.loading,
@@ -511,6 +540,18 @@
                 }
             }
         }
+    );
+
+    watch(
+        () => userDialog.value.publicProfileRef?.iconUrl,
+        async (iconUrl) => {
+            hasAvatarSet.value = false;
+            const avatarInfo = await getAvatarName(iconUrl);
+            if (iconUrl === userDialog.value.publicProfileRef?.iconUrl) {
+                hasAvatarSet.value = Boolean(avatarInfo.ownerId);
+            }
+        },
+        { immediate: true }
     );
 
     function onTabActivated() {
