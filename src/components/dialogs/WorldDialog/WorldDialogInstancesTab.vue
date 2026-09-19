@@ -6,7 +6,6 @@
                 <div class="flex flex-wrap items-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
                     <Location
                         :location="room.tag"
-                        exclude-group-name
                         class="text-sm" />
                     <InstanceActionBar
                         class="text-sm"
