@@ -8,9 +8,9 @@
                     props.class
                 )
             ">
-            <TooltipWrapper v-if="instanceInfoState.isValidInstance" side="top">
+            <TooltipWrapper side="top">
                 <template #content>
-                    <div class="flex flex-col flex-wrap gap-x-6 gap-y-2">
+                    <div v-if="instanceInfoState.isValidInstance" class="flex flex-col flex-wrap gap-x-6 gap-y-2">
                         <div class="flex flex-col gap-1">
                             <span>
                                 <span class="text-platform-pc border-platform-pc!">PC: </span>
@@ -57,13 +57,12 @@
                 <div :class="cn('flex items-center gap-0.5', playerCountColor)">
                     <UsersRound class="h-4 w-4 text-muted-foreground" />
                     <span v-if="resolvedInstanceLocation === locationStore.lastLocation.location">
-                        {{ locationStore.lastLocation.playerList.size }}/{{ instance?.capacity }}
+                        {{ locationStore.lastLocation.playerList.size }}/{{ instance?.capacity ?? '?' }}
                     </span>
 
-                    <span v-else-if="instance?.userCount"> {{ instance.userCount }}/{{ instance?.capacity }} </span>
+                    <span v-else-if="instance?.userCount"> {{ instance.userCount }}/{{ instance?.capacity ?? '?' }} </span>
                 </div>
             </TooltipWrapper>
-
             <TooltipWrapper v-if="friendcount" side="top" :content="t('dialog.user.info.instance_friends_tooltip')">
                 <span class="flex items-center gap-0.5 text-yellow-400 font-bold">
                     <UserPlus2 class="h-4 w-4" />
