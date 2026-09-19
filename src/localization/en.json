@@ -3032,7 +3032,8 @@
         },
         "image": {
             "downloading": "Downloading image...",
-            "copied_to_clipboard": "Image copied to clipboard"
+            "copied_to_clipboard": "Image copied to clipboard",
+            "url_copied": "Image URL copied to clipboard"
         },
         "registry": {
             "restored": "VRC registry settings restored",

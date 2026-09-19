@@ -19,6 +19,16 @@
                             size="icon"
                             class="h-8 w-8"
                             :disabled="!imageUrl"
+                            @click="copyImageUrl(imageUrl)"
+                            :ariaLabel="t('message.image.url_copied')">
+                            <Link class="h-4 w-4" />
+                        </Button>
+
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            class="h-8 w-8"
+                            :disabled="!imageUrl"
                             @click="copyImageToClipboard(imageUrl)"
                             :ariaLabel="t('common.actions.copy')">
                             <Copy class="h-4 w-4" />
@@ -111,7 +121,7 @@
 </template>
 
 <script setup>
-    import { Copy, Download, RefreshCcw, RotateCcw, RotateCw, X, ZoomIn, ZoomOut } from 'lucide-vue-next';
+    import { Copy, Download, Link, RefreshCcw, RotateCcw, RotateCw, X, ZoomIn, ZoomOut } from 'lucide-vue-next';
     import { useEventListener } from '@vueuse/core';
     import { computed, onBeforeUnmount, ref, watch } from 'vue';
     import { DialogContent as RekaDialogContent, DialogOverlay as RekaDialogOverlay, DialogPortal } from 'reka-ui';
@@ -302,6 +312,12 @@
         else if (e.key === '0') resetTransform();
     }
     useEventListener(window, 'keydown', onKeydown);
+
+    async function copyImageUrl(url) {
+        if (!url) return;
+        await navigator.clipboard.writeText(url);
+        toast.success(t('message.image.url_copied'));
+    }
 
     async function copyImageToClipboard(url) {
         if (!url) return;
