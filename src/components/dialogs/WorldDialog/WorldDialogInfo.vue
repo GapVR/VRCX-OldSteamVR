@@ -12,9 +12,9 @@
                 @change="onWorldMemoChange" />
         </div>
 
-        <!-- World ID + File Sizes -->
+        <!-- World ID, File Size, Cached Size -->
         <div style="display: flex; flex-direction: column; padding-bottom: 4px">
-            <div class="grid grid-cols-1 gap-2 text-xs">
+            <div class="grid grid-cols-3 gap-2 text-xs">
                 <div>
                     <span class="text-muted-foreground font-semibold">{{ t('dialog.world.info.id') }}</span>
                     <div class="flex items-center gap-2 mt-0.5">
@@ -41,6 +41,10 @@
                 <div v-if="Object.keys(worldDialog.fileAnalysis).length">
                     <span class="text-muted-foreground font-semibold">{{ t('dialog.world.info.file_sizes') }}</span>
                     <div class="text-muted-foreground mt-0.5">{{ fileSizes }}</div>
+                </div>
+                <div v-if="worldDialog.inCache">
+                    <span class="text-muted-foreground font-semibold">{{ t('dialog.world.info.cached_size') }}</span>
+                    <div class="text-muted-foreground mt-0.5">{{ worldDialog.cacheSize }}</div>
                 </div>
             </div>
         </div>

@@ -1651,6 +1651,7 @@
                 "version": "Version",
                 "platform": "Platform",
                 "file_sizes": "File Size",
+                "cached_size": "Cached Size",
                 "last_visited": "Last Visited",
                 "visit_count": "Visit Count",
                 "time_spent": "Time Spent",
