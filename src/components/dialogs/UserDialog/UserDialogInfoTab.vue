@@ -421,17 +421,16 @@
                 </div>
 
                 <!-- Avatar Info — flat, no card wrapper -->
-                <div style="padding-bottom: 4px;">
-                    <span class="text-xs font-semibold text-muted-foreground">{{ t('dialog.user.info.avatar_info') }}</span>
-                    <div class="text-xs flex items-center gap-2 mt-1">
-                        <template v-if="avatarImageUrl">
+                <div class="flex gap-2">
+                    <div class="flex-1 min-w-0">
+                        <span class="text-xs font-semibold text-muted-foreground">{{ t('dialog.user.info.avatar_info') }}</span>
+                        <div v-if="avatarImageUrl" class="text-xs mt-1">
                             <AvatarInfo :key="avatarImageUrl" :imageurl="avatarImageUrl" :userid="userDialog.id" :avatartags="userDialog.ref.currentAvatarTags" style="display: inline-block" />
-                            <img class="h-12 w-16 rounded-lg object-cover cursor-pointer flex-none" :src="avatarImageUrl" @click="showFullscreenImageDialog(avatarImageUrl)" loading="lazy" />
-                        </template>
-                        <template v-else>
-                            <span class="text-xs text-muted-foreground">—</span>
-                        </template>
+                        </div>
+                        <span v-else class="text-xs text-muted-foreground mt-1">—</span>
                     </div>
+                    <img v-if="avatarImageUrl" class="h-12 w-16 rounded-lg object-cover cursor-pointer flex-none self-start" :src="avatarImageUrl" @click="showFullscreenImageDialog(avatarImageUrl)" loading="lazy" />
+                    <span v-else class="text-xs text-muted-foreground self-start">—</span>
                 </div>
             </div>
         </div>
