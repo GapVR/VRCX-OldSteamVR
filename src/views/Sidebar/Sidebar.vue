@@ -308,7 +308,7 @@
                 <div class="flex-1 min-w-0 overflow-hidden">
                     <span>{{ t('side_panel.friends') }}</span>
                 </div>
-                <span class="sidebar-tab-count flex-none whitespace-nowrap"> ({{ onlineFriendCount }}/{{ friends.size }}) <span class="ml-1 text-muted-foreground">{{ nonPrivateOnlinePct }}</span></span>
+                <span class="sidebar-tab-count flex-none whitespace-nowrap"> ({{ onlineFriendCount }}/{{ friends.size }}) <span class="ml-1" :style="{ color: onlinePctColor }">{{ nonPrivateOnlinePct }}</span></span>
             </template>
             <template #label-groups>
                 <div class="flex-1 min-w-0 overflow-hidden">
@@ -387,6 +387,18 @@
             (f) => f.state === 'online' && isRealInstance(f.ref?.location)
         ).length;
         return `${Math.round((visible / onlineFriendCount.value) * 100)}%`;
+    });
+    const onlinePctColor = computed(() => {
+        if (onlineFriendCount.value === 0) return '';
+        const visible = Array.from(friends.value.values()).filter(
+            (f) => f.state === 'online' && isRealInstance(f.ref?.location)
+        ).length;
+        const pct = visible / onlineFriendCount.value;
+        // Green (#54D23A) at 100% to Orange (#E17823) at 0%
+        const r = Math.round(0x54 + (0xE1 - 0x54) * (1 - pct));
+        const g = Math.round(0xD2 + (0x78 - 0xD2) * (1 - pct));
+        const b = Math.round(0x3A + (0x23 - 0x3A) * (1 - pct));
+        return `rgb(${r}, ${g}, ${b})`;
     });
     const { groupInstances } = storeToRefs(useGroupStore());
     const notificationStore = useNotificationStore();
