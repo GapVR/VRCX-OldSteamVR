@@ -217,7 +217,6 @@
                             <User class="size-4 text-muted-foreground" />
                         </AvatarFallback>
                     </Avatar>
-                    <span v-else-if="userDialog.representedGroup" class="text-xs text-muted-foreground self-start">—</span>
                 </div>
 
                 <!-- Avatar Info — flat, no card wrapper -->
