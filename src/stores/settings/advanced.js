@@ -125,7 +125,7 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
             configRepository.getBool('VRCX_relaunchVRChatAfterCrash', false),
             configRepository.getBool('VRCX_vrcQuitFix', true),
             configRepository.getBool('VRCX_autoSweepVRChatCache', false),
-            configRepository.getBool('VRCX_autoClearPersistentData', false),
+            configRepository.getBool('VRCXOldSteamVR_autoClearPersistentData', false),
             configRepository.getBool('VRCX_selfInviteOverride', false),
             configRepository.getBool('VRCX_saveInstancePrints', false),
             configRepository.getBool('VRCX_cropInstancePrints', false),
@@ -240,7 +240,7 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
     }
     function setAutoClearPersistentData() {
         autoClearPersistentData.value = !autoClearPersistentData.value;
-        configRepository.setBool('VRCX_autoClearPersistentData', autoClearPersistentData.value);
+        configRepository.setBool('VRCXOldSteamVR_autoClearPersistentData', autoClearPersistentData.value);
     }
     function setSelfInviteOverride() {
         selfInviteOverride.value = !selfInviteOverride.value;
