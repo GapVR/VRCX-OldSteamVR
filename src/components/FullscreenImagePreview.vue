@@ -14,6 +14,35 @@
                     <div
                         @click.stop
                         class="absolute right-3 top-3 z-10 flex items-center gap-2 rounded-md bg-background/70 backdrop-blur px-2 py-1 border">
+                        <span class="text-xs text-muted-foreground">Version</span>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            class="h-6 w-6"
+                            :disabled="!imageUrl || imageVersion <= 1"
+                            @click="changeVersion(-1)">
+                            <span class="text-xs">-</span>
+                        </Button>
+                        <span class="text-xs min-w-[1.5rem] text-center">{{ imageVersion }}</span>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            class="h-6 w-6"
+                            :disabled="!imageUrl"
+                            @click="changeVersion(1)">
+                            <span class="text-xs">+</span>
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            class="h-6 w-6"
+                            :disabled="!imageUrl"
+                            @click="fullSize">
+                            <span class="text-xs">Fullsize</span>
+                        </Button>
+
+                        <div class="mx-1 h-5 w-px bg-border" />
+
                         <Button
                             variant="ghost"
                             size="icon"
@@ -45,33 +74,6 @@
                         </Button>
 
                         <div class="mx-1 h-5 w-px bg-border" />
-
-                        <span class="text-xs text-muted-foreground">Version</span>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            class="h-6 w-6"
-                            :disabled="!imageUrl || imageVersion <= 1"
-                            @click="changeVersion(-1)">
-                            <span class="text-xs">-</span>
-                        </Button>
-                        <span class="text-xs min-w-[1.5rem] text-center">{{ imageVersion }}</span>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            class="h-6 w-6"
-                            :disabled="!imageUrl"
-                            @click="changeVersion(1)">
-                            <span class="text-xs">+</span>
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            class="h-6 w-6"
-                            :disabled="!imageUrl"
-                            @click="fullSize">
-                            <span class="text-xs">Fullsize</span>
-                        </Button>
 
                         <Button
                             variant="ghost"
@@ -208,9 +210,10 @@
     }
 
     function fullSize() {
-        const match = imageUrl.value.match(/\/image\/[^/]+\/\d+\/(\d+)$/);
-        const currentRes = match ? parseInt(match[1], 10) : 256;
-        updateImageUrl(imageVersion.value, Math.max(currentRes * 2, 1024));
+        const match = imageUrl.value.match(/^(https:\/\/api\.vrchat\.cloud\/api\/1\/image\/[^/]+)\/\d+\/\d+$/);
+        if (!match) return;
+        fullscreenImageDialog.value.imageUrl = `${match[1]}/${imageVersion.value}/file`;
+        resetTransform();
     }
 
     const open = computed({
