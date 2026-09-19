@@ -24,10 +24,8 @@
 
     import { TooltipWrapper } from './ui/tooltip';
     import { getAvatarName, showAvatarAuthorDialog } from '../coordinators/avatarCoordinator';
-    import { useGalleryStore } from '../stores';
 
     const { t } = useI18n();
-    const { showFullscreenImageDialog } = useGalleryStore();
 
     const props = defineProps({
         imageurl: String,
@@ -41,7 +39,6 @@
     const avatarType = ref('');
     const avatarTags = ref('');
     let ownerId = '';
-    let resolved = false;
 
     const parse = async () => {
         ownerId = '';
@@ -77,7 +74,6 @@
         if (Array.isArray(props.avatartags)) {
             avatarTags.value = props.avatartags.map((tag) => String(tag).replace('content_', '')).join(', ');
         }
-        resolved = true;
     };
 
     const confirm = () => {

@@ -559,11 +559,9 @@ export async function showAvatarAuthorDialog(refUserId, ownerUserId, currentAvat
             avatarId = await checkAvatarCacheRemote(fileId, ownerUserId);
         }
         if (!avatarId) {
-            if (avatarInfo.avatarName !== '-') {
-                // Resolved - show fullscreen image
-                showFullscreenImageDialog(currentAvatarImageUrl);
+            if (ownerUserId === refUserId) {
+                toast.warning(t('message.avatar_lookup.private_or_not_found'));
             } else {
-                // Not resolved - show not found
                 toast.warning(t('message.avatar_lookup.not_found'));
                 showUserDialog(avatarInfo.ownerId);
             }
