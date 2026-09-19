@@ -99,11 +99,6 @@
                         <Pencil class="size-4" />
                         {{ t('dialog.user.actions.edit_profile') }}
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem variant="destructive" @click="onCommand('Clear Persistent Data')">
-                        <Trash2 class="size-4" />
-                        {{ t('dialog.user.actions.clear_persistent_data') }}
-                    </DropdownMenuItem>
                 </template>
                 <DropdownMenuItem @click="onCommand('Refresh')">
                     <RefreshCw class="size-4" />
@@ -121,6 +116,11 @@
                     <DropdownMenuItem @click="onCommand('Show Fallback Avatar Details')">
                         <User class="size-4" />
                         {{ t('dialog.user.actions.show_fallback_avatar') }}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem variant="destructive" @click="onCommand('Clear Persistent Data')">
+                        <Trash2 class="size-4" />
+                        {{ t('dialog.user.actions.clear_persistent_data') }}
                     </DropdownMenuItem>
                 </template>
                 <template v-else>
