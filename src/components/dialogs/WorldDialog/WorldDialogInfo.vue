@@ -12,7 +12,7 @@
                 @change="onWorldMemoChange" />
         </div>
 
-        <!-- World ID -->
+        <!-- World ID + File Sizes -->
         <div style="display: flex; flex-direction: column; padding-bottom: 4px">
             <div class="grid grid-cols-1 gap-2 text-xs">
                 <div>
@@ -37,6 +37,10 @@
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
+                </div>
+                <div v-if="Object.keys(worldDialog.fileAnalysis).length">
+                    <span class="text-muted-foreground font-semibold">{{ t('dialog.world.info.file_sizes') }}</span>
+                    <div class="text-muted-foreground mt-0.5">{{ fileSizes }}</div>
                 </div>
             </div>
         </div>
@@ -150,16 +154,6 @@
                     <TooltipWrapper side="top" :content="worldDialogPlatform" :disabled="!worldDialogPlatform">
                         <div class="text-muted-foreground mt-0.5 max-w-full truncate whitespace-pre-wrap">{{ worldDialogPlatform || '—' }}</div>
                     </TooltipWrapper>
-                </div>
-            </div>
-        </div>
-
-        <!-- File Sizes -->
-        <div v-if="Object.keys(worldDialog.fileAnalysis).length" style="display: flex; flex-direction: column; padding-bottom: 4px">
-            <div class="grid grid-cols-1 gap-2 text-xs">
-                <div>
-                    <span class="text-muted-foreground font-semibold">{{ t('dialog.world.info.file_sizes') }}</span>
-                    <div class="text-muted-foreground mt-0.5">{{ fileSizes }}</div>
                 </div>
             </div>
         </div>
