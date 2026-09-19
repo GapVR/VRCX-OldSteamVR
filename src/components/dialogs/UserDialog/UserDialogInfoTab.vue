@@ -423,12 +423,17 @@
                 <div class="flex gap-2">
                     <div class="flex-1 min-w-0">
                         <span class="text-xs font-semibold text-muted-foreground">{{ t('dialog.user.info.avatar_info') }}</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                            <TooltipWrapper v-if="!hasAvatarSet" side="right" :content="t('dialog.user.info.icon_hides_avatar')">
+                                <Info class="inline-block h-3 w-3 align-middle mt-1" :style="{ color: userDialog.theme.iconColor }" />
+                            </TooltipWrapper>
+                        </span>
                         <div v-if="avatarImageUrl" class="text-xs mt-1">
                             <AvatarInfo :key="avatarImageUrl" :imageurl="avatarImageUrl" :userid="userDialog.id" :avatartags="userDialog.ref.currentAvatarTags" style="display: inline-block" />
                         </div>
                         <span v-else class="text-xs text-muted-foreground mt-1">—</span>
                     </div>
-                    <img v-if="avatarImageUrl" class="h-12 w-16 rounded-lg object-cover cursor-pointer flex-none mt-1" :src="avatarImageUrl" @click="showFullscreenImageDialog(avatarImageUrl)" loading="lazy" />
+                    <img v-if="avatarImageUrl" class="rounded-lg object-cover cursor-pointer flex-none mt-1" :style="{ height: '72px', width: '72px' }" :src="avatarImageUrl" @click="showFullscreenImageDialog(avatarImageUrl)" loading="lazy" />
                     <span v-else class="text-xs text-muted-foreground mt-1">—</span>
                 </div>
             </div>
