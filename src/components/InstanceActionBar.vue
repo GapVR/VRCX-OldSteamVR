@@ -1,6 +1,123 @@
 <template>
-    <div class="flex row-auto gap-2" v-bind="$attrs">
-        <div v-if="showButtons" class="flex row-auto gap-2">
+    <div class="flex row-auto gap-1.5 items-center" v-bind="$attrs">
+        <div
+            v-if="showInstanceInfo"
+            :class="
+                cn(
+                    'flex items-center gap-1.5 text-muted-foreground rounded-full border border-muted-foreground/10 py-0.5 px-2',
+                    props.class
+                )
+            ">
+            <TooltipWrapper v-if="instanceInfoState.isValidInstance" side="top">
+                <template #content>
+                    <div class="flex flex-col flex-wrap gap-x-6 gap-y-2">
+                        <div class="flex flex-col gap-1">
+                            <span>
+                                <span class="text-platform-pc border-platform-pc!">PC: </span>
+                                {{ instance?.platforms?.standalonewindows }}
+                            </span>
+                            <span>
+                                <span class="text-platform-quest border-platform-quest!">Android: </span>
+                                {{ instance?.platforms?.android }}
+                            </span>
+                            <span>
+                                <span class="text-platform-ios border-platform-quest!">iOS: </span>
+                                {{ instance?.platforms?.ios }}
+                            </span>
+                        </div>
+
+                        <span>
+                            {{ t('dialog.user.info.instance_game_version') }} {{ instance?.gameServerVersion }}
+                        </span>
+
+                        <span v-if="instance?.queueEnabled" class="text-yellow-500 font-medium">
+                            {{ t('dialog.user.info.instance_queuing_enabled') }}
+                        </span>
+
+                        <span v-if="instanceInfoState.disabledContentSettings">
+                            {{ t('dialog.user.info.instance_disabled_content') }}
+                            {{ instanceInfoState.disabledContentSettings }}
+                        </span>
+
+                        <TooltipWrapper
+                            v-if="instanceInfoState.canCloseInstance && !instance?.closedAt"
+                            side="top"
+                            :content="t('dialog.user.info.close_instance')">
+                            <Button
+                                class="w-12 h-6 text-xs hover:text-muted-foreground"
+                                size="icon-sm"
+                                variant="destructive"
+                                :ariaLabel="t('dialog.user.info.close_instance')"
+                                @click="closeInstance(resolvedInstanceLocation)">
+                                <PowerIcon class="h-4 w-4" />
+                            </Button>
+                        </TooltipWrapper>
+                    </div>
+                </template>
+                <div :class="cn('flex items-center gap-0.5', !instance?.hasCapacityForYou ? 'text-red-400' : null)">
+                    <UsersRound class="h-4 w-4" />
+                    <span v-if="resolvedInstanceLocation === locationStore.lastLocation.location">
+                        {{ locationStore.lastLocation.playerList.size }}/{{ instance?.capacity }}
+                    </span>
+
+                    <span v-else-if="instance?.userCount"> {{ instance.userCount }}/{{ instance?.capacity }} </span>
+                </div>
+            </TooltipWrapper>
+
+            <TooltipWrapper v-if="friendcount" side="top" :content="t('dialog.user.info.instance_friends_tooltip')">
+                <span class="flex items-center gap-0.5 text-yellow-400">
+                    <UserPlus2 class="h-4 w-4" />
+                    {{ friendcount }}
+                </span>
+            </TooltipWrapper>
+            <span v-if="showLastJoinIndicator" class="inline-block">
+                <TooltipWrapper side="top">
+                    <template #content>
+                        <span>{{ t('dialog.user.info.last_join') }} </span>
+                    </template>
+                    <span class="flex items-center gap-0.5">
+                        <MapPin class="h-4 w-4" />
+                        <Timer :epoch="lastJoin" />
+                    </span>
+                </TooltipWrapper>
+            </span>
+
+            <template v-if="hasInstanceMetadata">
+                <TooltipWrapper v-if="instance?.queueSize" side="top" :content="t('dialog.user.info.instance_queue')">
+                    <span class="flex items-center gap-0.5 text-blue-400">
+                        <SquareStack class="h-4 w-4" />
+                        {{ instance.queueSize }}
+                    </span>
+                </TooltipWrapper>
+                <TooltipWrapper
+                    v-if="instanceInfoState.isAgeGated"
+                    side="top"
+                    :content="t('dialog.user.info.instance_age_gated')">
+                    <span class="flex items-center gap-0.5 text-red-500">
+                        <IdCard class="h-4 w-4" />
+                    </span>
+                </TooltipWrapper>
+                <TooltipWrapper
+                    v-if="instanceInfoState.isRoleRestricted"
+                    side="top"
+                    :content="t('dialog.user.info.instance_role_restricted')">
+                    <span class="flex items-center gap-0.5 text-red-500">
+                        <UserLock class="h-4 w-4" />
+                    </span>
+                </TooltipWrapper>
+                <TooltipWrapper
+                    v-if="instance?.minimumAvatarPerformance && instance.minimumAvatarPerformance !== 'None'"
+                    side="top"
+                    :content="
+                        t('dialog.user.info.instance_minimum_avatar_performance') +
+                        ': ' +
+                        instance.minimumAvatarPerformance
+                    ">
+                    <img :src="performanceIcon" class="h-4 w-4" />
+                </TooltipWrapper>
+            </template>
+        </div>
+        <div v-if="showButtons" class="flex row-auto gap-0.5">
             <div v-if="showLaunchButton" class="inline-block">
                 <TooltipWrapper side="top" :content="t('dialog.user.info.launch_invite_tooltip')">
                     <Button
@@ -87,124 +204,6 @@
                     <History class="h-4 w-4" />
                 </Button>
             </TooltipWrapper>
-        </div>
-
-        <div
-            v-if="showInstanceInfo"
-            :class="
-                cn(
-                    'flex items-center gap-1.5 text-muted-foreground rounded-full border border-muted-foreground/10 py-0.5 px-2',
-                    props.class
-                )
-            ">
-            <TooltipWrapper v-if="instanceInfoState.isValidInstance" side="top">
-                <template #content>
-                    <div class="flex flex-col flex-wrap gap-x-6 gap-y-2">
-                        <div class="flex flex-col gap-1">
-                            <span>
-                                <span class="text-platform-pc border-platform-pc!">PC: </span>
-                                {{ instance?.platforms?.standalonewindows }}
-                            </span>
-                            <span>
-                                <span class="text-platform-quest border-platform-quest!">Android: </span>
-                                {{ instance?.platforms?.android }}
-                            </span>
-                            <span>
-                                <span class="text-platform-ios border-platform-quest!">iOS: </span>
-                                {{ instance?.platforms?.ios }}
-                            </span>
-                        </div>
-
-                        <span>
-                            {{ t('dialog.user.info.instance_game_version') }} {{ instance?.gameServerVersion }}
-                        </span>
-
-                        <span v-if="instance?.queueEnabled" class="text-yellow-500 font-medium">
-                            {{ t('dialog.user.info.instance_queuing_enabled') }}
-                        </span>
-
-                        <span v-if="instanceInfoState.disabledContentSettings">
-                            {{ t('dialog.user.info.instance_disabled_content') }}
-                            {{ instanceInfoState.disabledContentSettings }}
-                        </span>
-
-                        <TooltipWrapper
-                            v-if="instanceInfoState.canCloseInstance && !instance?.closedAt"
-                            side="top"
-                            :content="t('dialog.user.info.close_instance')">
-                            <Button
-                                class="w-12 h-6 text-xs hover:text-muted-foreground"
-                                size="icon-sm"
-                                variant="destructive"
-                                :ariaLabel="t('dialog.user.info.close_instance')"
-                                @click="closeInstance(resolvedInstanceLocation)">
-                                <PowerIcon class="h-4 w-4" />
-                            </Button>
-                        </TooltipWrapper>
-                    </div>
-                </template>
-                <div :class="cn('flex items-center gap-0.5', !instance?.hasCapacityForYou ? 'text-red-500' : null)">
-                    <UsersRound class="h-4 w-4" />
-                    <span v-if="resolvedInstanceLocation === locationStore.lastLocation.location">
-                        {{ locationStore.lastLocation.playerList.size }}/{{ instance?.capacity }}
-                    </span>
-
-                    <span v-else-if="instance?.userCount"> {{ instance.userCount }}/{{ instance?.capacity }} </span>
-                </div>
-            </TooltipWrapper>
-
-            <TooltipWrapper v-if="friendcount" side="top" :content="t('dialog.user.info.instance_friends_tooltip')">
-                <span class="flex items-center gap-0.5">
-                    <UserPlus2 class="h-4 w-4" />
-                    {{ friendcount }}
-                </span>
-            </TooltipWrapper>
-            <span v-if="showLastJoinIndicator" class="inline-block">
-                <TooltipWrapper side="top">
-                    <template #content>
-                        <span>{{ t('dialog.user.info.last_join') }} </span>
-                    </template>
-                    <span class="flex items-center gap-0.5">
-                        <MapPin class="h-4 w-4" />
-                        <Timer :epoch="lastJoin" />
-                    </span>
-                </TooltipWrapper>
-            </span>
-
-            <template v-if="hasInstanceMetadata">
-                <TooltipWrapper v-if="instance?.queueSize" side="top" :content="t('dialog.user.info.instance_queue')">
-                    <span class="flex items-center gap-0.5">
-                        <SquareStack class="h-4 w-4" />
-                        {{ instance.queueSize }}
-                    </span>
-                </TooltipWrapper>
-                <TooltipWrapper
-                    v-if="instanceInfoState.isAgeGated"
-                    side="top"
-                    :content="t('dialog.user.info.instance_age_gated')">
-                    <span class="flex items-center gap-0.5 text-red-500">
-                        <IdCard class="h-4 w-4" />
-                    </span>
-                </TooltipWrapper>
-                <TooltipWrapper
-                    v-if="instanceInfoState.isRoleRestricted"
-                    side="top"
-                    :content="t('dialog.user.info.instance_role_restricted')">
-                    <span class="flex items-center gap-0.5 text-red-500">
-                        <UserLock class="h-4 w-4" />
-                    </span>
-                </TooltipWrapper>
-                <TooltipWrapper
-                    v-if="instance?.minimumAvatarPerformance && instance.minimumAvatarPerformance !== 'None'"
-                    side="top"
-                    :content="
-                        t('dialog.user.info.instance_minimum_avatar_performance') +
-                        ': ' +
-                        instance.minimumAvatarPerformance
-                    ">
-                    <img :src="performanceIcon" class="h-4 w-4" />
-                </TooltipWrapper>
-            </template>
         </div>
         <InstanceAnnouncementDialog
             v-if="instanceAnnouncementDialogVisible"
