@@ -1,12 +1,12 @@
 <template>
     <div class="flex items-center gap-3 px-2 py-1">
-        <!-- Avatar thumbnail (left) -->
+        <!-- User icon (left) -->
         <img
-            v-if="!userDialog.loading && userDialog.ref.currentAvatarThumbnailImageUrl"
+            v-if="userDialog.publicProfileRef?.iconUrl"
             class="cursor-pointer flex-none object-cover"
-            :src="userDialog.ref.currentAvatarThumbnailImageUrl"
-            style="height: 120px; width: 160px; border-radius: 12px"
-            @click="showFullscreenImageDialog(userDialog.ref.currentAvatarImageUrl)"
+            :src="userDialog.publicProfileRef.iconUrl"
+            style="width: 120px; height: 120px; border-radius: 12px"
+            @click="showFullscreenImageDialog(userDialog.publicProfileRef.iconUrl)"
             loading="lazy" />
 
         <!-- User info (center) -->
@@ -212,14 +212,17 @@
             </div>
         </div>
 
-        <!-- User icon (right) -->
-        <img
-            v-if="userDialog.publicProfileRef?.iconUrl"
-            class="cursor-pointer flex-none object-cover"
-            :src="userDialog.publicProfileRef.iconUrl"
-            style="width: 120px; height: 120px; border-radius: 12px"
-            @click="showFullscreenImageDialog(userDialog.publicProfileRef.iconUrl)"
-            loading="lazy" />
+        <!-- Banner image (right) -->
+        <div
+            v-if="!userDialog.loading && userDialog.ref.bannerUrl"
+            class="flex-none relative overflow-hidden rounded-xl cursor-pointer"
+            style="width: 220px; height: 124px"
+            @click="showFullscreenImageDialog(userDialog.ref.bannerUrl)">
+            <img
+                class="absolute inset-0 w-full h-full object-cover"
+                :src="userDialog.ref.bannerUrl"
+                loading="lazy" />
+        </div>
 
         <!-- Action menu -->
         <UserActionDropdown class="flex-none" :user-dialog-command="userDialogCommand" />
