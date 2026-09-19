@@ -616,12 +616,8 @@ export function useUserDialogCommands(
                     destructive: true
                 }),
                 handler: async () => {
-                    const args = await miscRequest.deleteAllPersistentData();
-                    if (args.json.success) {
-                        toast.success(t('message.user.persistent_data_deleted'));
-                    } else {
-                        toast.error(t('message.user.persistent_data_delete_failed'));
-                    }
+                    await miscRequest.deleteAllPersistentData();
+                    toast.success(t('message.user.persistent_data_deleted'));
                 }
             }
         };
