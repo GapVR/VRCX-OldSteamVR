@@ -79,6 +79,9 @@ export function showWorldDialog(tag, shortName = null, options = {}) {
     D.isFavorite = false;
     D.avatarScalingDisabled = false;
     D.focusViewDisabled = false;
+    D.avatarCollisionDisabled = false;
+    D.avatarStationsDisabled = false;
+    D.monetizedWorld = false;
     D.isPC = false;
     D.isQuest = false;
     D.isIos = false;
@@ -146,6 +149,9 @@ export function showWorldDialog(tag, shortName = null, options = {}) {
                 let { isPC, isQuest, isIos } = getAvailablePlatforms(args.ref.unityPackages);
                 D.avatarScalingDisabled = args.ref?.tags.includes('feature_avatar_scaling_disabled');
                 D.focusViewDisabled = args.ref?.tags.includes('feature_focus_view_disabled');
+                D.avatarCollisionDisabled = args.ref?.tags.includes('admin_disable_avatar_collision');
+                D.avatarStationsDisabled = args.ref?.tags.includes('admin_disable_avatar_stations');
+                D.monetizedWorld = args.ref?.tags.includes('system_monetized_world');
                 D.isPC = isPC;
                 D.isQuest = isQuest;
                 D.isIos = isIos;
@@ -195,6 +201,9 @@ export function applyWorld(json) {
         worldDialog.ref = ref;
         worldDialog.avatarScalingDisabled = ref.tags?.includes('feature_avatar_scaling_disabled');
         worldDialog.focusViewDisabled = ref.tags?.includes('feature_focus_view_disabled');
+        worldDialog.avatarCollisionDisabled = ref.tags?.includes('admin_disable_avatar_collision');
+        worldDialog.avatarStationsDisabled = ref.tags?.includes('admin_disable_avatar_stations');
+        worldDialog.monetizedWorld = ref.tags?.includes('system_monetized_world');
         instanceStore.applyWorldDialogInstances();
         for (const room of worldDialog.rooms) {
             if (isRealInstance(room.tag)) {

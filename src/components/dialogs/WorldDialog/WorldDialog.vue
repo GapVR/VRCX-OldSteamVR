@@ -65,6 +65,18 @@
                     </TooltipWrapper>
                     <Badge v-if="worldDialog.avatarScalingDisabled" variant="outline">{{ t('dialog.world.tags.avatar_scaling_disabled') }}</Badge>
                     <Badge v-if="worldDialog.focusViewDisabled" variant="outline">{{ t('dialog.world.tags.focus_view_disabled') }}</Badge>
+                    <Badge v-if="worldDialog.avatarCollisionDisabled" variant="outline">
+                        <Bird class="h-3 w-3 mr-1 text-red-500" />
+                        {{ t('dialog.world.tags.avatar_collision_disabled') }}
+                    </Badge>
+                    <Badge v-if="worldDialog.avatarStationsDisabled" variant="outline">
+                        <Armchair class="h-3 w-3 mr-1 text-red-500" />
+                        {{ t('dialog.world.tags.avatar_stations_disabled') }}
+                    </Badge>
+                    <Badge v-if="worldDialog.monetizedWorld" variant="outline">
+                        <HeartOff class="h-3 w-3 mr-1 text-red-500" />
+                        {{ t('dialog.world.tags.monetized') }}
+                    </Badge>
                     <Badge v-if="worldDialog.ref.unityPackageUrl" variant="outline">{{ t('dialog.world.tags.future_proofing') }}</Badge>
                     <Badge v-if="worldDialog.inCache" variant="outline" class="cursor-pointer" @click="openFolderGeneric(worldDialog.cachePath)">
                         <span v-text="worldDialog.cacheSize" /> | {{ t('dialog.world.tags.cache') }}
@@ -225,6 +237,8 @@
 <script setup>
     import {
         Apple,
+        Armchair,
+        Bird,
         Clipboard,
         Copy,
         Ellipsis,
@@ -233,6 +247,7 @@
         Flame,
         Globe2,
         Heart,
+        HeartOff,
         Link,
         LockKeyhole,
         UsersRound,
