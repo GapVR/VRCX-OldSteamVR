@@ -262,8 +262,7 @@ export const useVRCXUpdaterStore = defineStore('VRCXUpdater', () => {
         if (
             !currentVersion.value ||
             currentVersion.value === 'VRCX Nightly Build' ||
-            currentVersion.value === 'VRCX Build' ||
-            currentVersion.value.startsWith('VRCX ')
+            currentVersion.value === 'VRCX Build'
         ) {
             // ignore custom builds
             return false;

@@ -89,9 +89,9 @@ export const useUpdateLoopStore = defineStore('UpdateLoop', () => {
                 }
                 if (--state.nextAppUpdateCheck <= 0) {
                     state.nextAppUpdateCheck = 3600; // 1hour
-                    if (vrcxUpdaterStore.autoUpdateVRCX !== 'Off') {
-                        vrcxUpdaterStore.checkForVRCXUpdate();
-                    }
+                    // if (vrcxUpdaterStore.autoUpdateVRCX !== 'Off') {
+                    //     vrcxUpdaterStore.checkForVRCXUpdate();
+                    // }
                     vrcxStore.tryAutoBackupVrcRegistry();
                 }
                 if (--state.ipcTimeout <= 0) {
