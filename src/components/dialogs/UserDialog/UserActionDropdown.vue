@@ -99,6 +99,7 @@
                         <Pencil class="size-4" />
                         {{ t('dialog.user.actions.edit_profile') }}
                     </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                 </template>
                 <DropdownMenuItem @click="onCommand('Refresh')">
                     <RefreshCw class="size-4" />
