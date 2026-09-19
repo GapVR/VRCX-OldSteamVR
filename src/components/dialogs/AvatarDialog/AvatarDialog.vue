@@ -79,8 +79,8 @@
 
                         <!-- Avatar ID + Platform + File Size row -->
                         <div style="display: flex; flex-direction: column; padding-bottom: 4px">
-                            <div class="grid grid-cols-3 gap-2 text-xs">
-                                <div>
+                            <div class="grid grid-cols-4 gap-2 text-xs">
+                                <div class="col-span-2">
                                     <span class="text-muted-foreground font-semibold">{{ t('dialog.avatar.info.id') }}</span>
                                     <div class="flex items-center gap-2 mt-0.5">
                                         <span class="font-mono text-muted-foreground truncate">{{ avatarDialog.id }}</span>
