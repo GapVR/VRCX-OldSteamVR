@@ -87,13 +87,13 @@ export const useUpdateLoopStore = defineStore('UpdateLoop', () => {
                     }
                     AppApi.CheckGameRunning();
                 }
-                if (--state.nextAppUpdateCheck <= 0) {
-                    state.nextAppUpdateCheck = 3600; // 1hour
-                    // if (vrcxUpdaterStore.autoUpdateVRCX !== 'Off') {
-                    //     vrcxUpdaterStore.checkForVRCXUpdate();
-                    // }
-                    vrcxStore.tryAutoBackupVrcRegistry();
-                }
+                // if (--state.nextAppUpdateCheck <= 0) {
+                //     state.nextAppUpdateCheck = 3600; // 1hour
+                //     if (vrcxUpdaterStore.autoUpdateVRCX !== 'Off') {
+                //         vrcxUpdaterStore.checkForVRCXUpdate();
+                //     }
+                //     vrcxStore.tryAutoBackupVrcRegistry();
+                // }
                 if (--state.ipcTimeout <= 0) {
                     vrcxStore.setIpcEnabled(false);
                 }
