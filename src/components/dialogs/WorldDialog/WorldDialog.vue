@@ -156,8 +156,6 @@
             @update:modelValue="worldDialogTabClick">
             <template #Instances>
                 <div class="flex flex-col">
-                    <!-- Memo -->
-                    <WorldDialogMemo />
                     <!-- Capacity + summary info bar -->
                     <div class="rounded-xl bg-(--profile-card) p-3 mb-2">
                         <div class="flex flex-wrap gap-x-3 gap-y-1 items-center text-xs text-muted-foreground">
@@ -228,7 +226,6 @@
         Apple,
         Clipboard,
         Copy,
-        Download,
         Ellipsis,
         Eye,
         Flag,
@@ -291,7 +288,6 @@
     import ImageCropDialog from '../ImageCropDialog.vue';
     import WorldDialogInfo from './WorldDialogInfo.vue';
     import WorldDialogInstancesTab from './WorldDialogInstancesTab.vue';
-    import WorldDialogMemo from './WorldDialogMemo.vue';
     import { showUserDialog } from '../../../coordinators/userCoordinator';
     import { TooltipWrapper } from '@/components/ui/tooltip';
 

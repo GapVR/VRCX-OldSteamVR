@@ -18,8 +18,9 @@
 
     import { useWorldMemo } from './useWorldDialogInfo';
     import { useWorldStore } from '../../../stores';
+    import { storeToRefs } from 'pinia';
 
     const { t } = useI18n();
-    const { worldDialog } = useWorldStore();
+    const { worldDialog } = storeToRefs(useWorldStore());
     const { memo, onWorldMemoChange } = useWorldMemo(worldDialog);
 </script>
