@@ -1,6 +1,16 @@
 <template>
     <div @click="confirm" class="cursor-pointer align-top flex min-w-0 items-center">
-        <span v-if="avatarName" class="flex items-center mr-1">
+        <TooltipWrapper v-if="showThumbnailTooltip && imageurl" side="top">
+            <template #content>
+                <img :src="imageurl" class="max-w-[200px] rounded-lg" loading="lazy" />
+            </template>
+            <span v-if="avatarName" class="flex items-center mr-1">
+                {{ avatarName }}
+                <Lock v-if="avatarType && avatarType === '(own)'" class="h-4 w-4 ml-1" style="color: #e6a23c" />
+                <Lock v-else-if="avatarType && avatarType === '(public)'" class="h-4 w-4 ml-1" style="color: #67c23a" />
+            </span>
+        </TooltipWrapper>
+        <span v-else-if="avatarName" class="flex items-center mr-1">
             {{ avatarName }}
             <Lock v-if="avatarType && avatarType === '(own)'" class="h-4 w-4 ml-1" style="color: #e6a23c" />
             <Lock v-else-if="avatarType && avatarType === '(public)'" class="h-4 w-4 ml-1" style="color: #67c23a" />
@@ -32,7 +42,8 @@
         userid: String,
         hintownerid: String,
         hintavatarname: [String, Object],
-        avatartags: Array
+        avatartags: Array,
+        showThumbnailTooltip: Boolean
     });
 
     const avatarName = ref('');

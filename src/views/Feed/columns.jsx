@@ -100,6 +100,7 @@ const expandedRow = ({ row }) => {
                                     hintownerid={original.previousOwnerId}
                                     hintavatarname={original.previousAvatarName}
                                     avatartags={original.previousCurrentAvatarTags}
+                                    showThumbnailTooltip
                                 />
                             </>
                         ) : null}
@@ -123,6 +124,7 @@ const expandedRow = ({ row }) => {
                                     hintownerid={original.ownerId}
                                     hintavatarname={original.avatarName}
                                     avatartags={original.currentAvatarTags}
+                                    showThumbnailTooltip
                                 />
                             </>
                         ) : null}
@@ -333,6 +335,7 @@ export const columns = [
                             hintownerid={original.ownerId}
                             hintavatarname={original.avatarName}
                             avatartags={original.currentAvatarTags}
+                            showThumbnailTooltip
                         />
                     </div>
                 );

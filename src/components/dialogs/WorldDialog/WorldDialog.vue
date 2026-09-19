@@ -8,7 +8,7 @@
         </DialogHeader>
 
         <!-- Header row: Thumbnail | Details | Buttons -->
-        <div class="flex items-start gap-3 px-1">
+        <div class="flex items-center gap-3 px-1">
             <!-- Thumbnail 160x120 -->
             <img
                 v-if="!worldDialog.loading && !imageError"
