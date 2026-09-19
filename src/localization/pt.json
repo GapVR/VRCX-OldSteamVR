@@ -2620,7 +2620,9 @@
             "deleted": "Avatar excluído",
             "impostor_deleted": "Impostor excluído",
             "impostor_queued": "Impostor enfileirado para criação",
-            "impostor_regenerated": "Impostor excluído e enfileirado para criação"
+            "impostor_regenerated": "Impostor excluído e enfileirado para criação",
+            "id_copied": "ID do avatar copiado para a área de transferência",
+            "url_copied": "URL do avatar copiado para a área de transferência"
         },
         "avatar_lookup": {
             "not_found": "Avatar não encontrado nos provedores de pesquisa",

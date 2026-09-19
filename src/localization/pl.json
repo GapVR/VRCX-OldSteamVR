@@ -1956,7 +1956,9 @@
             "not_allowed": "Nie masz dostępu do tej instancji"
         },
         "avatar": {
-            "change_moderation_failed": "Niepowodzenie zmiany moderacji awatara"
+            "change_moderation_failed": "Niepowodzenie zmiany moderacji awatara",
+            "id_copied": "ID awatara skopiowane do schowka",
+            "url_copied": "URL awatara skopiowany do schowka"
         },
         "file": {
             "not_image": "Plik nie jest obrazkiem",

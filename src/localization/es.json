@@ -1659,7 +1659,9 @@
             "not_allowed": "No tienes permiso para acceder a esta instancia"
         },
         "avatar": {
-            "change_moderation_failed": "Error al cambiar la moderación del avatar"
+            "change_moderation_failed": "Error al cambiar la moderación del avatar",
+            "id_copied": "ID del avatar copiado al portapapeles",
+            "url_copied": "URL del avatar copiada al portapapeles"
         },
         "file": {
             "not_image": "El archivo no es una imagen",

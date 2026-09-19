@@ -1544,5 +1544,11 @@
             "cpu": "CPU:",
             "online": "Online:"
         }
+    },
+    "message": {
+        "avatar": {
+            "id_copied": "Đã sao chép ID avatar vào bảng tạm",
+            "url_copied": "Đã sao chép URL avatar vào bảng tạm"
+        }
     }
 }

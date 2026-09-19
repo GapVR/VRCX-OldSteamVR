@@ -2755,7 +2755,9 @@
             "deleted": "角色已刪除",
             "impostor_deleted": "投影替身已刪除",
             "impostor_queued": "投影替身已加入建立佇列",
-            "impostor_regenerated": "投影替身已刪除並重新加入建立佇列"
+            "impostor_regenerated": "投影替身已刪除並重新加入建立佇列",
+            "id_copied": "已將頭像 ID 複製到剪貼簿",
+            "url_copied": "已將頭像 URL 複製到剪貼簿"
         },
         "avatar_lookup": {
             "not_found": "在搜尋來源中找不到該角色",

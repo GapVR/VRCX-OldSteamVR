@@ -2932,7 +2932,9 @@
             "deleted": "Avatar deleted",
             "impostor_deleted": "Imposter deleted",
             "impostor_queued": "Imposter queued for creation",
-            "impostor_regenerated": "Imposter deleted and queued for creation"
+            "impostor_regenerated": "Imposter deleted and queued for creation",
+            "id_copied": "Avatar ID copied to clipboard",
+            "url_copied": "Avatar URL copied to clipboard"
         },
         "avatar_lookup": {
             "not_found": "Avatar not found in search providers",

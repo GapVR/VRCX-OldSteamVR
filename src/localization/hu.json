@@ -2704,7 +2704,9 @@
             "deleted": "Avatar törölve",
             "impostor_deleted": "Imposztor törölve",
             "impostor_queued": "Imposztor létrehozásra várakozik",
-            "impostor_regenerated": "Imposztor törölve és újragenerálásra várakozik"
+            "impostor_regenerated": "Imposztor törölve és újragenerálásra várakozik",
+            "id_copied": "Avatar ID vágólapra másolva",
+            "url_copied": "Avatar URL vágólapra másolva"
         },
         "avatar_lookup": {
             "not_found": "Az avatar nem található a keresőszolgáltatóknál",

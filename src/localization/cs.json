@@ -1543,7 +1543,9 @@
             "not_allowed": "You're not allowed to access this instance"
         },
         "avatar": {
-            "change_moderation_failed": "Failed to change avatar moderation"
+            "change_moderation_failed": "Failed to change avatar moderation",
+            "id_copied": "ID avataru zkopírováno do schránky",
+            "url_copied": "URL avataru zkopírováno do schránky"
         },
         "file": {
             "not_image": "File isn't an image",

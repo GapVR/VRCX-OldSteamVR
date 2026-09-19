@@ -2829,7 +2829,9 @@
             "deleted": "模型删除成功",
             "impostor_deleted": "模型替身删除成功",
             "impostor_queued": "模型替身已加入创建队列",
-            "impostor_regenerated": "模型替身删除成功，新替身已进入创建队列，正在等待创建"
+            "impostor_regenerated": "模型替身删除成功，新替身已进入创建队列，正在等待创建",
+            "id_copied": "已复制头像 ID 到剪贴板",
+            "url_copied": "已复制头像 URL 到剪贴板"
         },
         "avatar_lookup": {
             "not_found": "在模型数据库中未能找到模型",

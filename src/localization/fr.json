@@ -1795,7 +1795,9 @@
             "not_allowed": "Vous n'êtes pas autorisé à rejoindre cette instance"
         },
         "avatar": {
-            "change_moderation_failed": "Échec de la modération de l'avatar"
+            "change_moderation_failed": "Échec de la modération de l'avatar",
+            "id_copied": "ID de l'avatar copié dans le presse-papiers",
+            "url_copied": "URL de l'avatar copiée dans le presse-papiers"
         },
         "file": {
             "not_image": "Le fichier n'est pas une image",

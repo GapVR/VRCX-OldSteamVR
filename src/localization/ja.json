@@ -2746,7 +2746,9 @@
             "deleted": "アバターが削除されました",
             "impostor_deleted": "インポスターが削除されました",
             "impostor_queued": "インポスターが作成のためにキューに追加されました",
-            "impostor_regenerated": "インポスターが削除され、作成のためにキューに追加されました"
+            "impostor_regenerated": "インポスターが削除され、作成のためにキューに追加されました",
+            "id_copied": "アバターのIDをクリップボードにコピーしました",
+            "url_copied": "アバターのURLをクリップボードにコピーしました"
         },
         "avatar_lookup": {
             "not_found": "検索プロバイダーでアバターが見つかりません",

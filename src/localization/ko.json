@@ -1555,5 +1555,11 @@
             "cpu": "CPU:",
             "online": "온라인:"
         }
+    },
+    "message": {
+        "avatar": {
+            "id_copied": "아바타 ID가 클립보드에 복사되었습니다",
+            "url_copied": "아바타 URL이 클립보드에 복사되었습니다"
+        }
     }
 }

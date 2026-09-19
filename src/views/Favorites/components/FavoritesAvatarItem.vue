@@ -76,6 +76,13 @@
                     {{ t('view.favorite.select_avatar_tooltip') }}
                 </ContextMenuItem>
                 <ContextMenuSeparator v-if="canSelectAvatar" />
+                <ContextMenuItem @click="copyAvatarId(favorite.id)">
+                    {{ t('dialog.avatar.info.copy_id') }}
+                </ContextMenuItem>
+                <ContextMenuItem @click="copyAvatarUrl(favorite.id)">
+                    {{ t('dialog.avatar.info.copy_url') }}
+                </ContextMenuItem>
+                <ContextMenuSeparator />
                 <ContextMenuItem @click="showFavoriteDialog('avatar', favorite.id)">
                     {{ t('view.favorite.edit_favorite_tooltip') }}
                 </ContextMenuItem>
@@ -209,6 +216,16 @@
 
     function handleViewDetails() {
         showAvatarDialog(props.favorite.id);
+    }
+
+    function copyAvatarId(id) {
+        copyToClipboard(id);
+        toast.success(t('message.avatar.id_copied'));
+    }
+
+    function copyAvatarUrl(id) {
+        copyToClipboard(`https://vrchat.com/home/avatar/${id}`);
+        toast.success(t('message.avatar.url_copied'));
     }
 
     function handleDeleteFavorite() {
