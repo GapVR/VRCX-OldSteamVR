@@ -97,7 +97,7 @@ export const useVRCXUpdaterStore = defineStore('VRCXUpdater', () => {
             await syncCurrentVersionState();
         }
         if (autoUpdateVRCX.value !== 'Off' && !checkedForUpdatesDuringAnnouncement) {
-            await checkForVRCXUpdate();
+            // await checkForVRCXUpdate();
         }
     }
 
@@ -259,6 +259,7 @@ export const useVRCXUpdaterStore = defineStore('VRCXUpdater', () => {
         return { downloadUrl, hashString, size };
     }
     async function checkForVRCXUpdate() {
+        return; // disabled
         if (
             !currentVersion.value ||
             currentVersion.value === 'VRCX Nightly Build' ||

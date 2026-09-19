@@ -54,7 +54,7 @@
                         </TooltipWrapper>
                     </div>
                 </template>
-                <div :class="cn('flex items-center gap-0.5', !instance?.hasCapacityForYou ? 'text-red-400' : 'text-foreground')">
+                <div :class="cn('flex items-center gap-0.5', playerCountColor)">
                     <UsersRound class="h-4 w-4 text-muted-foreground" />
                     <span v-if="resolvedInstanceLocation === locationStore.lastLocation.location">
                         {{ locationStore.lastLocation.playerList.size }}/{{ instance?.capacity }}
@@ -377,6 +377,17 @@
             instanceInfoState.isRoleRestricted ||
             (props.instance.minimumAvatarPerformance && props.instance.minimumAvatarPerformance !== 'None')
         );
+    });
+
+    const playerCountColor = computed(() => {
+        if (!props.instance) return 'text-foreground';
+        const userCount = props.instance.userCount ?? 0;
+        const capacity = props.instance.capacity ?? 0;
+        if (capacity <= 0) return 'text-foreground';
+        const ratio = userCount / capacity;
+        if (ratio >= 1) return 'text-red-500';
+        if (ratio >= 0.8) return 'text-orange-400';
+        return 'text-foreground';
     });
 
     const performanceIcon = computed(() => {

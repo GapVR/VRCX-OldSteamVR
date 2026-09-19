@@ -29,6 +29,7 @@
                                                 <SidebarMenuButton
                                                     :is-active="activeMenuIndex === item.index"
                                                     :tooltip="getItemTooltip(item)"
+                                                    :class="{ 'border border-dashed border-primary/40 text-primary hover:bg-primary/10': item.action === 'direct-access' }"
                                                     @click="handleMenuItemClick(item)">
                                                     <i
                                                         :class="item.icon"

@@ -7,21 +7,23 @@
             </DialogDescription>
         </DialogHeader>
 
-        <!-- Header row: Banner/icon | Details | Buttons -->
+        <!-- Header row: Icon | Details | Banner/Buttons -->
         <div class="flex items-start gap-3 px-1">
-            <!-- Banner -->
+            <!-- Group Icon -->
             <div class="relative flex-none">
-                <img
-                    v-if="!groupDialog.loading && !bannerError && groupDialog.ref.bannerUrl"
-                    class="w-[160px] h-[120px] rounded-lg cursor-pointer object-cover"
-                    :src="groupDialog.ref.bannerUrl"
-                    @click="showFullscreenImageDialog(groupDialog.ref.bannerUrl)"
-                    @error="bannerError = true"
-                    loading="lazy" />
                 <div
-                    v-else-if="!groupDialog.loading"
-                    class="w-[160px] h-[120px] rounded-lg flex items-center justify-center bg-muted">
-                    <Image class="size-8 text-muted-foreground" />
+                    class="overflow-hidden rounded-md cursor-pointer shrink-0"
+                    style="width: 120px; height: 120px"
+                    @click="showFullscreenImageDialog(groupDialog.ref.iconUrl)">
+                    <Image
+                        v-if="groupDialog.loading || imageError"
+                        class="w-full! h-full! object-cover text-muted-foreground bg-accent" />
+                    <img
+                        v-else
+                        class="w-full h-full object-cover"
+                        :src="groupDialog.ref.iconUrl"
+                        @error="imageError = true"
+                        loading="lazy" />
                 </div>
             </div>
 
@@ -71,27 +73,19 @@
                 </template>
             </div>
 
-            <!-- Group Icon + Action Buttons -->
+            <!-- Banner + Action Buttons -->
             <div class="flex-none flex items-center gap-2">
-                <!-- Group icon -->
+                <img
+                    v-if="!groupDialog.loading && !bannerError && groupDialog.ref.bannerUrl"
+                    class="w-[160px] h-[120px] rounded-lg cursor-pointer object-cover shrink-0"
+                    :src="groupDialog.ref.bannerUrl"
+                    @click="showFullscreenImageDialog(groupDialog.ref.bannerUrl)"
+                    @error="bannerError = true"
+                    loading="lazy" />
                 <div
-                    class="overflow-hidden rounded-lg cursor-pointer shrink-0"
-                    style="
-                        width: 48px;
-                        height: 48px;
-                        filter: drop-shadow(0 0 1px rgb(0 0 0 / 0.95)) drop-shadow(0 0 4px rgb(0 0 0 / 0.75))
-                            drop-shadow(0 2px 8px rgb(0 0 0 / 0.55));
-                    "
-                    @click="showFullscreenImageDialog(groupDialog.ref.iconUrl)">
-                    <Image
-                        v-if="groupDialog.loading || imageError"
-                        class="w-full! h-full! object-cover text-muted-foreground bg-accent" />
-                    <img
-                        v-else
-                        class="w-full h-full object-cover"
-                        :src="groupDialog.ref.iconUrl"
-                        @error="imageError = true"
-                        loading="lazy" />
+                    v-else-if="!groupDialog.loading"
+                    class="w-[160px] h-[120px] rounded-lg flex items-center justify-center bg-muted shrink-0">
+                    <Image class="size-8 text-muted-foreground" />
                 </div>
                 <template v-if="groupDialog.inGroup && groupDialog.ref?.myMember">
                     <TooltipWrapper
@@ -387,8 +381,72 @@
                 fill
                 @update:modelValue="groupDialogTabClick">
                 <template #Instances>
+                    <div class="rounded-xl bg-(--profile-card) p-3 mb-2.5">
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                            <span>
+                                <span class="font-medium text-foreground">{{ t('dialog.group.info.short_code') }}</span>
+                                {{ groupDialog.ref.shortCode }}.{{ groupDialog.ref.discriminator }}
+                            </span>
+                            <span>
+                                <span class="font-medium text-foreground">{{ t('dialog.group.info.members') }}</span>
+                                {{ onlinePercentage }}
+                            </span>
+                            <TooltipWrapper
+                                side="top"
+                                :content="formatDateFilter(groupDialog.lastVisit, 'long')"
+                                :disabled="!groupDialog.lastVisit">
+                                <span>
+                                    <span class="font-medium text-foreground">{{ t('dialog.group.info.last_visited') }}</span>
+                                    <span>&nbsp;{{ timeAgo(groupDialog.lastVisit) }}</span>
+                                </span>
+                            </TooltipWrapper>
+                            <TooltipWrapper side="top" :content="t('dialog.user.info.open_previous_instance')">
+                                <span
+                                    class="cursor-pointer hover:text-foreground"
+                                    @click="showPreviousInstancesListDialog(groupDialog.ref)">
+                                    <span class="font-medium text-foreground">{{ t('dialog.user.info.join_count') }}</span>
+                                    <span>&nbsp;{{ groupDialog.joinCount || '—' }}</span>
+                                </span>
+                            </TooltipWrapper>
+                            <span class="flex-shrink-0 whitespace-nowrap">
+                                <span class="font-medium text-foreground">{{ t('dialog.group.info.roles') }}</span>
+                                <template v-if="groupDialog.memberRoles.length === 0">&nbsp;—</template>
+                                <template v-else>&nbsp;<template v-for="(role, rIndex) in groupDialog.memberRoles" :key="rIndex">
+                                        <TooltipWrapper side="top">
+                                            <template #content>
+                                                <div class="flex flex-col gap-0.5 whitespace-pre-wrap">
+                                                    <span>{{ t('dialog.group.info.role') }} {{ role.name }}</span>
+                                                    <span>{{ t('dialog.group.info.role_description') }} {{ role.description }}</span>
+                                                    <span v-if="role.updatedAt">{{ t('dialog.group.info.role_updated_at') }} {{ formatDateFilter(role.updatedAt, 'long') }}</span>
+                                                    <span v-else>{{ t('dialog.group.info.role_created_at') }} {{ formatDateFilter(role.createdAt, 'long') }}</span>
+                                                    <span>{{ t('dialog.group.info.role_permissions') }}</span>
+                                                    <template v-for="(permission, pIndex) in role.permissions" :key="pIndex">
+                                                        <span>{{ permission }}</span>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                            <span>{{ role.name }}{{ rIndex < groupDialog.memberRoles.length - 1 ? ', ' : '' }}</span>
+                                        </TooltipWrapper>
+                                    </template>
+                                </template>
+                            </span>
+                            <div class="flex items-center gap-2 ml-auto">
+                                <span class="text-xs text-muted-foreground">{{ t('dialog.group.info.hide_full') }}</span>
+                                <Switch
+                                    v-model="hideFullInstances"
+                                    :ariaLabel="t('dialog.group.info.hide_full')" />
+                                <Button
+                                    variant="ghost"
+                                    size="icon-sm"
+                                    class="h-6 w-6"
+                                    @click="refreshGroupDialog">
+                                    <RefreshCw class="size-3" />
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
                     <div v-if="groupDialog.instances.length" class="rounded-xl bg-(--profile-card) p-3 mb-2.5">
-                        <div v-for="room in groupDialog.instances" :key="room.tag" class="flex flex-col gap-2 mb-1.5">
+                        <div v-for="room in filteredInstances" :key="room.tag" class="flex flex-col gap-2 mb-1.5">
                             <div class="flex flex-wrap gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
                                 <Location
                                     :location="room.tag"
@@ -814,6 +872,7 @@
     import { computed, reactive, ref, watch } from 'vue';
     import { DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
     import { Button } from '@/components/ui/button';
+    import { Switch } from '@/components/ui/switch';
     import { TabsUnderline } from '@/components/ui/tabs';
     import { storeToRefs } from 'pinia';
     import { toast } from 'vue-sonner';
@@ -859,6 +918,7 @@
     import { formatJsonVars } from '../../../shared/utils/base/ui';
 
     import DialogJsonTab from '../DialogJsonTab.vue';
+    import InstanceActionBar from '@/components/InstanceActionBar.vue';
     import { useGroupDialogCommands } from './useGroupDialogCommands';
     import GroupDialogMembersTab from './GroupDialogMembersTab.vue';
     import GroupDialogPhotosTab from './GroupDialogPhotosTab.vue';
@@ -871,6 +931,7 @@
     const { t } = useI18n();
     const descExpanded = ref(false);
     const announcementPhotoError = ref(false);
+    const hideFullInstances = ref(false);
     const groupDialogTabs = computed(() => [
         { value: 'Instances', label: t('dialog.group.info.instances') },
         { value: 'Info', label: t('dialog.group.info.header') },
@@ -879,6 +940,26 @@
         { value: 'Photos', label: t('dialog.group.gallery.header') },
         { value: 'JSON', label: t('dialog.group.json.header') }
     ]);
+
+    const onlinePercentage = computed(() => {
+        if (!groupDialog?.value?.ref) return '—';
+        const members = groupDialog.value.ref.memberCount;
+        const online = groupDialog.value.ref.onlineMemberCount;
+        if (!members || members === 0) return '—';
+        const pct = Math.round((online / members) * 100);
+        return `${online}/${members} (${pct}%)`;
+    });
+
+    const filteredInstances = computed(() => {
+        if (!hideFullInstances.value) return groupDialog.value.instances;
+        return groupDialog.value.instances.filter(room => {
+            if (!room.ref) return true;
+            const userCount = room.ref.userCount ?? 0;
+            const capacity = room.ref.capacity ?? 0;
+            if (capacity <= 0) return true;
+            return (userCount / capacity) < 1;
+        });
+    });
 
     const modalStore = useModalStore();
 
@@ -1152,6 +1233,12 @@
             galleries: D.galleries,
             calendar: D.calendar
         };
+    }
+
+    function refreshGroupDialog() {
+        if (groupDialog.value.id) {
+            getGroupDialogGroup(groupDialog.value.id);
+        }
     }
 
     function updateGroupDialogData(obj) {

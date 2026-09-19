@@ -15,7 +15,7 @@ export function getSentry() {
 }
 
 export async function initSentry(app) {
-    if (!NIGHTLY) return;
+    return; // if (!NIGHTLY) return;
 
     try {
         if (!(await isSentryOptedIn())) return;

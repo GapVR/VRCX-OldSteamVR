@@ -155,7 +155,7 @@
             case 'previous-instances-user':
             case 'previous-instances-world':
             case 'previous-instances-group':
-                return 'x-dialog translate-y-0 sm:max-w-250';
+                return 'x-dialog translate-y-0 sm:max-w-250 bg-secondary';
             default:
                 return 'x-dialog translate-y-0 sm:max-w-235 overflow-hidden flex flex-col';
         }

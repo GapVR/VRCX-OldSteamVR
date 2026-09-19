@@ -1936,7 +1936,8 @@
                 "upcoming_events": "Upcoming Events",
                 "member_info": "Member Info",
                 "visibility": "Visibility",
-                "short_code": "Short Code"
+                "short_code": "Short Code",
+                "hide_full": "Hide Full"
             },
             "posts": {
                 "header": "Posts",
