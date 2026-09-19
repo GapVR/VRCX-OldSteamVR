@@ -121,27 +121,27 @@
                 <Badge v-if="avatarDialog.ref.unityPackageUrl" variant="outline">
                     {{ t('dialog.avatar.tags.future_proofing') }}
                 </Badge>
-                <TooltipWrapper v-if="avatarDialog.ref.lightCount > 0" side="top" :content="avatarDialog.ref.lightCount">
+                <TooltipWrapper v-if="avatarDialog.fileAnalysis.standalonewindows?.avatarStats?.lightCount > 0" side="top" :content="avatarDialog.fileAnalysis.standalonewindows.avatarStats.lightCount">
                     <Badge variant="outline">
                         <Lightbulb class="h-3 w-3" />
                     </Badge>
                 </TooltipWrapper>
-                <TooltipWrapper v-if="avatarDialog.ref.audioSourceCount > 0" side="top" :content="avatarDialog.ref.audioSourceCount">
+                <TooltipWrapper v-if="avatarDialog.fileAnalysis.standalonewindows?.avatarStats?.audioSourceCount > 0" side="top" :content="avatarDialog.fileAnalysis.standalonewindows.avatarStats.audioSourceCount">
                     <Badge variant="outline">
                         <Volume2 class="h-3 w-3" />
                     </Badge>
                 </TooltipWrapper>
-                <TooltipWrapper v-if="avatarDialog.ref.cameraCount > 0" side="top" :content="avatarDialog.ref.cameraCount">
+                <TooltipWrapper v-if="avatarDialog.fileAnalysis.standalonewindows?.avatarStats?.cameraCount > 0" side="top" :content="avatarDialog.fileAnalysis.standalonewindows.avatarStats.cameraCount">
                     <Badge variant="outline">
                         <Video class="h-3 w-3" />
                     </Badge>
                 </TooltipWrapper>
-                <TooltipWrapper v-if="avatarDialog.ref.clothCount > 0" side="top" :content="avatarDialog.ref.clothCount">
+                <TooltipWrapper v-if="avatarDialog.fileAnalysis.standalonewindows?.avatarStats?.clothCount > 0" side="top" :content="avatarDialog.fileAnalysis.standalonewindows.avatarStats.clothCount">
                     <Badge variant="outline">
                         <Shirt class="h-3 w-3" />
                     </Badge>
                 </TooltipWrapper>
-                <TooltipWrapper v-if="avatarDialog.ref.particleSystemCount > 0" side="top" :content="avatarDialog.ref.particleSystemCount">
+                <TooltipWrapper v-if="avatarDialog.fileAnalysis.standalonewindows?.avatarStats?.particleSystemCount > 0" side="top" :content="avatarDialog.fileAnalysis.standalonewindows.avatarStats.particleSystemCount">
                     <Badge variant="outline">
                         <PartyPopper class="h-3 w-3" />
                     </Badge>
