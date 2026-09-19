@@ -425,14 +425,14 @@
                         <span class="text-xs font-semibold text-muted-foreground">{{ t('dialog.user.info.avatar_info') }}</span>
                         <span class="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
                             <TooltipWrapper v-if="!hasAvatarSet" side="right" :content="t('dialog.user.info.icon_hides_avatar')">
-                                <Info class="inline-block h-3 w-3 align-middle mt-1" :style="{ color: userDialog.theme.iconColor }" />
+                                <Info class="inline-block h-3 w-3 align-middle" :style="{ color: userDialog.theme.iconColor }" />
                             </TooltipWrapper>
                         </span>
-                        <div v-if="avatarImageUrl" class="text-xs mt-1">
-                            <AvatarInfo :key="avatarImageUrl" :imageurl="avatarImageUrl" :userid="userDialog.id" :avatartags="userDialog.ref.currentAvatarTags" style="display: inline-block" />
-                        </div>
-                        <span v-else class="text-xs text-muted-foreground mt-1">—</span>
                     </div>
+                    <div v-if="avatarImageUrl" class="text-xs">
+                        <AvatarInfo :key="avatarImageUrl" :imageurl="avatarImageUrl" :userid="userDialog.id" :avatartags="userDialog.ref.currentAvatarTags" style="display: inline-block" />
+                    </div>
+                    <span v-else class="text-xs">—</span>
                 </div>
             </div>
         </div>
