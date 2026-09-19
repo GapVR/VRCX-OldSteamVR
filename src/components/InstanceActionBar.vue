@@ -65,7 +65,7 @@
             </TooltipWrapper>
 
             <TooltipWrapper v-if="friendcount" side="top" :content="t('dialog.user.info.instance_friends_tooltip')">
-                <span class="flex items-center gap-0.5 text-yellow-400">
+                <span class="flex items-center gap-0.5 text-yellow-400 font-bold">
                     <UserPlus2 class="h-4 w-4" />
                     {{ friendcount }}
                 </span>

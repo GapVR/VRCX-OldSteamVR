@@ -866,6 +866,7 @@
         Share2,
         Ticket,
         Trash2,
+        User,
         X,
         XCircle
     } from 'lucide-vue-next';
@@ -902,6 +903,11 @@
     } from '../../../shared/utils';
     import { useGalleryStore, useGroupStore, useInstanceStore, useLocationStore, useModalStore, useUserStore } from '../../../stores';
     import { useGroupCalendarEvents } from './useGroupCalendarEvents';
+    import { useUserDisplay } from '../../../composables/useUserDisplay';
+    import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+    import IconFrame from '@/components/IconFrame.vue';
+    import { Spinner } from '@/components/ui/spinner';
+    import Timer from '@/components/Timer.vue';
     import {
         getGroupDialogGroup,
         isSoleGroupOwner,
@@ -973,6 +979,7 @@
 
     const { showFullscreenImageDialog } = useGalleryStore();
     const instanceStore = useInstanceStore();
+    const { userImage, userStatusClass } = useUserDisplay();
 
     function showPreviousInstancesListDialog(groupRef) {
         instanceStore.showPreviousInstancesListDialog('group', groupRef);
