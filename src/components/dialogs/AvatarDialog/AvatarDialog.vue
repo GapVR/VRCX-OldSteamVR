@@ -411,12 +411,32 @@
     });
 
     const avatarFileSizes = computed(() => {
-        // File sizes for each platform
         const parts = [];
         const fa = avatarDialog.value.fileAnalysis;
-        if (fa.standalonewindows?._fileSize) parts.push(`PC: ${fa.standalonewindows._fileSize}`);
-        if (fa.android?._fileSize) parts.push(`Quest: ${fa.android._fileSize}`);
-        if (fa.ios?._fileSize) parts.push(`iOS: ${fa.ios._fileSize}`);
+        if (fa.standalonewindows?._fileSize) {
+            const texture = fa.standalonewindows._totalTextureUsage;
+            if (texture) {
+                parts.push(`PC: ${fa.standalonewindows._fileSize} (${texture})`);
+            } else {
+                parts.push(`PC: ${fa.standalonewindows._fileSize}`);
+            }
+        }
+        if (fa.android?._fileSize) {
+            const texture = fa.android._totalTextureUsage;
+            if (texture) {
+                parts.push(`Quest: ${fa.android._fileSize} (${texture})`);
+            } else {
+                parts.push(`Quest: ${fa.android._fileSize}`);
+            }
+        }
+        if (fa.ios?._fileSize) {
+            const texture = fa.ios._totalTextureUsage;
+            if (texture) {
+                parts.push(`iOS: ${fa.ios._fileSize} (${texture})`);
+            } else {
+                parts.push(`iOS: ${fa.ios._fileSize}`);
+            }
+        }
         return parts.join(', ');
     });
 
