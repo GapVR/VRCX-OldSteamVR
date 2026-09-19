@@ -158,7 +158,7 @@
         </div>
 
         <!-- Tabs -->
-        <div class="flex-1 min-h-0 mt-2">
+        <div class="flex-1 min-h-0 mt-2 overflow-y-auto">
             <TabsUnderline
                 v-model="worldDialog.activeTab"
                 :background="true"

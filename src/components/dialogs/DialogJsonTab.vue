@@ -43,7 +43,7 @@
 </script>
 
 <template>
-    <div :class="cn('flex h-full min-h-0 flex-col overflow-hidden', props.class)">
+    <div :class="cn('flex h-full min-h-0 flex-col', props.class)">
         <div class="shrink-0">
             <Button
                 class="rounded-full mr-2"
