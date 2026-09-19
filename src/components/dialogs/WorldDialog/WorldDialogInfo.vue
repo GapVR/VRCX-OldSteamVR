@@ -154,6 +154,16 @@
             </div>
         </div>
 
+        <!-- File Sizes -->
+        <div v-if="Object.keys(worldDialog.fileAnalysis).length" style="display: flex; flex-direction: column; padding-bottom: 4px">
+            <div class="grid grid-cols-1 gap-2 text-xs">
+                <div>
+                    <span class="text-muted-foreground font-semibold">{{ t('dialog.world.info.file_sizes') }}</span>
+                    <div class="text-muted-foreground mt-0.5">{{ fileSizes }}</div>
+                </div>
+            </div>
+        </div>
+
         <!-- YouTube Preview row (if any) -->
         <template v-if="worldDialog.ref.previewYoutubeId">
             <div style="display: flex; flex-direction: column; padding-bottom: 4px">
@@ -204,7 +214,7 @@
     } from '@/components/ui/dropdown-menu';
     import { storeToRefs } from 'pinia';
     import { toast } from 'vue-sonner';
-    import { ref } from 'vue';
+    import { computed, ref } from 'vue';
     import { useI18n } from 'vue-i18n';
 
     import { useAuthStore, useInstanceStore, useWorldStore } from '../../../stores';
@@ -213,6 +223,15 @@
 
     const { t } = useI18n();
     const showMoreInfo = ref(false);
+
+    const fileSizes = computed(() => {
+        const parts = [];
+        const fa = worldDialog.value.fileAnalysis;
+        if (fa.standalonewindows?._fileSize) parts.push(`PC: ${fa.standalonewindows._fileSize}`);
+        if (fa.android?._fileSize) parts.push(`Quest: ${fa.android._fileSize}`);
+        if (fa.ios?._fileSize) parts.push(`iOS: ${fa.ios._fileSize}`);
+        return parts.join(', ');
+    });
 
     const { worldDialog } = storeToRefs(useWorldStore());
     const authStore = useAuthStore();
