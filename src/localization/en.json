@@ -1656,7 +1656,7 @@
                 "time_in_labs": "Time In Labs:",
                 "version": "Version",
                 "platform": "Platform",
-                "file_sizes": "File Size (Texture Size)",
+                "file_sizes": "File Size",
                 "cached_size": "Cached Size",
                 "last_visited": "Last Visited",
                 "visit_count": "Visit Count",
@@ -1740,7 +1740,7 @@
                 "memo_placeholder": "Click to add a memo",
                 "listings": "Listings",
                 "gallery": "Gallery",
-                "file_sizes": "File Size"
+                "file_sizes": "File Size (Texture Size)"
             },
             "json": {
                 "header": "JSON"
