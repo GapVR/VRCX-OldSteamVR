@@ -74,7 +74,7 @@
                         {{ t('dialog.world.tags.avatar_stations_disabled') }}
                     </Badge>
                     <Badge v-if="worldDialog.monetizedWorld" variant="outline" class="border-red-500 text-red-500">
-                        <HeartOff class="h-3 w-3 mr-1 text-red-500" />
+                        <Wallet class="h-3 w-3 mr-1 text-red-500" />
                         {{ t('dialog.world.tags.monetized') }}
                     </Badge>
                     <Badge v-if="worldDialog.ref.unityPackageUrl" variant="outline">{{ t('dialog.world.tags.future_proofing') }}</Badge>
@@ -247,7 +247,7 @@
         Flame,
         Globe2,
         Heart,
-        HeartOff,
+        Wallet,
         Link,
         LockKeyhole,
         UsersRound,
