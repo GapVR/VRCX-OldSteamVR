@@ -392,32 +392,31 @@
         </div>
                 </div>
 
-                <!-- Represented Group — compact, no card wrapper -->
-                <div
-                    v-if="userDialog.representedGroup"
-                    style="padding-bottom: 4px;">
-                    <span class="text-xs font-semibold text-muted-foreground">{{ t('dialog.user.info.represented_group') }}</span>
-                    <div
-                        v-if="userDialog.representedGroup.isRepresenting"
-                        class="flex items-center gap-2.5 cursor-pointer mt-1"
-                        @click="showGroupDialog(userDialog.representedGroup.groupId)">
-                        <div class="flex-1 min-w-0">
-                            <div class="text-xs font-medium truncate">
-                                <span v-if="userDialog.representedGroup.ownerId === userDialog.id" class="mr-1">👑</span>
-                                <span v-text="userDialog.representedGroup.name"></span>
+                <!-- Represented Group — flat, no card wrapper -->
+                <div class="flex gap-2">
+                    <div class="flex-1 min-w-0">
+                        <span class="text-xs font-semibold text-muted-foreground">{{ t('dialog.user.info.represented_group') }}</span>
+                        <div v-if="userDialog.representedGroup && userDialog.representedGroup.isRepresenting" class="flex items-center gap-2.5 mt-1 cursor-pointer" @click="showGroupDialog(userDialog.representedGroup.groupId)">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-medium truncate">
+                                    <span v-if="userDialog.representedGroup.ownerId === userDialog.id" class="mr-1">👑</span>
+                                    <span v-text="userDialog.representedGroup.name"></span>
+                                </div>
+                                <div class="text-xs text-muted-foreground">({{ userDialog.representedGroup.memberCount }})</div>
                             </div>
-                            <div class="text-xs text-muted-foreground">({{ userDialog.representedGroup.memberCount }})</div>
                         </div>
-                        <Avatar
-                            class="cursor-pointer shrink-0 size-9 rounded-lg"
-                            @click.stop="showFullscreenImageDialog(userDialog.representedGroup.iconUrl)">
-                            <AvatarImage :src="userDialog.representedGroup.$thumbnailUrl" class="object-cover" />
-                            <AvatarFallback>
-                                <User class="size-4 text-muted-foreground" />
-                            </AvatarFallback>
-                        </Avatar>
+                        <div v-else-if="userDialog.representedGroup" class="text-xs text-muted-foreground mt-1">—</div>
                     </div>
-                    <div v-else class="text-xs text-muted-foreground mt-1">—</div>
+                    <Avatar
+                        v-if="userDialog.representedGroup && userDialog.representedGroup.isRepresenting"
+                        class="cursor-pointer shrink-0 size-9 rounded-lg self-start"
+                        @click.stop="showFullscreenImageDialog(userDialog.representedGroup.iconUrl)">
+                        <AvatarImage :src="userDialog.representedGroup.$thumbnailUrl" class="object-cover" />
+                        <AvatarFallback>
+                            <User class="size-4 text-muted-foreground" />
+                        </AvatarFallback>
+                    </Avatar>
+                    <span v-else-if="userDialog.representedGroup" class="text-xs text-muted-foreground self-start">—</span>
                 </div>
 
                 <!-- Avatar Info — flat, no card wrapper -->
