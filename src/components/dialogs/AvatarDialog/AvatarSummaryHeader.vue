@@ -121,6 +121,31 @@
                 <Badge v-if="avatarDialog.ref.unityPackageUrl" variant="outline">
                     {{ t('dialog.avatar.tags.future_proofing') }}
                 </Badge>
+                <TooltipWrapper v-if="avatarDialog.ref.lightCount > 0" side="top" :content="avatarDialog.ref.lightCount">
+                    <Badge variant="outline">
+                        <Lightbulb class="h-3 w-3" />
+                    </Badge>
+                </TooltipWrapper>
+                <TooltipWrapper v-if="avatarDialog.ref.audioSourceCount > 0" side="top" :content="avatarDialog.ref.audioSourceCount">
+                    <Badge variant="outline">
+                        <Volume2 class="h-3 w-3" />
+                    </Badge>
+                </TooltipWrapper>
+                <TooltipWrapper v-if="avatarDialog.ref.cameraCount > 0" side="top" :content="avatarDialog.ref.cameraCount">
+                    <Badge variant="outline">
+                        <Video class="h-3 w-3" />
+                    </Badge>
+                </TooltipWrapper>
+                <TooltipWrapper v-if="avatarDialog.ref.clothCount > 0" side="top" :content="avatarDialog.ref.clothCount">
+                    <Badge variant="outline">
+                        <Shirt class="h-3 w-3" />
+                    </Badge>
+                </TooltipWrapper>
+                <TooltipWrapper v-if="avatarDialog.ref.particleSystemCount > 0" side="top" :content="avatarDialog.ref.particleSystemCount">
+                    <Badge variant="outline">
+                        <PartyPopper class="h-3 w-3" />
+                    </Badge>
+                </TooltipWrapper>
             </div>
         </div>
 
@@ -297,14 +322,19 @@
         Download,
         Ellipsis,
         Image,
+        Lightbulb,
         Link,
         Monitor,
+        PartyPopper,
         Pencil,
         RefreshCw,
+        Shirt,
         Smartphone,
         Star,
         Trash2,
         User,
+        Video,
+        Volume2,
         XCircle
     } from 'lucide-vue-next';
     import { ref } from 'vue';
