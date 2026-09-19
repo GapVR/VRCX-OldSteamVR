@@ -37,8 +37,7 @@
 
                         <Button
                             variant="ghost"
-                            size="icon"
-                            class="h-6 w-6"
+                            class="h-6 px-2"
                             :disabled="!imageUrl"
                             @click="fullSize">
                             <span class="text-xs">Fullsize</span>
