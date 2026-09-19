@@ -4,7 +4,7 @@
             v-if="showInstanceInfo"
             :class="
                 cn(
-                    'flex items-center gap-1.5 text-muted-foreground rounded-full border border-muted-foreground/10 py-0.5 px-2',
+                    'flex items-center gap-1.5 text-muted-foreground',
                     props.class
                 )
             ">
@@ -117,11 +117,11 @@
                 </TooltipWrapper>
             </template>
         </div>
-        <div v-if="showButtons" class="flex row-auto gap-0.5">
+        <div v-if="showButtons" class="flex row-auto gap-0.5 items-center">
             <div v-if="showLaunchButton" class="inline-block">
                 <TooltipWrapper side="top" :content="t('dialog.user.info.launch_invite_tooltip')">
                     <Button
-                        class="rounded-full w-6 h-6 text-xs text-muted-foreground hover:text-foreground"
+                        class="rounded-full w-5 h-5 text-xs text-muted-foreground hover:text-foreground"
                         :style="buttonStyle"
                         size="icon-sm"
                         variant="outline"
@@ -137,7 +137,7 @@
                     side="top"
                     :content="t('dialog.user.info.self_invite_tooltip')">
                     <Button
-                        class="rounded-full h-6 w-6 text-xs text-muted-foreground hover:text-foreground"
+                        class="rounded-full h-5 w-5 text-xs text-muted-foreground hover:text-foreground"
                         :style="buttonStyle"
                         size="icon-sm"
                         variant="outline"
@@ -148,7 +148,7 @@
                 </TooltipWrapper>
                 <TooltipWrapper v-else side="top" :content="t('dialog.user.info.open_in_vrchat_tooltip')">
                     <Button
-                        class="rounded-full h-6 w-6 text-xs text-muted-foreground hover:text-foreground"
+                        class="rounded-full h-5 w-5 text-xs text-muted-foreground hover:text-foreground"
                         :style="buttonStyle"
                         size="icon-sm"
                         variant="outline"
@@ -157,7 +157,7 @@
                         <Loader2 class="h-4 w-4 animate-spin" />
                     </Button>
                     <Button
-                        class="rounded-full h-6 w-6 text-xs text-muted-foreground hover:text-foreground"
+                        class="rounded-full h-5 w-5 text-xs text-muted-foreground hover:text-foreground"
                         :style="buttonStyle"
                         size="icon-sm"
                         variant="outline"
@@ -173,7 +173,7 @@
                 side="top"
                 :content="t('dialog.user.info.instance_announcement_tooltip')">
                 <Button
-                    class="rounded-full h-6 w-6 text-xs text-muted-foreground hover:text-foreground"
+                    class="rounded-full h-5 w-5 text-xs text-muted-foreground hover:text-foreground"
                     :style="buttonStyle"
                     size="icon-sm"
                     variant="outline"
@@ -184,9 +184,9 @@
             </TooltipWrapper>
             <TooltipWrapper v-if="showRefreshButton" side="top" :content="refreshTooltip">
                 <Button
-                    class="rounded-full w-6 h-6 text-xs text-muted-foreground hover:text-foreground"
+                    class="rounded-full w-5 h-5 text-xs text-muted-foreground hover:text-foreground"
                     :style="buttonStyle"
-                    size="icon"
+                    size="icon-sm"
                     variant="outline"
                     :ariaLabel="t('common.actions.refresh')"
                     @click="handleRefresh">
@@ -195,7 +195,7 @@
             </TooltipWrapper>
             <TooltipWrapper v-if="showHistoryButton" side="top" :content="historyTooltip">
                 <Button
-                    class="rounded-full w-6 h-6 text-xs text-muted-foreground hover:text-foreground"
+                    class="rounded-full w-5 h-5 text-xs text-muted-foreground hover:text-foreground"
                     :style="buttonStyle"
                     size="icon-sm"
                     variant="outline"
