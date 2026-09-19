@@ -29,21 +29,21 @@
             </SettingsItem>
 
             <SettingsItem
-                :label="t('view.settings.advanced.advanced.auto_clear_persistent_data.header')"
-                :description="t('view.settings.advanced.advanced.auto_clear_persistent_data.description')">
-                <Switch
-                    :model-value="autoClearPersistentData"
-                    :ariaLabel="t('view.settings.advanced.advanced.auto_clear_persistent_data.header')"
-                    @update:modelValue="(value) => setAutoClearPersistentData(value)" />
-            </SettingsItem>
-
-            <SettingsItem
                 :label="t('view.settings.advanced.advanced.self_invite.header')"
                 :description="t('view.settings.advanced.advanced.self_invite.description')">
                 <Switch
                     :model-value="selfInviteOverride"
                     :ariaLabel="t('view.settings.advanced.advanced.self_invite.header')"
                     @update:modelValue="setSelfInviteOverride" />
+            </SettingsItem>
+
+            <SettingsItem
+                :label="t('view.settings.advanced.advanced.auto_clear_persistent_data.header')"
+                :description="t('view.settings.advanced.advanced.auto_clear_persistent_data.description')">
+                <Switch
+                    :model-value="autoClearPersistentData"
+                    :ariaLabel="t('view.settings.advanced.advanced.auto_clear_persistent_data.header')"
+                    @update:modelValue="(value) => setAutoClearPersistentData(value)" />
             </SettingsItem>
         </SettingsGroup>
 
