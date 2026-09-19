@@ -226,7 +226,9 @@ export const columns = [
             const type = row.getValue('type');
             const feedTypeVariants = { GPS: 'gps', Online: 'online', Offline: 'offline', Status: 'status', Avatar: 'outline', Bio: 'bio' };
             return (
-                <div>
+                <div
+                    class="cursor-pointer"
+                    onClick={() => row.toggleExpanded()}>
                     <Badge variant={feedTypeVariants[type] || 'outline'}>
                         {t(`view.feed.filters.${type}`)}
                     </Badge>
