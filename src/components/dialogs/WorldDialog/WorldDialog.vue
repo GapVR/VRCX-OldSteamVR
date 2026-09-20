@@ -335,6 +335,7 @@
         onCropConfirmWorld,
         copyWorldName,
         showWorldAllowedDomainsDialog,
+        showPreviousInstancesListDialog,
         registerCallbacks
     } = useWorldDialogCommands(worldDialog, {
         t,

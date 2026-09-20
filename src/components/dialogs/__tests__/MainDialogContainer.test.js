@@ -28,7 +28,8 @@ vi.mock('@/stores', () => ({
     useInstanceStore: () => ({
         previousInstancesInfoDialog: ref({ visible: false }),
         previousInstancesListDialog: ref({ visible: false, variant: 'user' })
-    })
+    }),
+    useAppearanceSettingsStore: () => ({ displayVRCProfileBackgrounds: false, isDarkMode: false, profileBackgroundOpacity: 0 })
 }));
 vi.mock('@/components/ui/dialog', () => ({
     Dialog: { template: '<div><slot /></div>' },

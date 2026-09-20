@@ -230,16 +230,16 @@ export const useUiStore = defineStore('Ui', () => {
             (instanceStore.previousInstancesInfoDialog.visible && !isPrevInfo) ||
             (instanceStore.previousInstancesListDialog.visible && !isPrevList);
 
-        if (type !== 'user') {
+        if (type !== 'user' && type !== 'previous-instances-user') {
             userStore.setUserDialogVisible(false);
         }
-        if (type !== 'world') {
+        if (type !== 'world' && type !== 'previous-instances-world') {
             worldStore.setWorldDialogVisible(false);
         }
         if (type !== 'avatar') {
             avatarStore.setAvatarDialogVisible(false);
         }
-        if (type !== 'group') {
+        if (type !== 'group' && type !== 'previous-instances-group') {
             groupStore.setGroupDialogVisible(false);
         }
         if (type !== 'group-member-moderation') {
