@@ -1,45 +1,72 @@
 <template>
     <div class="x-container x-container--auto-height" ref="playerListRef">
         <div class="flex h-full min-h-0 flex-col overflow-y-auto overflow-x-hidden">
-            <div v-if="currentInstanceWorld.ref.id" ref="playerListHeaderRef" style="display: flex; gap: 8px; align-items: flex-start">
+            <div
+                v-if="currentInstanceWorld.ref.id"
+                ref="playerListHeaderRef"
+                style="display: flex; min-height: 120px"
+                class="mb-2">
                 <img
                     v-if="!worldImageError"
                     :src="currentInstanceWorld.ref.thumbnailImageUrl"
-                    class="cursor-pointer shrink-0"
-                    style="width: 64px; height: 48px; border-radius: var(--radius-md)"
+                    class="cursor-pointer"
+                    style="flex: none; width: 160px; height: 120px; border-radius: var(--radius-md)"
                     @click="showFullscreenImageDialog(currentInstanceWorld.ref.imageUrl)"
+                    @error="worldImageError = true"
                     loading="lazy" />
-                <div v-else class="cursor-pointer shrink-0" style="width: 64px; height: 48px">
-                    <div class="flex items-center justify-center bg-muted" style="width: 100%; height: 100%; border-radius: var(--radius-md)">
-                        <Image class="size-5 text-muted-foreground" />
-                    </div>
+                <div
+                    v-else
+                    class="flex items-center justify-center bg-muted"
+                    style="flex: none; width: 160px; height: 120px; border-radius: var(--radius-md)">
+                    <Image class="size-8 text-muted-foreground" />
                 </div>
-                <div class="min-w-0 flex-1">
-                    <span
-                        class="text-md text-foreground cursor-pointer block truncate"
-                        @click="showWorldDialog(currentInstanceWorld.ref.id)"
-                        :title="currentInstanceWorld.ref.name"
-                        >{{ currentInstanceWorld.ref.name }}</span
-                    >
-                    <div class="flex flex-wrap items-center gap-1.5">
-                        <Badge class="mr-1.5" v-if="currentInstanceWorld.ref.$isLabs" variant="outline">
+                <div class="ml-2" style="display: flex; flex-direction: column; min-width: 320px; width: 100%">
+                    <div class="flex items-center">
+                        <span
+                            class="cursor-pointer"
+                            style="
+                                font-weight: bold;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                display: -webkit-box;
+                                -webkit-box-orient: vertical;
+                                line-clamp: 1;
+                            "
+                            @click="showWorldDialog(currentInstanceWorld.ref.id)">
+                            <Home
+                                v-if="
+                                    currentUser.$homeLocation &&
+                                    currentUser.$homeLocation.worldId === currentInstanceWorld.ref.id
+                                "
+                                class="inline-block" />
+                            {{ currentInstanceWorld.ref.name }}
+                        </span>
+                    </div>
+                    <div>
+                        <span
+                            class="cursor-pointer x-grey font-mono"
+                            @click="showUserDialog(currentInstanceWorld.ref.authorId)"
+                            v-text="currentInstanceWorld.ref.authorName"></span>
+                    </div>
+                    <div class="mt-1.5">
+                        <Badge class="mr-1.5 text-[10px] py-0 px-1.5" v-if="currentInstanceWorld.ref.$isLabs" variant="outline">
                             {{ t('dialog.world.tags.labs') }}
                         </Badge>
                         <Badge
-                            class="mr-1.5"
+                            class="mr-1.5 text-[10px] py-0 px-1.5"
                             v-else-if="currentInstanceWorld.ref.releaseStatus === 'public'"
                             variant="outline">
                             {{ t('dialog.world.tags.public') }}
                         </Badge>
                         <Badge
-                            class="mr-1.5"
+                            class="mr-1.5 text-[10px] py-0 px-1.5"
                             v-else-if="currentInstanceWorld.ref.releaseStatus === 'private'"
                             variant="outline">
                             {{ t('dialog.world.tags.private') }}
                         </Badge>
                         <TooltipWrapper v-if="currentInstanceWorld.isPC" side="top" content="PC">
-                            <Badge class="text-platform-pc border-platform-pc! mr-1.5" variant="outline">
-                                <Monitor class="h-4 w-4" />
+                            <Badge class="text-platform-pc border-platform-pc! mr-1.5 text-[10px] py-0 px-1.5" variant="outline"
+                                ><Monitor class="h-3 w-3" />
                                 <span
                                     v-if="currentInstanceWorld.fileAnalysis.standalonewindows?._fileSize"
                                     class="x-grey text-platform-pc border-l-[0.8px] border-solid ml-1.5 pl-1.5 pb-px"
@@ -48,8 +75,8 @@
                             </Badge>
                         </TooltipWrapper>
                         <TooltipWrapper v-if="currentInstanceWorld.isQuest" side="top" content="Android">
-                            <Badge class="text-platform-quest border-platform-quest! mr-1.5" variant="outline">
-                                <Smartphone class="h-4 w-4" />
+                            <Badge class="text-platform-quest border-platform-quest! mr-1.5 text-[10px] py-0 px-1.5" variant="outline"
+                                ><Smartphone class="h-3 w-3" />
                                 <span
                                     v-if="currentInstanceWorld.fileAnalysis.android?._fileSize"
                                     class="x-grey text-platform-quest border-l-[0.8px] border-solid ml-1.5 pl-1.5 pb-px"
@@ -58,8 +85,8 @@
                             </Badge>
                         </TooltipWrapper>
                         <TooltipWrapper v-if="currentInstanceWorld.isIos" side="top" content="iOS">
-                            <Badge class="text-platform-ios border-platform-ios mr-1.5" variant="outline">
-                                <Apple class="h-4 w-4 text-platform-ios" />
+                            <Badge class="text-platform-ios border-platform-ios mr-1.5 text-[10px] py-0 px-1.5" variant="outline"
+                                ><Apple class="h-3 w-3 text-platform-ios" />
                                 <span
                                     v-if="currentInstanceWorld.fileAnalysis.ios?._fileSize"
                                     class="x-grey text-platform-ios border-platform-ios border-l-[0.8px] border-solid ml-1.5 pl-1.5 pb-px"
@@ -68,40 +95,68 @@
                             </Badge>
                         </TooltipWrapper>
                         <Badge
-                            class="mr-1.5"
+                            class="mr-1.5 text-[10px] py-0 px-1.5"
                             v-if="currentInstanceWorld.avatarScalingDisabled"
                             variant="outline">
                             {{ t('dialog.world.tags.avatar_scaling_disabled') }}
                         </Badge>
-                        <Badge class="mr-1.5" v-if="currentInstanceWorld.inCache" variant="outline">
+                        <Badge class="mr-1.5 text-[10px] py-0 px-1.5" v-if="currentInstanceWorld.inCache" variant="outline">
                             <span>{{ currentInstanceWorld.cacheSize }} {{ t('dialog.world.tags.cache') }}</span>
                         </Badge>
-                        <Badge v-if="currentInstanceWorld.focusViewDisabled" variant="outline">{{ t('dialog.world.tags.focus_view_disabled') }}</Badge>
-                        <Badge v-if="currentInstanceWorld.ref.unityPackageUrl" variant="outline">{{ t('dialog.world.tags.future_proofing') }}</Badge>
-                        <Badge v-for="tag in currentInstanceWorld.ref.tags" :key="tag" v-if="tag.startsWith('content_')" variant="outline">
-                            <span v-if="tag === 'content_horror'">{{ t('dialog.world.tags.content_horror') }}</span>
-                            <span v-else-if="tag === 'content_gore'">{{ t('dialog.world.tags.content_gore') }}</span>
-                            <span v-else-if="tag === 'content_violence'">{{ t('dialog.world.tags.content_violence') }}</span>
-                            <span v-else-if="tag === 'content_adult'">{{ t('dialog.world.tags.content_adult') }}</span>
-                            <span v-else-if="tag === 'content_sex'">{{ t('dialog.world.tags.content_sex') }}</span>
-                            <span v-else>{{ tag.replace('content_', '') }}</span>
-                        </Badge>
                     </div>
-                    <div class="flex min-w-0 flex-wrap items-start gap-1.5">
+                    <div class="mt-1.5">
                         <LocationWorld
-                            class="text-sm inline-flex min-w-0 w-fit max-w-full border-muted-foreground/30"
                             :locationobject="currentInstanceLocation"
-                            :currentuserid="currentUser.id" />
-                        <span v-if="lastLocation.playerList.size > 0" class="text-xs x-grey">
+                            :currentuserid="currentUser.id"
+                            class="w-fit" />
+                        <span class="ml-1.5" v-if="lastLocation.playerList.size > 0">
                             <UsersRound class="inline-block h-3.5 w-3.5 align-middle mr-0.5" />
-                            {{ lastLocation.playerList.size }}
+                            {{ lastLocation.playerList.size }} / {{ commaNumber(currentInstanceWorld.ref.capacity) }}
                             <template v-if="lastLocation.friendList.size > 0">
-                                <UserPlus2 class="inline-block h-3.5 w-3.5 align-middle ml-0.5" />
-                                {{ lastLocation.friendList.size }}
+                                <UserPlus2 class="inline-block h-3.5 w-3.5 align-middle ml-1.5 mr-0.5" />
+                                <span class="font-bold text-yellow-400">{{ lastLocation.friendList.size }}</span>
                             </template>
-                            / {{ commaNumber(currentInstanceWorld.ref.recommendedCapacity) }} ({{ commaNumber(currentInstanceWorld.ref.capacity) }})
-                            &nbsp;&horbar; <Timer v-if="lastLocation.date" :epoch="lastLocation.date" />
+                            <Clock class="inline-block h-3.5 w-3.5 align-middle ml-1.5 mr-0.5" />
+                            <Timer v-if="lastLocation.date" :epoch="lastLocation.date" />
                         </span>
+                    </div>
+
+                </div>
+                <div class="ml-5" style="display: flex; flex-direction: column">
+                    <div class="box-border flex items-center p-1.5 text-[13px] cursor-default">
+                        <div class="flex-1 overflow-hidden">
+                            <span class="block truncate font-medium leading-[18px]">{{
+                                t('dialog.world.info.capacity')
+                            }}</span>
+                            <span class="block truncate text-xs"
+                                >{{ commaNumber(currentInstanceWorld.ref.recommendedCapacity) }} ({{
+                                    commaNumber(currentInstanceWorld.ref.capacity)
+                                }})</span
+                            >
+                        </div>
+                    </div>
+                    <div class="box-border flex items-center p-1.5 text-[13px] cursor-default">
+                        <div class="flex-1 overflow-hidden">
+                            <span class="block truncate font-medium leading-[18px]">{{
+                                t('dialog.world.info.last_updated')
+                            }}</span>
+                            <span class="block truncate text-xs">{{
+                                formatDateFilter(
+                                    currentInstanceWorld.fileAnalysis.standalonewindows?.created_at,
+                                    'long'
+                                )
+                            }}</span>
+                        </div>
+                    </div>
+                    <div class="box-border flex items-center p-1.5 text-[13px] cursor-default">
+                        <div class="flex-1 overflow-hidden">
+                            <span class="block truncate font-medium leading-[18px]">{{
+                                t('dialog.world.info.created')
+                            }}</span>
+                            <span class="block truncate text-xs">{{
+                                formatDateFilter(currentInstanceWorld.ref.created_at, 'long')
+                            }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -128,7 +183,7 @@
 
 <script setup>
     import { computed, onActivated, onMounted, ref, watch } from 'vue';
-    import { Apple, Image, Monitor, Smartphone, UsersRound, UserPlus2 } from 'lucide-vue-next';
+    import { Apple, Clock, Home, Image, Monitor, Smartphone, UsersRound, UserPlus2 } from 'lucide-vue-next';
     import { storeToRefs } from 'pinia';
     import { useI18n } from 'vue-i18n';
 
@@ -141,13 +196,12 @@
         useUserStore
     } from '../../stores';
     import { commaNumber, formatDateFilter } from '../../shared/utils';
+    import { Badge } from '../../components/ui/badge';
     import { DataTableLayout } from '../../components/ui/data-table';
     import { createColumns } from './columns.jsx';
     import { useVrcxVueTable } from '../../lib/table/useVrcxVueTable';
 
     import ChatboxBlacklistDialog from './dialogs/ChatboxBlacklistDialog.vue';
-    import { Badge } from '../../components/ui/badge';
-    import { TooltipWrapper } from '../../components/ui/tooltip-wrapper';
     import Timer from '../../components/Timer.vue';
     import { showUserDialog, lookupUser } from '../../coordinators/userCoordinator';
     import { showWorldDialog } from '../../coordinators/worldCoordinator';
