@@ -86,6 +86,7 @@ export const useAppearanceSettingsStore = defineStore(
         const sidebarFavoriteGroups = ref([]);
         const sidebarFavoriteGroupOrder = ref([]);
         const sidebarCosmetics = ref(false);
+        const hidePrivateUsers = ref(false);
         const hideUserNotes = ref(false);
         const hideUserMemos = ref(false);
         const hideUnfriends = ref(false);
@@ -162,6 +163,7 @@ export const useAppearanceSettingsStore = defineStore(
                 sidebarFavoriteGroupsConfig,
                 sidebarFavoriteGroupOrderConfig,
                 sidebarCosmeticsConfig,
+                hidePrivateUsersConfig,
                 hideUserNotesConfig,
                 hideUserMemosConfig,
                 hideUnfriendsConfig,
@@ -206,6 +208,7 @@ export const useAppearanceSettingsStore = defineStore(
                 configRepository.getString('VRCX_sidebarFavoriteGroups', '[]'),
                 configRepository.getString('VRCX_sidebarFavoriteGroupOrder', '[]'),
                 configRepository.getBool('VRCX_sidebarCosmetics', false),
+                configRepository.getBool('vrcxoldsteamvr_hidePrivateUsers', false),
                 configRepository.getBool('VRCX_hideUserNotes', false),
                 configRepository.getBool('VRCX_hideUserMemos', false),
                 configRepository.getBool('VRCX_hideUnfriends', false),
@@ -287,6 +290,7 @@ export const useAppearanceSettingsStore = defineStore(
             sidebarFavoriteGroups.value = JSON.parse(sidebarFavoriteGroupsConfig);
             sidebarFavoriteGroupOrder.value = JSON.parse(sidebarFavoriteGroupOrderConfig);
             sidebarCosmetics.value = sidebarCosmeticsConfig;
+            hidePrivateUsers.value = hidePrivateUsersConfig;
             hideUserNotes.value = hideUserNotesConfig;
             hideUserMemos.value = hideUserMemosConfig;
             hideUnfriends.value = hideUnfriendsConfig;
@@ -688,6 +692,10 @@ export const useAppearanceSettingsStore = defineStore(
             sidebarCosmetics.value = !sidebarCosmetics.value;
             configRepository.setBool('VRCX_sidebarCosmetics', sidebarCosmetics.value);
         }
+        function setHidePrivateUsers() {
+            hidePrivateUsers.value = !hidePrivateUsers.value;
+            configRepository.setBool('vrcxoldsteamvr_hidePrivateUsers', hidePrivateUsers.value);
+        }
         function setHideUserNotes() {
             hideUserNotes.value = !hideUserNotes.value;
             configRepository.setBool('VRCX_hideUserNotes', hideUserNotes.value);
@@ -926,6 +934,7 @@ export const useAppearanceSettingsStore = defineStore(
             sidebarFavoriteGroups,
             sidebarFavoriteGroupOrder,
             sidebarCosmetics,
+            hidePrivateUsers,
             hideUserNotes,
             hideUserMemos,
             hideUnfriends,
@@ -972,6 +981,7 @@ export const useAppearanceSettingsStore = defineStore(
             setSidebarFavoriteGroups,
             setSidebarFavoriteGroupOrder,
             setSidebarCosmetics,
+            setHidePrivateUsers,
             setHideUserNotes,
             setHideUserMemos,
             setHideUnfriends,

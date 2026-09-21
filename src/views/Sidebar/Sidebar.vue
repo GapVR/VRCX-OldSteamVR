@@ -1,10 +1,10 @@
 <template>
     <div class="x-aside-container">
         <div style="display: flex; align-items: baseline">
-            <div class="search-container p-2 pl-0" style="flex: 1">
+            <div class="search-container pl-0" style="flex: 1">
                 <button
                     type="button"
-                    class="border-input dark:bg-input/30 flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-[color,box-shadow] hover:border-ring cursor-pointer overflow-hidden"
+                    class="border-input dark:bg-input/30 flex h-7 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-[color,box-shadow] hover:border-ring cursor-pointer overflow-hidden"
                     @click="openQuickSearch">
                     <Search class="size-4 shrink-0 opacity-50" />
                     <span class="search-text flex-1 min-w-0 text-left text-sm text-muted-foreground truncate">{{
@@ -294,6 +294,14 @@
                         </div>
                     </PopoverContent>
                 </Popover>
+                <TooltipWrapper side="bottom" :content="t('view.settings.appearance.appearance.hide_private_users')">
+                    <Field orientation="horizontal" class="items-center gap-1">
+                        <Switch
+                            :model-value="hidePrivateUsers"
+                            :ariaLabel="t('view.settings.appearance.appearance.hide_private_users')"
+                            @update:modelValue="setHidePrivateUsers" />
+                    </Field>
+                </TooltipWrapper>
             </div>
         </div>
         <TabsUnderline
@@ -303,12 +311,15 @@
             variant="equal"
             fill
             class="zero-margin-tabs"
-            style="height: calc(100% - 70px); margin-top: 6px">
+            style="height: calc(100% - 42px); margin-top: 3px">
             <template #label-friends>
                 <div class="flex-1 min-w-0 overflow-hidden">
                     <span>{{ t('side_panel.friends') }}</span>
                 </div>
-                <span class="sidebar-tab-count flex-none whitespace-nowrap"> ({{ onlineFriendCount }}/{{ friends.size }}) <span class="ml-1" :style="{ color: onlinePctColor }">{{ nonPrivateOnlinePct }}</span></span>
+                <span class="sidebar-tab-count flex-none whitespace-nowrap">
+                    ({{ onlineFriendCount }}/{{ friends.size }})
+                    <span class="ml-1" :style="{ color: onlinePctColor }">{{ nonPrivateOnlinePct }}</span></span
+                >
             </template>
             <template #label-groups>
                 <div class="flex-1 min-w-0 overflow-hidden">
@@ -431,7 +442,8 @@
         isSameInstanceAboveFavorites,
         isSidebarDivideByFriendGroup,
         sidebarFavoriteGroups,
-        sidebarCosmetics
+        sidebarCosmetics,
+        hidePrivateUsers
     } = storeToRefs(appearanceSettingsStore);
     const {
         setSidebarSortMethod1,
@@ -442,7 +454,8 @@
         setIsSameInstanceAboveFavorites,
         setIsSidebarDivideByFriendGroup,
         setSidebarFavoriteGroups,
-        setSidebarCosmetics
+        setSidebarCosmetics,
+        setHidePrivateUsers
     } = appearanceSettingsStore;
 
     const favoriteStore = useFavoriteStore();

@@ -1,7 +1,7 @@
 <template>
     <div class="relative h-full">
         <div ref="scrollViewportRef" class="h-full w-full overflow-auto overflow-x-hidden">
-            <div class="px-[5px] py-2.5">
+            <div class="px-[5px] pt-0.75 pb-2.5">
                 <div v-if="virtualRows.length" class="relative w-full box-border" :style="virtualContainerStyle">
                     <template v-for="item in virtualItems" :key="String(item.virtualItem.key)">
                         <div
@@ -21,7 +21,10 @@
                                     <span class="ml-1.5">
                                         {{ item.row.label }}
                                         <template v-if="item.row.count !== null && item.row.count !== undefined">
-                                            &horbar; {{ item.row.count }}<template v-if="item.row.nonPrivateCount > 0"> ({{ item.row.nonPrivateCount }})</template>
+                                            &horbar; {{ item.row.count
+                                            }}<template v-if="item.row.nonPrivateCount > 0">
+                                                ({{ item.row.nonPrivateCount }})</template
+                                            >
                                         </template>
                                     </span>
                                 </div>
@@ -142,7 +145,9 @@
                                     <Location class="inline text-xs" :location="item.row.location" exclude-group-name />
                                     <span class="text-xs ml-1.5">{{ `(${item.row.count})` }}</span>
                                     <template v-if="item.row.nonPrivateCount > 0">
-                                        <span class="text-xs ml-1 text-muted-foreground">(visible {{ item.row.nonPrivateCount }})</span>
+                                        <span class="text-xs ml-1 text-muted-foreground"
+                                            >(visible {{ item.row.nonPrivateCount }})</span
+                                        >
                                     </template>
                                 </div>
                             </template>
@@ -284,9 +289,14 @@
         sidebarFavoriteGroups,
         sidebarFavoriteGroupOrder,
         sidebarSortMethods,
-        sidebarCosmetics
+        sidebarCosmetics,
+        hidePrivateUsers
     } = storeToRefs(appearanceSettingsStore);
     const { gameLogDisabled } = storeToRefs(useAdvancedSettingsStore());
+
+    function isPrivateUser(friend) {
+        return !isRealInstance(friend.ref?.location);
+    }
     const userStore = useUserStore();
     const { showSendBoopDialog, showEditProfileDialog } = userStore;
     const launchStore = useLaunchStore();
@@ -356,6 +366,13 @@
         return excludeSameInstance(filtered);
     });
 
+    const filteredFavoriteOnlineFriends = computed(() => {
+        if (hidePrivateUsers.value) {
+            return visibleFavoriteOnlineFriends.value.filter((f) => !isPrivateUser(f));
+        }
+        return visibleFavoriteOnlineFriends.value;
+    });
+
     /**
      * @param list
      */
@@ -386,6 +403,27 @@
         return excludeSameInstance(
             [...nonFavOnline, ...unselectedGroupFriends].sort(getFriendsSortFunction(sidebarSortMethods.value))
         );
+    });
+
+    const filteredOnlineFriendsByGroupStatus = computed(() => {
+        if (hidePrivateUsers.value) {
+            return onlineFriendsByGroupStatus.value.filter((f) => !isPrivateUser(f));
+        }
+        return onlineFriendsByGroupStatus.value;
+    });
+
+    const filteredActiveFriends = computed(() => {
+        if (hidePrivateUsers.value) {
+            return activeFriends.value.filter((f) => !isPrivateUser(f));
+        }
+        return activeFriends.value;
+    });
+
+    const filteredOfflineFriends = computed(() => {
+        if (hidePrivateUsers.value) {
+            return offlineFriends.value.filter((f) => !isPrivateUser(f));
+        }
+        return offlineFriends.value;
     });
 
     // VIP friends divide by group
@@ -491,7 +529,7 @@
                     }
                 });
             } else {
-                visibleFavoriteOnlineFriends.value.forEach((friend, idx) => {
+                filteredFavoriteOnlineFriends.value.forEach((friend, idx) => {
                     rows.push(buildFriendRow(friend, `vip:${friend?.id ?? idx}`));
                 });
             }
@@ -530,8 +568,7 @@
                         rows.push(
                             buildFriendRow(friend, `instance:${groupKey}:${friend?.id ?? idx}`, {
                                 isGroupByInstance: true,
-                                paddingBottom: idx === friendArr.length - 1 ? 5 : undefined,
-                                itemStyle: idx === friendArr.length - 1 ? { marginBottom: '6px' } : undefined
+                                paddingBottom: idx === friendArr.length - 1 ? 11 : undefined
                             })
                         );
                     });
@@ -580,7 +617,7 @@
         }
 
         if (isOnlineFriends.value) {
-            onlineFriendsByGroupStatus.value.forEach((friend, idx) => {
+            filteredOnlineFriendsByGroupStatus.value.forEach((friend, idx) => {
                 rows.push(buildFriendRow(friend, `online:${friend?.id ?? idx}`));
             });
         }
@@ -600,7 +637,7 @@
         }
 
         if (isActiveFriends.value) {
-            activeFriends.value.forEach((friend, idx) => {
+            filteredActiveFriends.value.forEach((friend, idx) => {
                 rows.push(buildFriendRow(friend, `active:${friend?.id ?? idx}`));
             });
         }
@@ -620,7 +657,7 @@
         }
 
         if (isOfflineFriends.value) {
-            offlineFriends.value.forEach((friend, idx) => {
+            filteredOfflineFriends.value.forEach((friend, idx) => {
                 rows.push(buildFriendRow(friend, `offline:${friend?.id ?? idx}`));
             });
         }
