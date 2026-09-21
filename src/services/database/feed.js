@@ -593,6 +593,9 @@ const feed = {
      * @returns {Promise<Array>} Ranked list of hot worlds
      */
     async getHotWorlds(days = 30, limit = 30) {
+        if (!dbVars.userPrefix) {
+            return [];
+        }
         const halfDays = Math.floor(days / 2);
         const results = [];
         await sqliteService.execute(
@@ -686,6 +689,9 @@ const feed = {
      * @returns {Promise<Array>} List of friends who visited
      */
     async getHotWorldFriendDetail(worldId, days = 30) {
+        if (!dbVars.userPrefix) {
+            return [];
+        }
         const results = [];
         await sqliteService.execute(
             (dbRow) => {

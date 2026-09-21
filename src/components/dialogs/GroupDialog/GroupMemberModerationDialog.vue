@@ -128,7 +128,7 @@
     import { storeToRefs } from 'pinia';
     import { useI18n } from 'vue-i18n';
 
-    import { useAppearanceSettingsStore, useGalleryStore, useGroupStore, useUserStore } from '../../../stores';
+    import { useAppearanceSettingsStore, useGalleryStore, useGroupStore, useModalStore, useUserStore } from '../../../stores';
     import {
         applyGroupMember,
         handleGroupMember,
@@ -160,6 +160,7 @@
 
     const { currentUser } = storeToRefs(useUserStore());
     const { groupDialog, groupMemberModeration } = storeToRefs(useGroupStore());
+    const modalStore = useModalStore();
     const { showFullscreenImageDialog } = useGalleryStore();
     const { t } = useI18n();
 
@@ -329,12 +330,22 @@
             onComplete: () => getAllGroupInvitesAndJoinRequests(groupMemberModeration.value.id)
         });
     }
-    function handleRejectInviteRequest() {
+    async function handleRejectInviteRequest() {
+        const { ok } = await modalStore.confirm({
+            title: t('confirm.title'),
+            description: 'Reject join request?'
+        });
+        if (!ok) return;
         groupMembersRejectInviteRequest({
             onComplete: () => getAllGroupInvitesAndJoinRequests(groupMemberModeration.value.id)
         });
     }
-    function handleBlockJoinRequest() {
+    async function handleBlockJoinRequest() {
+        const { ok } = await modalStore.confirm({
+            title: t('confirm.title'),
+            description: 'Block user from group request?'
+        });
+        if (!ok) return;
         groupMembersBlockJoinRequest({
             onComplete: () => getAllGroupInvitesAndJoinRequests(groupMemberModeration.value.id)
         });
