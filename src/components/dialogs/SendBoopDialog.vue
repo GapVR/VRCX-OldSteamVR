@@ -17,6 +17,13 @@
                     :deselect-on-reselect="true"
                     :maxHeight="230">
                     <template #item="{ item, selected }">
+                        <img
+                            v-if="getPhotonEmojiUrl(item.label)"
+                            :src="getPhotonEmojiUrl(item.label)"
+                            class="mr-2 size-[38px] shrink-0 rounded"
+                            loading="lazy"
+                            :alt="item.label"
+                        />
                         <span v-text="item.label"></span>
                         <CheckIcon :class="['ml-auto size-4', selected ? 'opacity-100' : 'opacity-0']" />
                     </template>
@@ -81,6 +88,82 @@
     import { photonEmojis } from '../../shared/constants/photon.js';
 
     import Emoji from '../Emoji.vue';
+
+    const photonEmojiWikiMap = {
+        'Angry': 'Angry',
+        'Blushing': 'Blush',
+        'Crying': 'Crying',
+        'Frown': 'Frown',
+        'Hand Wave': 'Handwave',
+        'Hang Ten': 'Summer_Hangten',
+        'In Love': 'Inlove',
+        'Jack O Lantern': 'Fall_Jackolantern',
+        'Kiss': 'Kiss',
+        'Laugh': 'Laugh',
+        'Skull': 'Fall_Skull',
+        'Smile': 'Smile',
+        'Spooky Ghost': 'Fall_Ghost',
+        'Stoic': 'Stoic',
+        'Sunglasses': 'Sunglasses',
+        'Thinking': 'Thinking',
+        'Thumbs Down': 'Dislike',
+        'Thumbs Up': 'Like',
+        'Tongue Out': 'Tongue',
+        'Wow': 'Wow',
+        'Arrow Point': 'Accessibility_Arrow',
+        "Can't see": 'Accessibility_Blind',
+        'Hourglass': 'Accessibility_Hourglass',
+        'Keyboard': 'Accessibility_Keyboard',
+        'No Headphones': 'Accessibility_Deafened',
+        'No Mic': 'Accessibility_Muted',
+        'Portal': 'Accessibility_Portal',
+        'Shush': 'Accessibility_Shush',
+        'Bats': 'Fall_Bat',
+        'Cloud': 'Cloud',
+        'Fire': 'Fire',
+        'Snow Fall': 'Winter_Snowflake',
+        'Snowball': 'Emoji_Winter_Snowball',
+        'Splash': 'Summer_Splash',
+        'Web': 'Fall_Web',
+        'Beer': 'Beer',
+        'Candy': 'Fall_Candy',
+        'Candy Cane': 'Winter_Candycane',
+        'Candy Corn': 'Fall_CandyCorn',
+        'Champagne': 'Winter_Champagneclink',
+        'Drink': 'Summer_Coconut_Drink',
+        'Gingerbread': 'Winter_Gingerbreadman',
+        'Ice Cream': 'Summer_Icecream',
+        'Pineapple': 'Summer_Pineapple',
+        'Pizza': 'Pizza',
+        'Tomato': 'Tomato',
+        'Beachball': 'Summer_Beachball',
+        'Coal': 'Winter_Coal',
+        'Confetti': 'Winter_ConfettiPopper',
+        'Gift': 'Gift',
+        'Gifts': 'Winter_Gifts',
+        'Life Ring': 'Lifering',
+        'Mistletoe': 'Winter_Mistletoe',
+        'Money': 'Money',
+        'Neon Shades': 'Summer_Neonshades',
+        'Sun Lotion': 'Summer_Sunlotion',
+        'Boo': 'Fall_BOO',
+        'Broken Heart': 'Brokenheart',
+        'Exclamation': 'Exclaim',
+        'Go': 'Go',
+        'Heart': 'Love',
+        'Music Note': 'Music',
+        'Question': 'Question',
+        'Stop': 'Stop',
+        'Zzz': 'ZZZZ'
+    };
+
+    function getPhotonEmojiUrl(emojiName) {
+        const wikiName = photonEmojiWikiMap[emojiName];
+        if (!wikiName) {
+            return null;
+        }
+        return `https://wiki-media.vrchat.com/${wikiName}.webp`;
+    }
 
     const { t } = useI18n();
 
