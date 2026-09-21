@@ -127,6 +127,10 @@
                 <template v-else>
                     <template v-if="userDialog.isFriend">
                         <DropdownMenuSeparator />
+                        <DropdownMenuItem :disabled="!currentUser.isBoopingEnabled" @click="onCommand('Send Boop')">
+                            <Hand class="size-4" />
+                            {{ t('dialog.user.actions.send_boop') }}
+                        </DropdownMenuItem>
                         <DropdownMenuItem @click="onCommand('Request Invite')">
                             <Mail class="size-4" />
                             {{ t('dialog.user.actions.request_invite') }}
@@ -161,10 +165,6 @@
                                 </DropdownMenuShortcut>
                             </DropdownMenuItem>
                         </template>
-                        <DropdownMenuItem :disabled="!currentUser.isBoopingEnabled" @click="onCommand('Send Boop')">
-                            <Hand class="size-4" />
-                            {{ t('dialog.user.actions.send_boop') }}
-                        </DropdownMenuItem>
                     </template>
                     <template v-else-if="userDialog.incomingRequest">
                         <DropdownMenuItem @click="onCommand('Accept Friend Request')">

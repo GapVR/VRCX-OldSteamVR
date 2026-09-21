@@ -162,13 +162,9 @@
                                     </ContextMenuTrigger>
                                     <ContextMenuContent>
                                         <ContextMenuItem
-                                            v-if="item.row.friend.state === 'online'"
-                                            @click="friendRequestInvite(item.row.friend)">
-                                            {{ t('dialog.user.actions.request_invite') }}
-                                            <ContextMenuShortcut
-                                                v-if="isActionRecent(item.row.friend.id, 'Request Invite')">
-                                                <Clock class="size-3.5 text-muted-foreground" />
-                                            </ContextMenuShortcut>
+                                            :disabled="!currentUser.isBoopingEnabled"
+                                            @click="friendSendBoop(item.row.friend)">
+                                            {{ t('dialog.user.actions.send_boop') }}
                                         </ContextMenuItem>
                                         <ContextMenuItem
                                             v-if="isGameRunning"
@@ -180,9 +176,13 @@
                                             </ContextMenuShortcut>
                                         </ContextMenuItem>
                                         <ContextMenuItem
-                                            :disabled="!currentUser.isBoopingEnabled"
-                                            @click="friendSendBoop(item.row.friend)">
-                                            {{ t('dialog.user.actions.send_boop') }}
+                                            v-if="item.row.friend.state === 'online'"
+                                            @click="friendRequestInvite(item.row.friend)">
+                                            {{ t('dialog.user.actions.request_invite') }}
+                                            <ContextMenuShortcut
+                                                v-if="isActionRecent(item.row.friend.id, 'Request Invite')">
+                                                <Clock class="size-3.5 text-muted-foreground" />
+                                            </ContextMenuShortcut>
                                         </ContextMenuItem>
                                         <ContextMenuSeparator
                                             v-if="

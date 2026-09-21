@@ -9,12 +9,9 @@
                 {{ t('common.actions.view_details') }}
             </ContextMenuItem>
             <ContextMenuSeparator />
-            <ContextMenuItem v-if="isOnline" @click="handleRequestInvite">
-                <Mail class="size-4" />
-                {{ t('dialog.user.actions.request_invite') }}
-                <ContextMenuShortcut v-if="showRecentRequestInvite">
-                    <Clock class="size-3.5 text-muted-foreground" />
-                </ContextMenuShortcut>
+            <ContextMenuItem :disabled="!currentUser?.isBoopingEnabled" @click="handleSendBoop">
+                <Hand class="size-4" />
+                {{ t('dialog.user.actions.send_boop') }}
             </ContextMenuItem>
             <ContextMenuItem v-if="isGameRunning" :disabled="!canInviteToMyLocation" @click="handleInvite">
                 <MessageSquare class="size-4" />
@@ -23,9 +20,12 @@
                     <Clock class="size-3.5 text-muted-foreground" />
                 </ContextMenuShortcut>
             </ContextMenuItem>
-            <ContextMenuItem :disabled="!currentUser?.isBoopingEnabled" @click="handleSendBoop">
-                <Hand class="size-4" />
-                {{ t('dialog.user.actions.send_boop') }}
+            <ContextMenuItem v-if="isOnline" @click="handleRequestInvite">
+                <Mail class="size-4" />
+                {{ t('dialog.user.actions.request_invite') }}
+                <ContextMenuShortcut v-if="showRecentRequestInvite">
+                    <Clock class="size-3.5 text-muted-foreground" />
+                </ContextMenuShortcut>
             </ContextMenuItem>
             <ContextMenuSeparator v-if="isOnline && hasLocation" />
             <ContextMenuItem v-if="isOnline && hasLocation" :disabled="!canJoin" @click="handleJoin">
