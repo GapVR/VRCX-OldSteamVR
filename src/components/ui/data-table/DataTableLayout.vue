@@ -1,6 +1,6 @@
 <template>
     <div :class="['flex flex-col min-w-0 data-table', autoHeight && 'flex-1 min-h-0 overflow-hidden']">
-        <div v-if="$slots.toolbar" class="mb-2">
+        <div v-if="$slots.toolbar">
             <slot name="toolbar"></slot>
         </div>
 
@@ -262,13 +262,23 @@
             </div>
         </div>
 
-        <div v-if="showPagination" class="dt-pagination mt-4 flex w-full items-center gap-3 mb-1">
-            <div v-if="pageSizes.length" class="dt-pagination-sizes inline-flex items-center flex-1 justify-end gap-3">
-                <span class="text-xs text-muted-foreground whitespace-nowrap">{{ t('table.pagination.rows_per_page') }}</span>
-                <Popover>
+        <div v-if="showPagination" class="dt-pagination mt-2 flex w-full items-center gap-3 mb-1">
+            <div v-if="pageSizes.length" class="dt-pagination-sizes inline-flex items-center flex-1 justify-end gap-2">
+                <span v-if="!useSlider" class="text-xs text-muted-foreground truncate">{{ t('table.pagination.rows_per_page') }}</span>
+                <Select v-if="!useSlider" v-model="pageSizeValue">
+                    <SelectTrigger size="sm">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem v-for="size in pageSizes" :key="String(size)" :value="String(size)">
+                            {{ size }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+                <Popover v-if="useSlider">
                     <PopoverTrigger as-child>
                         <Button variant="ghost" size="sm" class="h-7 px-2 gap-1.5">
-                            <span class="text-xs font-mono tabular-nums">{{ pageSizeProxy }}</span>
+                            <span class="text-xs font-mono tabular-nums">{{ Math.round(pageSizeProxy) }}</span>
                             <ChevronDown class="size-3 opacity-50" />
                         </Button>
                     </PopoverTrigger>
@@ -281,7 +291,7 @@
                                 :step="1"
                                 class="w-full"
                                 @update:model-value="handlePageSizeChange(logScale($event[0], 0, 100))" />
-                            <span class="text-xs font-mono tabular-nums text-center">{{ pageSizeProxy }}</span>
+                            <span class="text-xs text-muted-foreground">{{ t('table.pagination.rows_per_page') }}: <span class="text-xs font-mono tabular-nums text-center">{{ Math.round(pageSizeProxy) }}</span></span>
                         </div>
                     </PopoverContent>
                 </Popover>
@@ -345,6 +355,13 @@
     import { Popover, PopoverContent, PopoverTrigger } from '../popover';
     import { Button } from '../button';
     import { ChevronDown } from 'lucide-vue-next';
+    import {
+        Select,
+        SelectContent,
+        SelectItem,
+        SelectTrigger,
+        SelectValue
+    } from '../select';
     import {
         getColStyle,
         getToggleableColumns,
@@ -417,6 +434,10 @@
             default: true
         },
         autoHeight: {
+            type: Boolean,
+            default: false
+        },
+        useSlider: {
             type: Boolean,
             default: false
         }
@@ -603,12 +624,12 @@
     function logScale(value, min, max) {
         if (max === min) return min;
         const ratio = (value - min) / (max - min);
-        return Math.round(Math.exp(Math.log(PAGE_SIZE_MIN) + ratio * (Math.log(PAGE_SIZE_MAX) - Math.log(PAGE_SIZE_MIN))));
+        return Math.exp(Math.log(PAGE_SIZE_MIN) + ratio * (Math.log(PAGE_SIZE_MAX) - Math.log(PAGE_SIZE_MIN)));
     }
 
     function logScaleInverse(pageSize, min, max) {
         const ratio = (Math.log(pageSize) - Math.log(PAGE_SIZE_MIN)) / (Math.log(PAGE_SIZE_MAX) - Math.log(PAGE_SIZE_MIN));
-        return Math.round(min + ratio * (max - min));
+        return min + ratio * (max - min);
     }
 
     const handlePageSizeChange = (size) => {
@@ -628,21 +649,14 @@
         set: (size) => handlePageSizeChange(size)
     });
 
-    // When the current pageSize is not in the available pageSizes list
-    watch(
-        [pageSizeProxy, () => props.pageSizes],
-        ([current, sizes]) => {
-            if (!sizes?.length || sizes.includes(current) || sizes.length <= 2) {
-                return;
-            }
-            const nearest = sizes.reduce((prev, s) => (Math.abs(s - current) < Math.abs(prev - current) ? s : prev));
-            handlePageSizeChange(nearest);
-        },
-        { immediate: true }
-    );
-
     const pageSizeValue = computed({
-        get: () => String(pageSizeProxy.value),
+        get: () => {
+            const val = pageSizeProxy.value;
+            if (!val || !props.pageSizes?.includes(val)) {
+                return String(props.pageSizes[0] ?? 10);
+            }
+            return String(val);
+        },
         set: (value) => handlePageSizeChange(Number(value))
     });
 

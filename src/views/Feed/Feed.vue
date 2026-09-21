@@ -4,15 +4,16 @@
             :table="table"
             :loading="feedTable.loading"
             auto-height
+            use-slider
             :page-sizes="pageSizes"
             :total-items="totalItems"
             :on-page-size-change="handlePageSizeChange">
             <template #toolbar>
-                <div class="mt-0 mx-0 mb-2" style="display: flex; align-items: center">
+                <div class="mb-2" style="display: flex; align-items: center">
                     <div style="flex: none; display: flex; align-items: center" class="mr-2">
                         <Popover v-model:open="popoverOpen">
                             <PopoverTrigger as-child>
-                                <Button variant="outline" size="sm" class="mx-2 h-8 gap-1.5">
+                                <Button variant="outline" size="sm" class="mx-2 h-8 gap-1.5 pl-[2px]">
                                     <ListFilter class="size-4" />
                                     {{ t('view.my_avatars.filter') }}
                                     <Badge
