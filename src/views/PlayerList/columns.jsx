@@ -68,18 +68,24 @@ export const createColumns = ({
                 if (!src) return null;
                 return (
                     <div class="flex items-center pl-2">
-                        <img
-                            src={src}
-                            class="h-4 w-4 rounded-sm object-cover"
-                            loading="lazy"
-                            onError={(e) => {
-                                e.target.style.display = 'none';
-                                e.target.nextElementSibling.style.display = '';
-                            }}
-                        />
-                        <div class="h-4 w-4 rounded-sm bg-muted flex items-center justify-center" style="display: none">
-                            <User class="h-3 w-3 text-muted-foreground" />
-                        </div>
+                        <TooltipWrapper side="top" v-slots={{
+                            content: () => (
+                                <img src={src} class="w-40 rounded-lg" loading="lazy" />
+                            )
+                        }}>
+                            <img
+                                src={src}
+                                class="h-4 w-4 rounded-sm object-cover cursor-pointer"
+                                loading="lazy"
+                                onError={(e) => {
+                                    e.target.style.display = 'none';
+                                    e.target.nextElementSibling.style.display = '';
+                                }}
+                            />
+                            <div class="h-4 w-4 rounded-sm bg-muted flex items-center justify-center" style="display: none">
+                                <User class="h-3 w-3 text-muted-foreground" />
+                            </div>
+                        </TooltipWrapper>
                     </div>
                 );
             }
