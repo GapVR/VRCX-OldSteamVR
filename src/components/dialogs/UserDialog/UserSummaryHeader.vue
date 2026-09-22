@@ -2,7 +2,7 @@
     <div class="flex items-center gap-3 px-2 py-1">
         <!-- User icon (left) -->
         <img
-            v-if="userDialog.publicProfileRef?.iconUrl"
+            v-if="userDialog.publicProfileRef?.iconUrl && !isDefaultAvatar(userDialog.publicProfileRef.iconUrl)"
             class="cursor-pointer flex-none object-cover rounded-md"
             :src="userDialog.publicProfileRef.iconUrl"
             style="width: 120px; height: 120px"
@@ -263,4 +263,8 @@
     const { userDialog, currentUser } = storeToRefs(useUserStore());
     const { showFullscreenImageDialog } = useGalleryStore();
     const { userStatusClass } = useUserDisplay();
+
+    function isDefaultAvatar(url) {
+        return url.replace(/\/\d+$/, '') === 'https://assets.vrchat.com/default/filtered.png';
+    }
 </script>

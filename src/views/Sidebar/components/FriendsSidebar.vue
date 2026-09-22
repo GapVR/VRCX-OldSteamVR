@@ -1,7 +1,7 @@
 <template>
     <div class="relative h-full">
         <div ref="scrollViewportRef" class="h-full w-full overflow-auto overflow-x-hidden">
-            <div class="px-[5px] pt-0.75 pb-2.5">
+            <div class="pt-0.75 pb-2.5">
                 <div v-if="virtualRows.length" class="relative w-full box-border" :style="virtualContainerStyle">
                     <template v-for="item in virtualItems" :key="String(item.virtualItem.key)">
                         <div

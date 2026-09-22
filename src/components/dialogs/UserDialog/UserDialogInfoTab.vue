@@ -376,7 +376,7 @@
 
             <TooltipWrapper
                 side="top"
-                :content="formatDateFilter(userDialog.ref.date_joined, 'date')"
+                :content="timeAgo(userDialog.ref.date_joined)"
                 :disabled="!userDialog.ref.date_joined">
                 <div class="flex justify-between items-start gap-2 text-xs">
                     <span class="text-muted-foreground shrink-0">{{
@@ -384,7 +384,7 @@
                     }}</span>
                     <span
                         class="text-right text-muted-foreground"
-                        v-text="timeAgo(userDialog.ref.date_joined)"></span>
+                        v-text="formatDateFilter(userDialog.ref.date_joined, 'date')"></span>
                 </div>
             </TooltipWrapper>
 
