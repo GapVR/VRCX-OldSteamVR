@@ -84,6 +84,10 @@
                         </Popover>
                     </div>
                 </TooltipWrapper>
+                <Switch
+                    class="ml-2 mr-2"
+                    v-model="hidePrivateUsersLocal"
+                    :ariaLabel="t('view.settings.appearance.appearance.hide_private_users')" />
             </div>
         </div>
         <div v-else class="friend-view__toolbar friend-view__toolbar--loading">
@@ -102,7 +106,7 @@
                         <template v-if="item.row.type === 'header'">
                             <header class="friend-view__instance-header">
                                 <Location
-                                    class="text-xs"
+                                    class="text-sm"
                                     :location="getRowInstanceId(item.row)"
                                     style="display: inline" />
                                 <span class="friend-view__instance-count">({{ getRowCount(item.row) }})</span>
@@ -111,7 +115,7 @@
 
                         <template v-else-if="item.row.type === 'group-header'">
                             <div
-                                class="flex cursor-pointer select-none items-center gap-1.5 px-1 py-1.5 text-[13px] font-semibold hover:opacity-80"
+                                class="flex cursor-pointer select-none items-center gap-1.5 px-1 py-1 text-[14px] font-semibold hover:opacity-80"
                                 @click="toggleGroupCollapse(item.row.groupKey)">
                                 <ChevronDown
                                     class="size-4 shrink-0 transition-transform duration-200 ease-in-out"
@@ -132,7 +136,6 @@
                                     :key="card.key"
                                     :friend="card.friend"
                                     :card-scale="cardScale"
-                                    :card-spacing="cardSpacing"
                                     :show-cosmetics="showCosmetics"
                                     :display-instance-info="card.displayInstanceInfo" />
                             </div>
@@ -165,6 +168,7 @@
 
     import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/popover';
     import { useAppearanceSettingsStore, useFavoriteStore, useFriendStore, useLocationStore } from '../../stores';
+    import { isRealInstance } from '../../shared/utils/instance.js';
     import { Slider } from '../../components/ui/slider';
     import { Switch } from '../../components/ui/switch';
     import { getFriendsLocations } from '../../shared/utils/location.js';
@@ -311,6 +315,8 @@
 
     const normalizedSearchTerm = computed(() => searchTerm.value.trim().toLowerCase());
 
+    const hidePrivateUsersLocal = ref(false);
+
     const toEntries = (list = [], instanceId) =>
         Array.isArray(list)
             ? list.map((friend) => ({
@@ -323,6 +329,18 @@
     const getFriendIdentity = (friend) => friend?.id ?? friend?.userId ?? friend?.displayName ?? 'unknown';
 
     const getEntryIdentity = (entry) => entry?.id ?? getFriendIdentity(entry?.friend);
+
+    const isPrivateUser = (friend) => !isRealInstance(friend.ref?.location);
+
+    const filterNonPrivate = (list) => {
+        if (!hidePrivateUsersLocal.value) return list;
+        return list.filter((f) => !isPrivateUser(f));
+    };
+
+    const filterEntriesNonPrivate = (entries) => {
+        if (!hidePrivateUsersLocal.value) return entries;
+        return entries.filter((e) => !isPrivateUser(e.friend));
+    };
 
     const scheduleVirtualMeasure = ({ updateGridWidth: shouldUpdateGridWidth = false } = {}) => {
         pendingGridWidthUpdate = pendingGridWidthUpdate || shouldUpdateGridWidth;
@@ -447,7 +465,7 @@
 
         const result = [];
         for (const { key, groupName, memberIds } of groups) {
-            const filteredFriends = visibleFavoriteOnlineFriends.value.filter((friend) => memberIds.has(friend.id));
+            const filteredFriends = filterNonPrivate(visibleFavoriteOnlineFriends.value.filter((friend) => memberIds.has(friend.id)));
             if (filteredFriends.length > 0) {
                 result.push({ key, groupName, friends: filteredFriends });
             }
@@ -486,20 +504,20 @@
 
     const filteredFriends = computed(() => {
         if (normalizedSearchTerm.value) {
-            return searchableEntries.value.filter(({ friend }) => {
+            return filterEntriesNonPrivate(searchableEntries.value.filter(({ friend }) => {
                 const haystack =
                     `${friend.displayName ?? friend.name ?? ''} ${friend.signature ?? ''} ${friend.worldName ?? ''}`.toLowerCase();
                 return haystack.includes(normalizedSearchTerm.value);
-            });
+            }));
         }
 
         switch (activeSegment.value) {
             case 'online': {
                 if (!showSameInstance.value) {
-                    const sameEntries = sameInstanceEntries.value.map((entry) => ({
+                    const sameEntries = filterEntriesNonPrivate(sameInstanceEntries.value.map((entry) => ({
                         ...entry,
                         section: 'same-instance'
-                    }));
+                    })));
 
                     const seenIds = new Set(
                         sameEntries
@@ -519,19 +537,19 @@
                             section: 'online'
                         }));
 
-                    return [...sameEntries, ...remainingOnline];
+                    return [...sameEntries, ...filterEntriesNonPrivate(remainingOnline)];
                 }
 
-                return toEntries(onlineFriendsByGroupStatus.value);
+                return filterEntriesNonPrivate(toEntries(onlineFriendsByGroupStatus.value));
             }
             case 'favorite':
-                return toEntries(visibleFavoriteOnlineFriends.value);
+                return filterEntriesNonPrivate(toEntries(visibleFavoriteOnlineFriends.value));
             case 'same-instance':
-                return sameInstanceEntries.value;
+                return filterEntriesNonPrivate(sameInstanceEntries.value);
             case 'active':
-                return toEntries(activeFriends.value);
+                return filterEntriesNonPrivate(toEntries(activeFriends.value));
             case 'offline':
-                return toEntries(offlineFriends.value);
+                return filterEntriesNonPrivate(toEntries(offlineFriends.value));
             default:
                 return [];
         }
@@ -621,7 +639,7 @@
 
     const computeGridLayout = (count = 1, options = {}) => {
         const baseWidth = 220;
-        const baseGap = 14;
+        const baseGap = 10;
         const scale = cardScale.value;
         const spacing = cardSpacing.value;
         const minWidth = baseWidth * scale;
@@ -810,16 +828,16 @@
 
     const estimateRowSize = (row) => {
         if (!row) {
-            return 48;
+            return 36;
         }
         if (row.type === 'header') {
-            return 32;
+            return 28;
         }
         if (row.type === 'group-header') {
-            return 40;
+            return 34;
         }
         if (row.type === 'divider') {
-            return 36;
+            return 28;
         }
 
         const itemCount = Array.isArray(row.items) ? row.items.length : 0;
@@ -828,11 +846,11 @@
         const rows = Math.max(1, Math.ceil(itemCount / safeColumns));
         const scale = cardScale.value;
         const spacing = cardSpacing.value;
-        const baseCardHeight = 150;
+        const baseCardHeight = 110;
         const cardHeight = baseCardHeight * scale * spacing;
         const rowGap = Math.max(0, gap - 4);
 
-        return rows * cardHeight + (rows - 1) * rowGap + 8;
+        return rows * cardHeight + (rows - 1) * rowGap + 2;
     };
 
     const virtualizer = useVirtualizer(
@@ -944,7 +962,7 @@
     .friend-view {
         display: grid;
         grid-template-rows: auto 1fr;
-        gap: 16px;
+        gap: 8px;
         min-height: 0;
         height: 100%;
         overflow: hidden;
@@ -956,9 +974,9 @@
 
     .friend-view__toolbar {
         display: flex;
-        gap: 20px;
+        gap: 12px;
         align-items: center;
-        padding: 8px 2px 0 2px;
+        padding: 4px 1px 0 1px;
     }
 
     .friend-view__tabs {
@@ -991,7 +1009,7 @@
 
     .friend-view__virtual {
         width: 100%;
-        padding: 2px;
+        padding: 0;
         box-sizing: border-box;
         position: relative;
     }
@@ -1002,22 +1020,22 @@
         position: absolute;
         left: 0;
         top: 0;
-        padding-bottom: calc(var(--friend-card-gap, 14px) - 4px);
+        padding-bottom: calc(var(--friend-card-gap, 10px) - 6px);
     }
 
     .friend-view__virtual-row--header {
-        padding: 4px 8px;
-        padding-bottom: calc(var(--friend-card-gap, 14px) - 4px);
+        padding: 1px 4px;
+        padding-bottom: calc(var(--friend-card-gap, 10px) - 6px);
     }
 
     .friend-view__virtual-row--divider {
-        padding: 16px 4px;
-        padding-bottom: calc(var(--friend-card-gap, 14px) - 4px);
+        padding: 4px 2px;
+        padding-bottom: calc(var(--friend-card-gap, 10px) - 6px);
     }
 
     .friend-view__virtual-row--cards {
-        padding: 2px;
-        padding-bottom: calc(var(--friend-card-gap, 14px) - 4px);
+        padding: 0;
+        padding-bottom: calc(var(--friend-card-gap, 10px) - 6px);
     }
 
     .friend-view__row {
@@ -1026,9 +1044,9 @@
             var(--friend-grid-columns, 1),
             minmax(var(--friend-card-min-width, 200px), var(--friend-card-target-width, 1fr))
         );
-        gap: var(--friend-card-gap, 14px);
+        gap: var(--friend-card-gap, 10px);
         justify-content: start;
-        padding: 2px;
+        padding: 0;
         box-sizing: border-box;
     }
 
@@ -1084,9 +1102,9 @@
     .friend-view__instance-header {
         display: flex;
         align-items: center;
-        padding: 4px 2px;
+        padding: 3px 2px;
         font-weight: 600;
-        font-size: 13px;
+        font-size: 14px;
     }
 
     .friend-view__divider {
@@ -1109,12 +1127,12 @@
     }
 
     .friend-view__instance-count {
-        font-size: 12px;
+        font-size: 13px;
     }
 
     .friend-view__virtual-row--group-header {
-        padding: 2px;
-        padding-bottom: calc(var(--friend-card-gap, 14px) - 8px);
+        padding: 0 1px;
+        padding-bottom: calc(var(--friend-card-gap, 10px) - 6px);
     }
 
     .friend-view__empty {

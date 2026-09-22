@@ -8,8 +8,8 @@
                 v-if="showCosmetics"
                 :profile-effect="friend.ref.profileEffect"
                 class="object-cover rounded-lg" />
-            <div class="friend-card__header grid items-center mb-1.75">
-                <div class="relative inline-block flex-none size-9 mr-2.5">
+            <div class="friend-card__header grid items-center mb-0.5">
+                <div class="relative inline-block flex-none size-7 mr-2">
                     <Avatar class="size-full rounded-full">
                         <AvatarImage :src="userImage(friend.ref, true)" class="object-cover" />
                         <AvatarFallback>
@@ -27,7 +27,7 @@
                     {{ friend.name }}
                 </div>
             </div>
-            <div class="friend-card__body grid">
+            <div class="friend-card__body grid ml-1 mr-1 mb-1">
                 <div
                     class="friend-card__signature flex items-center overflow-hidden text-ellipsis whitespace-nowrap text-muted-foreground"
                     :title="friend.ref?.statusDescription">
@@ -83,19 +83,14 @@
         showCosmetics: {
             type: Boolean,
             default: true
-        },
-        cardSpacing: {
-            type: Number,
-            default: 1
         }
     });
 
     const cardStyle = computed(() => ({
         '--card-scale': props.cardScale,
-        '--card-spacing': props.cardSpacing,
         cursor: 'pointer',
-        padding: `${8 * props.cardScale}px`,
-        paddingBottom: `${6 * props.cardScale}px !important`
+        padding: `${2 * props.cardScale}px`,
+        paddingBottom: `${1 * props.cardScale}px !important`
     }));
 
     const statusDotClass = computed(() => {
@@ -136,22 +131,21 @@
 <style scoped>
     .friend-card {
         --card-scale: 1;
-        --card-spacing: 1;
-        gap: calc(14px * var(--card-scale) * var(--card-spacing));
+        gap: calc(2px * var(--card-scale));
         max-width: var(--friend-card-target-width, 220px);
         min-width: var(--friend-card-min-width, 220px);
     }
 
     .friend-card__header {
         grid-template-columns: auto minmax(0, 1fr);
-        gap: calc(10px * var(--card-scale) * var(--card-spacing));
-        padding-top: calc(3px * var(--card-scale));
-        padding-left: calc(4px * var(--card-scale));
+        gap: calc(2px * var(--card-scale));
+        padding-top: calc(1px * var(--card-scale));
+        padding-left: calc(1px * var(--card-scale));
     }
 
     .friend-card__status-dot {
-        top: calc(16px * var(--card-scale));
-        right: calc(16px * var(--card-scale));
+        top: calc(12px * var(--card-scale));
+        right: calc(12px * var(--card-scale));
         inline-size: calc(12px * var(--card-scale));
         block-size: calc(12px * var(--card-scale));
     }
@@ -209,18 +203,18 @@
     }
 
     .friend-card__body {
-        gap: calc(8px * var(--card-scale) * var(--card-spacing));
+        gap: calc(1px * var(--card-scale));
     }
 
     .friend-card__name {
-        font-size: calc(13px * var(--card-scale));
+        font-size: calc(15px * var(--card-scale));
     }
 
     .friend-card__signature {
-        font-size: calc(12px * var(--card-scale));
-        padding: calc(7px * var(--card-scale)) calc(8px * var(--card-scale));
-        line-height: 1.4;
-        gap: calc(4px * var(--card-scale));
+        font-size: calc(13px * var(--card-scale));
+        padding: calc(1px * var(--card-scale)) calc(3px * var(--card-scale));
+        line-height: 1.2;
+        gap: calc(2px * var(--card-scale));
     }
 
     .friend-card__signature :deep(svg) {
@@ -228,11 +222,11 @@
     }
 
     .friend-card__world {
-        min-height: calc(24px * var(--card-scale));
-        padding: calc(7px * var(--card-scale)) calc(8px * var(--card-scale));
+        min-height: calc(16px * var(--card-scale));
+        padding: calc(1px * var(--card-scale)) calc(3px * var(--card-scale));
         border-radius: calc(var(--radius-lg) * var(--card-scale));
-        font-size: calc(12px * var(--card-scale));
-        line-height: 1.3;
+        font-size: calc(13px * var(--card-scale));
+        line-height: 1.2;
     }
 
     :global(html.dark) .friend-card__world,
