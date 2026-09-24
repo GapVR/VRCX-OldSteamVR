@@ -295,7 +295,9 @@
     const { gameLogDisabled } = storeToRefs(useAdvancedSettingsStore());
 
     function isPrivateUser(friend) {
-        return !isRealInstance(friend.ref?.location);
+        const loc = friend.ref?.location;
+        if (loc === 'traveling') return false;
+        return !isRealInstance(loc);
     }
     const userStore = useUserStore();
     const { showSendBoopDialog, showEditProfileDialog } = userStore;

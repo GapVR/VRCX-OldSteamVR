@@ -315,7 +315,15 @@
 
     const normalizedSearchTerm = computed(() => searchTerm.value.trim().toLowerCase());
 
-    const hidePrivateUsersLocal = ref(false);
+    const hidePrivateUsersLocalBase = ref(false);
+
+    const hidePrivateUsersLocal = computed({
+        get: () => hidePrivateUsersLocalBase.value,
+        set: (value) => {
+            hidePrivateUsersLocalBase.value = value;
+            configRepository.setBool('vrcxoldsteamvr_FriLocsHidePrivate', value);
+        }
+    });
 
     const toEntries = (list = [], instanceId) =>
         Array.isArray(list)
@@ -330,7 +338,11 @@
 
     const getEntryIdentity = (entry) => entry?.id ?? getFriendIdentity(entry?.friend);
 
-    const isPrivateUser = (friend) => !isRealInstance(friend.ref?.location);
+    const isPrivateUser = (friend) => {
+        const loc = friend.ref?.location;
+        if (loc === 'traveling') return false;
+        return !isRealInstance(loc);
+    };
 
     const filterNonPrivate = (list) => {
         if (!hidePrivateUsersLocal.value) return list;
@@ -921,11 +933,12 @@
 
     async function loadInitialSettings() {
         try {
-            const [storedScale, storedSpacing, storedShowSameInstance, storedShowCosmetics] = await Promise.all([
+            const [storedScale, storedSpacing, storedShowSameInstance, storedShowCosmetics, storedHidePrivate] = await Promise.all([
                 configRepository.getString('VRCX_FriendLocationCardScale', '1'),
                 configRepository.getString('VRCX_FriendLocationCardSpacing', '1'),
                 configRepository.getBool('VRCX_FriendLocationShowSameInstance', null),
-                configRepository.getBool('VRCX_FriendLocationShowCosmetics', true)
+                configRepository.getBool('VRCX_FriendLocationShowCosmetics', true),
+                configRepository.getBool('vrcxoldsteamvr_FriLocsHidePrivate', false)
             ]);
 
             const parsedScale = parseFloat(storedScale);
@@ -942,6 +955,7 @@
                 showSameInstanceBase.value = Boolean(storedShowSameInstance);
             }
             showCosmeticsBase.value = Boolean(storedShowCosmetics);
+            hidePrivateUsersLocalBase.value = Boolean(storedHidePrivate);
         } catch (error) {
             console.error('Failed to load Friend Location preferences', error);
         } finally {
