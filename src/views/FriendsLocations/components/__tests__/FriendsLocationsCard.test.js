@@ -547,25 +547,23 @@ describe('FriendsLocationsCard.vue', () => {
     describe('status dot classes', () => {
         test('shows join status class when user status indicates join me', () => {
             mockUserStatusClass.mockReturnValue({
-                joinme: true,
-                online: false,
-                active: false
+                'status-icon': true,
+                joinme: true
             });
             const wrapper = mountCard();
-            expect(wrapper.find('.friend-card__status-dot').classes()).toContain('friend-card__status-dot--join');
+            expect(wrapper.find('.status-icon').classes()).toContain('joinme');
         });
 
         test('shows active busy status class when active + busy', () => {
             mockUserStatusClass.mockReturnValue({
-                joinme: false,
-                online: false,
-                active: true
+                'status-icon': true,
+                'active-busy': true
             });
             const wrapper = mountCard({
                 friend: makeFriend({ status: 'busy' })
             });
-            expect(wrapper.find('.friend-card__status-dot').classes()).toContain(
-                'friend-card__status-dot--active-busy'
+            expect(wrapper.find('.status-icon').classes()).toContain(
+                'active-busy'
             );
         });
     });

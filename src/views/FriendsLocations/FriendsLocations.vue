@@ -88,6 +88,7 @@
                     class="ml-2 mr-2"
                     v-model="hidePrivateUsersLocal"
                     :ariaLabel="t('view.settings.appearance.appearance.hide_private_users')" />
+
             </div>
         </div>
         <div v-else class="friend-view__toolbar friend-view__toolbar--loading">
@@ -137,7 +138,8 @@
                                     :friend="card.friend"
                                     :card-scale="cardScale"
                                     :show-cosmetics="showCosmetics"
-                                    :display-instance-info="card.displayInstanceInfo" />
+                                    :display-instance-info="displayInstanceInfo"
+                                    :cache-tick="cacheTick" />
                             </div>
                         </template>
                     </div>
@@ -155,7 +157,7 @@
 
 <script setup>
     import { useResizeObserver } from '@vueuse/core';
-    import { computed, nextTick, onBeforeMount, onMounted, reactive, ref, watch } from 'vue';
+    import { computed, nextTick, onBeforeMount, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
     import { ChevronDown, Loader2, Settings } from 'lucide-vue-next';
     import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
     import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -166,15 +168,18 @@
     import { useI18n } from 'vue-i18n';
     import { useVirtualizer } from '@tanstack/vue-virtual';
 
+    import { TooltipWrapper } from '../../components/ui/tooltip';
     import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/popover';
     import { useAppearanceSettingsStore, useFavoriteStore, useFriendStore, useLocationStore } from '../../stores';
     import { isRealInstance } from '../../shared/utils/instance.js';
+
     import { Slider } from '../../components/ui/slider';
     import { Switch } from '../../components/ui/switch';
     import { getFriendsLocations } from '../../shared/utils/location.js';
     import { debounce, getFriendsSortFunction } from '../../shared/utils';
+import FriendLocationCard from './components/FriendsLocationsCard.vue';
 
-    import FriendLocationCard from './components/FriendsLocationsCard.vue';
+    defineOptions({ name: 'FriendsLocations' });
     import configRepository from '../../services/config.js';
 
     const { t } = useI18n();
@@ -202,6 +207,7 @@
     const collapsedGroups = reactive(new Set());
 
     const SEGMENTED_BASE_OPTIONS = [
+        { label: t('view.friends_locations.all'), value: 'all' },
         { label: t('view.friends_locations.online'), value: 'online' },
         { label: t('view.friends_locations.favorite'), value: 'favorite' },
         { label: t('view.friends_locations.same_instance'), value: 'same-instance' },
@@ -282,7 +288,7 @@
 
     const settingsReady = ref(false);
 
-    const activeSegment = ref('online');
+    const activeSegment = ref('all');
     const searchTerm = ref('');
 
     const scrollbarRef = ref();
@@ -438,6 +444,12 @@
         return allFavoriteOnlineFriends.value.filter((friend) => displayedVipIds.value.has(friend.id));
     });
 
+    const allOnlineFriends = computed(() => {
+        const seen = new Set(onlineFriends.value.map((f) => f.id));
+        const favs = allFavoriteOnlineFriends.value.filter((f) => !seen.has(f.id));
+        return [...onlineFriends.value, ...favs].sort(getFriendsSortFunction(sidebarSortMethods.value));
+    });
+
     const onlineFriendsByGroupStatus = computed(() => {
         const selectedGroups = sidebarFavoriteGroups.value;
         if (selectedGroups.length === 0) {
@@ -524,12 +536,42 @@
         }
 
         switch (activeSegment.value) {
-            case 'online': {
+            case 'all': {
                 if (!showSameInstance.value) {
-                    const sameEntries = filterEntriesNonPrivate(sameInstanceEntries.value.map((entry) => ({
+                    const sameEntries = sameInstanceEntries.value.map((entry) => ({
                         ...entry,
                         section: 'same-instance'
-                    })));
+                    }));
+
+                    const seenIds = new Set(
+                        sameEntries
+                            .map((entry) => entry.id)
+                            .filter((id) => typeof id === 'string' || typeof id === 'number')
+                    );
+
+                    const remainingAll = toEntries(allOnlineFriends.value)
+                        .filter((entry) => {
+                            if (!entry?.id) {
+                                return true;
+                            }
+                            return !seenIds.has(entry.id);
+                        })
+                        .map((entry) => ({
+                            ...entry,
+                            section: 'all'
+                        }));
+
+                    return filterEntriesNonPrivate([...sameEntries, ...remainingAll]);
+                }
+
+                return filterEntriesNonPrivate(toEntries(allOnlineFriends.value));
+            }
+            case 'online': {
+                if (!showSameInstance.value) {
+                    const sameEntries = sameInstanceEntries.value.map((entry) => ({
+                        ...entry,
+                        section: 'same-instance'
+                    }));
 
                     const seenIds = new Set(
                         sameEntries
@@ -549,7 +591,7 @@
                             section: 'online'
                         }));
 
-                    return [...sameEntries, ...filterEntriesNonPrivate(remainingOnline)];
+                    return filterEntriesNonPrivate([...sameEntries, ...remainingOnline]);
                 }
 
                 return filterEntriesNonPrivate(toEntries(onlineFriendsByGroupStatus.value));
@@ -559,9 +601,9 @@
             case 'same-instance':
                 return filterEntriesNonPrivate(sameInstanceEntries.value);
             case 'active':
-                return filterEntriesNonPrivate(toEntries(activeFriends.value));
+                return toEntries(activeFriends.value);
             case 'offline':
-                return filterEntriesNonPrivate(toEntries(offlineFriends.value));
+                return toEntries(offlineFriends.value);
             default:
                 return [];
         }
@@ -572,7 +614,7 @@
     );
 
     const shouldMergeSameInstance = computed(
-        () => !showSameInstance.value && activeSegment.value === 'online' && !normalizedSearchTerm.value
+        () => !showSameInstance.value && (activeSegment.value === 'online' || activeSegment.value === 'all') && !normalizedSearchTerm.value
     );
 
     const displayInstanceInfo = computed(() => activeSegment.value !== 'active' && activeSegment.value !== 'offline');
@@ -692,6 +734,11 @@
         };
     };
 
+    const gridColumns = computed(() => {
+        const { columns } = computeGridLayout(9999, { matchMaxColumnWidth: true });
+        return columns;
+    });
+
     const gridStyle = computed(() => {
         return (count = 1, options = {}) => {
             const { minWidth, gap, cardWidth, columns } = computeGridLayout(count, options);
@@ -705,12 +752,11 @@
         };
     });
 
-    const chunkCardItems = (items = [], keyPrefix = 'row') => {
+    const chunkCardItems = (items = [], keyPrefix = 'row', columns) => {
         const safeItems = Array.isArray(items) ? items : [];
         if (!safeItems.length) {
             return [];
         }
-        const { columns } = computeGridLayout(safeItems.length, { matchMaxColumnWidth: true });
         const safeColumns = Math.max(1, columns || 1);
         const rows = [];
 
@@ -729,7 +775,10 @@
         () => isSidebarDivideByFriendGroup.value && activeSegment.value === 'favorite' && !normalizedSearchTerm.value
     );
 
+    const cacheTick = ref(0);
+
     const virtualRows = computed(() => {
+        cacheTick.value; // force re-eval on tick change
         const rows = [];
 
         if (isSameInstanceView.value) {
@@ -745,10 +794,9 @@
                 if (friends.length) {
                     const items = friends.map((friend) => ({
                         key: `f:${getFriendIdentity(friend)}`,
-                        friend,
-                        displayInstanceInfo: displayInstanceInfo.value
+                        friend
                     }));
-                    rows.push(...chunkCardItems(items, `g:${group.instanceId}`));
+                    rows.push(...chunkCardItems(items, `g:${group.instanceId}`, gridColumns.value));
                 }
             }
 
@@ -768,10 +816,9 @@
                 if (friends.length) {
                     const items = friends.map((friend) => ({
                         key: `f:${getFriendIdentity(friend)}`,
-                        friend,
-                        displayInstanceInfo: displayInstanceInfo.value
+                        friend
                     }));
-                    rows.push(...chunkCardItems(items, `mg:${group.instanceId}`));
+                    rows.push(...chunkCardItems(items, `mg:${group.instanceId}`, gridColumns.value));
                 }
             }
 
@@ -783,10 +830,9 @@
             if (online.length) {
                 const items = online.map((entry) => ({
                     key: `e:${getEntryIdentity(entry)}`,
-                    friend: entry.friend,
-                    displayInstanceInfo: displayInstanceInfo.value
+                    friend: entry.friend
                 }));
-                rows.push(...chunkCardItems(items, 'o:merged'));
+                rows.push(...chunkCardItems(items, 'o:merged', gridColumns.value));
             }
 
             return rows;
@@ -806,10 +852,9 @@
                 if (!isCollapsed) {
                     const items = group.friends.map((friend) => ({
                         key: `fg:${group.key}:${getFriendIdentity(friend)}`,
-                        friend,
-                        displayInstanceInfo: displayInstanceInfo.value
+                        friend
                     }));
-                    rows.push(...chunkCardItems(items, `vg:${group.key}`));
+                    rows.push(...chunkCardItems(items, `vg:${group.key}`, gridColumns.value));
                 }
             }
             return rows;
@@ -819,10 +864,9 @@
         if (entries.length) {
             const items = entries.map((entry) => ({
                 key: `e:${getEntryIdentity(entry)}`,
-                friend: entry.friend,
-                displayInstanceInfo: displayInstanceInfo.value
+                friend: entry.friend
             }));
-            rows.push(...chunkCardItems(items, 'r:all'));
+            rows.push(...chunkCardItems(items, 'r:all', gridColumns.value));
         }
         return rows;
     });
@@ -900,7 +944,7 @@
             return;
         }
         if (!value && activeSegment.value === 'same-instance') {
-            activeSegment.value = 'online';
+            activeSegment.value = 'all';
         }
 
         scheduleVirtualMeasure({ updateGridWidth: true });
@@ -922,6 +966,14 @@
 
     watch(virtualRows, () => {
         scheduleVirtualMeasure();
+    });
+
+    const cacheInterval = setInterval(() => {
+        cacheTick.value++;
+    }, 5000);
+
+    onUnmounted(() => {
+        clearInterval(cacheInterval);
     });
 
     onMounted(() => {
