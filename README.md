@@ -7,5 +7,7 @@
 - Reverted OpenVR API for SteamVR 2.7.4 compatibility
 - Old compact vertical dialog (user/world/avatar/group) layout
 - World Persistence Data auto-wipe on VRChat exit
+- "Hide Private Users" toggle on contact list
+- Boop dialog shows preview image
 - Feed, dialogs, favorites QoL additions
 - Updates disabled
