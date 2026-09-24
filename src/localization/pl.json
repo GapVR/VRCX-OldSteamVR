@@ -786,7 +786,8 @@
             "status": {
                 "active": "Aktywne",
                 "offline": "Offline",
-                "online": "Online",
+                "all": "All",
+            "online": "Online",
                 "join_me": "Dołącz do mnie",
                 "ask_me": "Zapytaj mnie",
                 "busy": "Nie przeszkadzać"

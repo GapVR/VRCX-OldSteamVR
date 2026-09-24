@@ -189,7 +189,8 @@
         "me": "Én",
         "favorite": "Kedvencek",
         "same_instance": "UGYANABBAN A HELYZETBEN",
-        "online": "Online",
+        "all": "All",
+            "online": "Online",
         "active": "Aktív",
         "offline": "Offline",
         "pending_offline": "Függőben lévő offline",
@@ -259,6 +260,7 @@
             "photon_event_logging": "Photon esemény naplózás"
         },
         "friends_locations": {
+            "all": "All",
             "online": "Online",
             "favorite": "Kedvencek",
             "same_instance": "Ugyanazon helyzetben",
@@ -1301,7 +1303,8 @@
             "status": {
                 "active": "Aktív",
                 "offline": "Offline",
-                "online": "Online",
+                "all": "All",
+            "online": "Online",
                 "join_me": "Csatlakozz hozzám",
                 "ask_me": "Kérdezz meg",
                 "busy": "Elfoglalt"

@@ -271,6 +271,7 @@
             "photon_event_logging": "Photon Event Logging"
         },
         "friends_locations": {
+            "all": "All",
             "online": "Online",
             "favorite": "Favorites",
             "same_instance": "Same instance",
@@ -1338,7 +1339,8 @@
             "status": {
                 "active": "Active",
                 "offline": "Offline",
-                "online": "Online",
+                "all": "All",
+            "online": "Online",
                 "join_me": "Join Me",
                 "ask_me": "Ask Me",
                 "busy": "Do Not Disturb"
