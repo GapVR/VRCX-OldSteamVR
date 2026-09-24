@@ -172,7 +172,12 @@
         }
         return classes;
     });
-    const tooltipContent = computed(() => `${t('dialog.new_instance.instance_id')}: #${instanceName.value}`);
+    const tooltipContent = computed(() => {
+        const parts = [];
+        if (locationParts.value[0]) parts.push(locationParts.value[0]);
+        if (instanceName.value) parts.push(`#${instanceName.value}`);
+        return parts.join(' ');
+    });
     const tooltipDisabled = computed(
         () => props.disableTooltip || !instanceName.value || showInstanceIdInLocation.value
     );
