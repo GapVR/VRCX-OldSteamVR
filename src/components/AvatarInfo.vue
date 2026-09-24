@@ -2,7 +2,7 @@
     <div @click="confirm" class="cursor-pointer align-top flex min-w-0 items-center">
         <TooltipWrapper v-if="showThumbnailTooltip && imageurl" side="top">
             <template #content>
-                <img :src="imageurl" class="max-w-[200px] rounded-lg" loading="lazy" />
+                <img :src="imageurl" class="max-w-[200px] rounded-lg cursor-pointer" loading="lazy" @click.stop="openFullscreen" />
             </template>
             <span v-if="avatarName" class="flex items-center mr-1">
                 {{ avatarName }}
@@ -34,6 +34,9 @@
 
     import { TooltipWrapper } from './ui/tooltip';
     import { getAvatarName, showAvatarAuthorDialog } from '../coordinators/avatarCoordinator';
+    import { useGalleryStore } from '../stores';
+
+    const { showFullscreenImageDialog } = useGalleryStore();
 
     const { t } = useI18n();
 
@@ -90,6 +93,10 @@
     const confirm = () => {
         if (!props.imageurl) return;
         showAvatarAuthorDialog(props.userid, ownerId, props.imageurl);
+    };
+
+    const openFullscreen = () => {
+        if (props.imageurl) showFullscreenImageDialog(props.imageurl);
     };
 
     watch([() => props.imageurl, () => props.userid, () => props.avatartags], parse, { immediate: true });
