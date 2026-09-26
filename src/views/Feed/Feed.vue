@@ -89,7 +89,77 @@
                         @change="feedTableLookup" />
                 </div>
             </template>
+            <template #footer>
+                <div class="flex justify-end">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        class="h-7 text-xs"
+                        @click="blacklistOpen = true">
+                        Hidden Users: {{ feedBlacklist.length }}
+                    </Button>
+                </div>
+            </template>
         </DataTableLayout>
+
+        <Dialog :open="blacklistOpen" @update:open="blacklistOpen = $event">
+            <DialogContent class="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Hidden Users</DialogTitle>
+                    <DialogDescription>
+                        Feed events from these user IDs will be hidden.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <div class="flex gap-2 mb-4">
+                    <Input
+                        v-model="blacklistInput"
+                        placeholder="usr_xxxxxxxxxxxxxxxxxxxx"
+                        class="flex-1"
+                        @keyup.enter="handleAddBlacklist"
+                    />
+                    <Button size="sm" @click="handleAddBlacklist">Add</Button>
+                </div>
+
+                <div v-if="feedBlacklist.length" class="max-h-60 overflow-auto rounded border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>User ID</TableHead>
+                                <TableHead class="w-20">Display Name</TableHead>
+                                <TableHead class="w-24">Action</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow v-for="uid in feedBlacklist" :key="uid">
+                                <TableCell class="font-mono text-xs">{{ uid }}</TableCell>
+                                <TableCell class="text-xs">
+                                    {{ getFriendName(uid) }}
+                                </TableCell>
+                                <TableCell>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        class="h-6 text-xs"
+                                        @click="handleRemoveBlacklist(uid)">
+                                        Remove
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
+                <div v-else class="text-xs text-muted-foreground py-4 text-center">
+                    No hidden users
+                </div>
+
+                <DialogFooter>
+                    <Button variant="outline" size="sm" @click="blacklistOpen = false">
+                        Close
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     </div>
 </template>
 
@@ -103,7 +173,17 @@
     import dayjs from 'dayjs';
 
     import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/popover';
-    import { useAppearanceSettingsStore, useFeedStore, useVrcxStore } from '../../stores';
+    import {
+        Dialog,
+        DialogContent,
+        DialogDescription,
+        DialogFooter,
+        DialogHeader,
+        DialogTitle
+    } from '../../components/ui/dialog';
+    import { Input } from '../../components/ui/input';
+    import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
+    import { useAppearanceSettingsStore, useFeedStore, useFriendStore, useVrcxStore } from '../../stores';
     import { ToggleGroup, ToggleGroupItem } from '../../components/ui/toggle-group';
     import { Badge } from '../../components/ui/badge';
     import { Button } from '../../components/ui/button';
@@ -114,15 +194,18 @@
     import { columns as baseColumns } from './columns.jsx';
     import { useVrcxVueTable } from '../../lib/table/useVrcxVueTable';
 
-    const { feedTable, feedTableData } = storeToRefs(useFeedStore());
-    const { feedTableLookup } = useFeedStore();
+    const { feedTable, feedTableData, feedBlacklist } = storeToRefs(useFeedStore());
+    const { feedTableLookup, addToBlacklist, removeFromBlacklist } = useFeedStore();
     const appearanceSettingsStore = useAppearanceSettingsStore();
+    const friendStore = useFriendStore();
     const { weekStartsOn } = storeToRefs(appearanceSettingsStore);
     const vrcxStore = useVrcxStore();
 
     const { t, locale } = useI18n();
     const feedFilterTypes = ['GPS', 'Online', 'Offline', 'Status', 'Avatar', 'Bio'];
 
+    const blacklistOpen = ref(false);
+    const blacklistInput = ref('');
     const popoverOpen = ref(false);
     const todayDate = today(getLocalTimeZone());
     const dateRange = ref(undefined);
@@ -216,6 +299,23 @@
         }
         return filter;
     });
+
+    function getFriendName(userId) {
+        const friend = friendStore.friends.get(userId);
+        return friend?.ref?.displayName ?? friend?.displayName ?? '—';
+    }
+
+    function handleAddBlacklist() {
+        const uid = blacklistInput.value.trim();
+        if (uid && !feedBlacklist.value.includes(uid)) {
+            addToBlacklist(uid);
+            blacklistInput.value = '';
+        }
+    }
+
+    function handleRemoveBlacklist(userId) {
+        removeFromBlacklist(userId);
+    }
 
     /**
      * @param value

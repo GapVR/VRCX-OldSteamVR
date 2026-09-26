@@ -320,6 +320,9 @@
                 </PaginationContent>
             </Pagination>
             <div class="dt-pagination-spacer flex-1"></div>
+            <div v-if="$slots.footer">
+                <slot name="footer"></slot>
+            </div>
         </div>
     </div>
 </template>

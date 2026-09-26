@@ -13,6 +13,7 @@ export const useFeedStore = defineStore('Feed', () => {
     const vrcxStore = useVrcxStore();
 
     const feedTableData = shallowRef([]);
+    const feedBlacklist = ref([]);
     const feedTable = ref({
         search: '',
         dateFrom: '',
@@ -47,6 +48,7 @@ export const useFeedStore = defineStore('Feed', () => {
     async function init() {
         feedTable.value.filter = JSON.parse(await configRepository.getString('VRCX_feedTableFilters', '[]'));
         feedTable.value.vip = await configRepository.getBool('VRCX_feedTableVIPFilter', false);
+        feedBlacklist.value = await configRepository.getArray('vrcxoldsteamvr_feedblacklist', []);
     }
 
     init();
@@ -143,8 +145,10 @@ export const useFeedStore = defineStore('Feed', () => {
                           dateTo
                       )
                     : await database.lookupFeedDatabase(feedTable.value.filter, vipList);
+            const blacklistSet = new Set(feedBlacklist.value);
+            const filtered = blacklistSet.size === 0 ? rows : rows.filter((r) => !blacklistSet.has(r.userId));
             feedTableData.value = [];
-            feedTableData.value = [...feedTableData.value, ...rows];
+            feedTableData.value = [...feedTableData.value, ...filtered];
         } finally {
             feedTable.value.loading = false;
         }
@@ -161,6 +165,9 @@ export const useFeedStore = defineStore('Feed', () => {
             return;
         }
         if (feedTable.value.vip && !friendStore.localFavoriteFriends.has(feed.userId)) {
+            return;
+        }
+        if (feedBlacklist.value.length > 0 && feedBlacklist.value.includes(feed.userId)) {
             return;
         }
         if (!feedSearch(feed)) {
@@ -189,11 +196,35 @@ export const useFeedStore = defineStore('Feed', () => {
         feedTable.value.loading = false;
     }
 
+    async function saveFeedBlacklist() {
+        await configRepository.setArray('vrcxoldsteamvr_feedblacklist', feedBlacklist.value);
+    }
+
+    function addToBlacklist(userId) {
+        if (!feedBlacklist.value.includes(userId)) {
+            feedBlacklist.value.push(userId);
+            saveFeedBlacklist();
+            feedTableLookup();
+        }
+    }
+
+    function removeFromBlacklist(userId) {
+        const idx = feedBlacklist.value.indexOf(userId);
+        if (idx > -1) {
+            feedBlacklist.value.splice(idx, 1);
+            saveFeedBlacklist();
+            feedTableLookup();
+        }
+    }
+
     return {
         feedTable,
         feedTableData,
+        feedBlacklist,
         initFeedTable,
         feedTableLookup,
-        addFeedEntry
+        addFeedEntry,
+        addToBlacklist,
+        removeFromBlacklist
     };
 });
