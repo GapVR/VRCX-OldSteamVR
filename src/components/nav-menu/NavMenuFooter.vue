@@ -1,6 +1,7 @@
 <template>
     <SidebarFooter class="px-2 py-3">
         <SidebarMenu>
+            <!--
             <SidebarMenuItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger as-child>
@@ -28,7 +29,7 @@
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-            </SidebarMenuItem>
+            </SidebarMenuItem> -->
 
             <SidebarMenuItem>
                 <DropdownMenu>
