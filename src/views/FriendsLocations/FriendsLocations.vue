@@ -378,13 +378,7 @@ import FriendLocationCard from './components/FriendsLocationsCard.vue';
                 updateGridWidth();
             }
 
-            const scrollOffset = scrollbarRef.value?.scrollTop ?? 0;
             virtualizer.value?.measure?.();
-            nextTick(() => {
-                if (scrollbarRef.value) {
-                    scrollbarRef.value.scrollTop = scrollOffset;
-                }
-            });
         });
     };
 
@@ -972,9 +966,6 @@ import FriendLocationCard from './components/FriendsLocationsCard.vue';
         scheduleVirtualMeasure({ updateGridWidth: true });
     });
 
-    watch(virtualRows, () => {
-        scheduleVirtualMeasure();
-    });
 
     const cacheInterval = setInterval(() => {
         cacheTick.value++;
