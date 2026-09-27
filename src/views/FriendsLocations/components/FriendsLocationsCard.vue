@@ -105,10 +105,6 @@
             type: Boolean,
             default: true
         },
-        cacheTick: {
-            type: Number,
-            default: 0
-        }
     });
 
     const cardStyle = computed(() => ({
@@ -152,7 +148,7 @@
     };
 
     watch(
-        () => [locationTag.value, props.cacheTick],
+        () => locationTag.value,
         () => refreshInstance(),
         { immediate: true }
     );

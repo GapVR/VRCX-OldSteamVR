@@ -139,7 +139,7 @@
                                     :card-scale="cardScale"
                                     :show-cosmetics="showCosmetics"
                                     :display-instance-info="displayInstanceInfo"
-                                    :cache-tick="cacheTick" />
+                                    />
                             </div>
                         </template>
                     </div>
@@ -157,7 +157,7 @@
 
 <script setup>
     import { useResizeObserver } from '@vueuse/core';
-    import { computed, nextTick, onBeforeMount, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+    import { computed, nextTick, onBeforeMount, onMounted, reactive, ref, watch } from 'vue';
     import { ChevronDown, Loader2, Settings } from 'lucide-vue-next';
     import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
     import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -778,8 +778,6 @@ import FriendLocationCard from './components/FriendsLocationsCard.vue';
         () => isSidebarDivideByFriendGroup.value && activeSegment.value === 'favorite' && !normalizedSearchTerm.value
     );
 
-    const cacheTick = ref(0);
-
     const virtualRows = computed(() => {
         const rows = [];
 
@@ -966,14 +964,6 @@ import FriendLocationCard from './components/FriendsLocationsCard.vue';
         scheduleVirtualMeasure({ updateGridWidth: true });
     });
 
-
-    const cacheInterval = setInterval(() => {
-        cacheTick.value++;
-    }, 5000);
-
-    onUnmounted(() => {
-        clearInterval(cacheInterval);
-    });
 
     onMounted(() => {
         nextTick(() => {
