@@ -170,7 +170,7 @@
 
     import { TooltipWrapper } from '../../components/ui/tooltip';
     import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/popover';
-    import { useAppearanceSettingsStore, useFavoriteStore, useFriendStore, useLocationStore } from '../../stores';
+    import { useAppearanceSettingsStore, useFavoriteStore, useFeedStore, useFriendStore, useLocationStore } from '../../stores';
     import { isRealInstance } from '../../shared/utils/instance.js';
 
     import { Slider } from '../../components/ui/slider';
@@ -202,6 +202,7 @@ import FriendLocationCard from './components/FriendsLocationsCard.vue';
     const { favoriteFriendGroups, groupedByGroupKeyFavoriteFriends, localFriendFavorites } = storeToRefs(favoriteStore);
 
     const locationStore = useLocationStore();
+    const { feedBlacklist } = storeToRefs(useFeedStore());
     const { lastLocation } = storeToRefs(locationStore);
 
     const collapsedGroups = reactive(new Set());
@@ -356,8 +357,10 @@ import FriendLocationCard from './components/FriendsLocationsCard.vue';
     };
 
     const filterEntriesNonPrivate = (entries) => {
-        if (!hidePrivateUsersLocal.value) return entries;
-        return entries.filter((e) => !isPrivateUser(e.friend));
+        const blacklistSet = new Set(feedBlacklist.value);
+        let filtered = blacklistSet.size > 0 ? entries.filter((e) => !blacklistSet.has(e.friend.id)) : entries;
+        if (!hidePrivateUsersLocal.value) return filtered;
+        return filtered.filter((e) => !isPrivateUser(e.friend));
     };
 
     const scheduleVirtualMeasure = ({ updateGridWidth: shouldUpdateGridWidth = false } = {}) => {
@@ -375,7 +378,13 @@ import FriendLocationCard from './components/FriendsLocationsCard.vue';
                 updateGridWidth();
             }
 
+            const scrollOffset = scrollbarRef.value?.scrollTop ?? 0;
             virtualizer.value?.measure?.();
+            nextTick(() => {
+                if (scrollbarRef.value) {
+                    scrollbarRef.value.scrollTop = scrollOffset;
+                }
+            });
         });
     };
 
@@ -601,9 +610,9 @@ import FriendLocationCard from './components/FriendsLocationsCard.vue';
             case 'same-instance':
                 return filterEntriesNonPrivate(sameInstanceEntries.value);
             case 'active':
-                return toEntries(activeFriends.value);
+                return filterEntriesNonPrivate(toEntries(activeFriends.value));
             case 'offline':
-                return toEntries(offlineFriends.value);
+                return filterEntriesNonPrivate(toEntries(offlineFriends.value));
             default:
                 return [];
         }
@@ -778,7 +787,6 @@ import FriendLocationCard from './components/FriendsLocationsCard.vue';
     const cacheTick = ref(0);
 
     const virtualRows = computed(() => {
-        cacheTick.value; // force re-eval on tick change
         const rows = [];
 
         if (isSameInstanceView.value) {
