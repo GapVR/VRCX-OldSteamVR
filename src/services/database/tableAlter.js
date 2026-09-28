@@ -16,6 +16,7 @@ const tableAlter = {
         await this.addFriendLogFriendNumber();
         await this.updateTableForAvatarHistory();
         await this.addPerformanceIndexes(); // 16
+        await this.addCacheUserTable();
     },
 
     async updateTableForGroupNames() {
@@ -93,6 +94,12 @@ const tableAlter = {
                 console.error(e);
             }
         }
+    },
+
+    async addCacheUserTable() {
+        await sqliteService.executeNonQuery(
+            `CREATE TABLE IF NOT EXISTS vrcxoldsteamvr_favorite_user (id TEXT PRIMARY KEY, display_name TEXT, avatar_url TEXT, added_at TEXT)`
+        );
     }
 };
 

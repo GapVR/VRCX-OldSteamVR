@@ -15,6 +15,7 @@ import { tableFixes } from './tableFixes.js';
 import { tableSize } from './tableSize.js';
 import { worldFavorites } from './worldFavorites.js';
 import { printFavorites } from './printFavorites.js';
+import { userCache } from './userCache.js';
 
 import sqliteService from '../sqlite.js';
 
@@ -39,6 +40,7 @@ const database = {
     ...friendFavorites,
     ...worldFavorites,
     ...printFavorites,
+    ...userCache,
     ...tableAlter,
     ...tableFixes,
     ...tableSize,
@@ -208,6 +210,9 @@ const database = {
         );
         await sqliteService.executeNonQuery(
             `CREATE TABLE IF NOT EXISTS favorite_friend (id INTEGER PRIMARY KEY, created_at TEXT, user_id TEXT, group_name TEXT)`
+        );
+        await sqliteService.executeNonQuery(
+            `CREATE TABLE IF NOT EXISTS vrcxoldsteamvr_favorite_user (id TEXT PRIMARY KEY, display_name TEXT, avatar_url TEXT, added_at TEXT)`
         );
         await sqliteService.executeNonQuery(
             `CREATE TABLE IF NOT EXISTS memos (user_id TEXT PRIMARY KEY, edited_at TEXT, memo TEXT)`

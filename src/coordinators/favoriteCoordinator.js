@@ -1026,6 +1026,14 @@ export function addLocalFriendFavorite(userId, group) {
         favoriteStore.localFriendFavorites[group] = [];
     }
     favoriteStore.localFriendFavorites[group].unshift(userId);
+    const D = userStore.userDialog;
+    if (D.visible && D.ref.id === userId) {
+        database.cacheUser({
+            id: D.ref.id,
+            displayName: D.ref.displayName,
+            avatarUrl: D.publicProfileRef?.iconUrl || ''
+        });
+    }
     database.addFriendToLocalFavorites(userId, group);
     if (favoriteStore.favoriteDialog.visible && favoriteStore.favoriteDialog.objectId === userId) {
         favoriteStore.updateFavoriteDialog(userId);
@@ -1083,9 +1091,22 @@ export function deleteLocalFriendFavoriteGroup(group) {
  */
 export async function getLocalFriendFavorites() {
     const favoriteStore = useFavoriteStore();
+    const userStore = useUserStore();
     const friendStore = useFriendStore();
 
     const localFavorites = Object.create(null);
+
+    const cachedUsers = await database.getUserCache();
+    for (let i = 0; i < cachedUsers.length; ++i) {
+        const cachedRef = cachedUsers[i];
+        if (!userStore.cachedUsers.has(cachedRef.id)) {
+            userStore.setCachedUser({
+                id: cachedRef.id,
+                displayName: cachedRef.displayName,
+                currentAvatarImageUrl: cachedRef.avatarUrl
+            });
+        }
+    }
 
     const favorites = await database.getFriendFavorites();
     for (let i = 0; i < favorites.length; ++i) {
