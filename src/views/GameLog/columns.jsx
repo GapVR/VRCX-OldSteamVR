@@ -110,7 +110,7 @@ export const createColumns = ({ getCreatedAt, onDelete, onDeletePrompt }) => {
                                 {original.displayName}
                             </span>
                         ) : null}
-                        {isFriend ? <span>{isFavorite ? '⭐' : '💚'}</span> : null}
+                        {isFriend ? <span>{isFavorite ? '⭐' : '💚'}</span> : (isFavorite ? <span>🏷️</span> : null)}
                     </span>
                 );
             }

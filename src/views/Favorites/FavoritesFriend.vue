@@ -512,10 +512,11 @@
         const userIds = localFriendFavorites.value[activeLocalGroupName.value] || [];
         return userIds.map((userId) => {
             const ref = cachedUsers.value.get(userId);
+            const displayName = ref?.displayName || userId;
             return {
                 id: userId,
-                ref: ref || undefined,
-                name: ref?.displayName || userId
+                ref: ref ? { ...ref, displayName: `🏷️ ${displayName}` } : undefined,
+                name: `🏷️ ${displayName}`
             };
         });
     });
