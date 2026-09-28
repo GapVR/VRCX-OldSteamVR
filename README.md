@@ -6,9 +6,16 @@
 
 - Reverted OpenVR API for SteamVR 2.7.4 compatibility
 - Old compact vertical dialog (user/world/avatar/group) layout
-- World Persistence Data auto-wipe on VRChat exit
+- World Persistence Data auto-wipe on VRChat exit [**will nuke savegames!**]
 - Redone Friend Location with All filter
 - "Hide Private Users" toggle on contact list
 - Boop dialog shows preview image
+- Non-friend favorites with memo
+- Simple Feed user ID blacklist
+- Red Anti-Feature badges (monetized, no colliders/stations) for world info
+- More avatar details (lights, audio, texture size, etc.)
+- Image viewer file version/fullsize download/copy URL
+- Avatar thumbnail tooltips in feed and player list
+- Friend non-private % in contact list tab
 - Feed, dialogs, favorites QoL additions
 - Updates disabled
