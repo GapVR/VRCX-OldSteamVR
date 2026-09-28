@@ -348,8 +348,10 @@
     import FavoritesFriendItem from './components/FavoritesFriendItem.vue';
     import FavoritesToolbar from './components/FavoritesToolbar.vue';
     import FriendExportDialog from './dialogs/FriendExportDialog.vue';
+    import { getUserMemo } from '../../coordinators/memoCoordinator';
 
     const friendGroupVisibilityOptions = ref(['public', 'friends', 'private']);
+    const localUserMemos = ref({});
 
     const {
         splitterGroupRef,
@@ -516,7 +518,8 @@
             return {
                 id: userId,
                 ref: ref ? { ...ref, displayName: `🏷️ ${displayName}` } : undefined,
-                name: `🏷️ ${displayName}`
+                name: `🏷️ ${displayName}`,
+                memo: localUserMemos.value[userId] || ''
             };
         });
     });
@@ -549,6 +552,25 @@
             if (!value) {
                 clearSelectedFriends();
             }
+        }
+    );
+
+    watch(
+        () => activeLocalGroupName.value,
+        async (groupName) => {
+            if (!groupName) {
+                localUserMemos.value = {};
+                return;
+            }
+            const userIds = localFriendFavorites.value[groupName] || [];
+            const memoMap = {};
+            for (const userId of userIds) {
+                const memo = await getUserMemo(userId);
+                if (memo.memo) {
+                    memoMap[userId] = memo.memo;
+                }
+            }
+            localUserMemos.value = memoMap;
         }
     );
 

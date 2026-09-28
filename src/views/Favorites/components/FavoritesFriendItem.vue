@@ -27,7 +27,15 @@
                 <ItemContent class="min-w-0">
                     <ItemTitle class="truncate max-w-full" :style="displayNameStyle">{{ displayName }}</ItemTitle>
                     <ItemDescription class="truncate line-clamp-1 text-xs!">
-                        <template v-if="favorite.ref.location !== 'offline'">
+                        <template v-if="group?.type === 'local' && favorite.memo">
+                            <TooltipWrapper side="top" :content="favorite.memo">
+                                <span class="truncate">📝 {{ favorite.memo }}</span>
+                            </TooltipWrapper>
+                        </template>
+                        <template v-else-if="group?.type === 'local'">
+                            {{ favorite.ref.statusDescription }}
+                        </template>
+                        <template v-else-if="favorite.ref.location !== 'offline'">
                             <Location
                                 :location="favorite.ref.location"
                                 :traveling="favorite.ref.travelingToLocation"
