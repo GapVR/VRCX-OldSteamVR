@@ -9,7 +9,7 @@
                 {{ t('common.actions.view_details') }}
             </ContextMenuItem>
             <ContextMenuSeparator />
-            <ContextMenuItem :disabled="!currentUser?.isBoopingEnabled" @click="handleSendBoop">
+            <ContextMenuItem :disabled="!currentUser?.isBoopingEnabled || !isFriend" @click="handleSendBoop">
                 <Hand class="size-4" />
                 {{ t('dialog.user.actions.send_boop') }}
             </ContextMenuItem>
@@ -57,7 +57,7 @@
         ContextMenuTrigger
     } from './ui/context-menu';
     import { isRealInstance, parseLocation } from '../shared/utils';
-    import { useGameStore, useLaunchStore, useLocationStore, useUserStore } from '../stores';
+    import { useFriendStore, useGameStore, useLaunchStore, useLocationStore, useUserStore } from '../stores';
     import { instanceRequest, notificationRequest, queryRequest } from '../api';
     import { useInviteChecks } from '../composables/useInviteChecks';
     import { isActionRecent, recordRecentAction } from '../composables/useRecentActions';
@@ -71,6 +71,7 @@
     const { isGameRunning } = storeToRefs(useGameStore());
     const { currentUser } = storeToRefs(useUserStore());
     const { checkCanInvite, checkCanInviteSelf } = useInviteChecks();
+    const friendStore = useFriendStore();
 
     const props = defineProps({
         userId: {
@@ -97,6 +98,7 @@
 
     const showRecentRequestInvite = computed(() => isActionRecent(props.userId, 'Request Invite'));
     const showRecentInvite = computed(() => isActionRecent(props.userId, 'Invite'));
+    const isFriend = computed(() => friendStore.friends.has(props.userId));
 
     function handleViewDetails() {
         showUserDialog(props.userId);

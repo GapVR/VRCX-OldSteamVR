@@ -86,7 +86,7 @@
                         <DropdownMenuItem v-if="isGameRunning" :disabled="!canInviteToMyLocation" @click="friendInvite">
                             {{ t('dialog.user.actions.invite') }}
                         </DropdownMenuItem>
-                        <DropdownMenuItem :disabled="!currentUser?.isBoopingEnabled" @click="friendSendBoop">
+                        <DropdownMenuItem :disabled="!currentUser?.isBoopingEnabled || !isFriend" @click="friendSendBoop">
                             {{ t('dialog.user.actions.send_boop') }}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator v-if="favorite.ref.state === 'online' && hasFriendLocation" />
@@ -178,7 +178,7 @@
     import { removeLocalFriendFavorite } from '../../../coordinators/favoriteCoordinator';
     import { showUserDialog } from '../../../coordinators/userCoordinator';
     import { parseLocation, isRealInstance } from '../../../shared/utils';
-    import { useFavoriteStore, useGameStore, useLocationStore, useLaunchStore, useUserStore } from '../../../stores';
+    import { useFavoriteStore, useFriendStore, useGameStore, useLocationStore, useLaunchStore, useUserStore } from '../../../stores';
     import { useUserDisplay } from '../../../composables/useUserDisplay';
 
     import Location from '../../../components/Location.vue';
@@ -204,6 +204,7 @@
     const { currentUser } = storeToRefs(useUserStore());
     const { isGameRunning } = storeToRefs(useGameStore());
     const { lastLocation, lastLocationDestination } = storeToRefs(useLocationStore());
+    const friendStore = useFriendStore();
 
     const isSelected = computed({
         get: () => props.selected,
@@ -248,6 +249,8 @@
         }
         return checkCanInviteSelf(loc);
     });
+
+    const isFriend = computed(() => friendStore.friends.has(props.favorite.id));
 
     function handleOpenProfile() {
         showUserDialog(props.favorite.id);

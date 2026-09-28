@@ -11,6 +11,7 @@
                         variant="outline"
                         style="width: 100%; white-space: initial"
                         class="my-1"
+                        :disabled="isFriendType && !isFavoriteUserFriend"
                         @click="deleteFavoriteNoConfirm(favoriteDialog.objectId)">
                         <Check />{{ favoriteDialog.currentGroup.displayName }} ({{
                             favoriteDialog.currentGroup.count
@@ -25,6 +26,7 @@
                         :key="group.key"
                         style="width: 100%; white-space: initial"
                         class="my-1"
+                        :disabled="isFriendType && !isFavoriteUserFriend"
                         @click="addFavorite(group)">
                         {{ group.displayName }} ({{ group.count }} / {{ group.capacity }})
                     </Button>
@@ -106,7 +108,7 @@
     import { toast } from 'vue-sonner';
     import { useI18n } from 'vue-i18n';
 
-    import { useFavoriteStore, useUserStore } from '../../stores';
+    import { useFavoriteStore, useFriendStore, useUserStore } from '../../stores';
     import {
         addLocalWorldFavorite,
         removeLocalWorldFavorite,
@@ -120,6 +122,7 @@
     const { t } = useI18n();
 
     const favoriteStore = useFavoriteStore();
+    const friendStore = useFriendStore();
     const {
         favoriteFriendGroups,
         favoriteAvatarGroups,
@@ -142,6 +145,14 @@
 
     const groups = ref([]);
     const loading = ref(false);
+
+    const isFriendType = computed(() => favoriteDialog.value.type === 'friend');
+    const isFavoriteUserFriend = computed(() => {
+        if (isFriendType.value) {
+            return friendStore.friends.has(favoriteDialog.value.objectId);
+        }
+        return true;
+    });
 
     const isVisible = computed({
         get: () => favoriteDialog.value.visible,
