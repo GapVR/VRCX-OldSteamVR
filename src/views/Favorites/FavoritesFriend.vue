@@ -522,12 +522,11 @@
     });
 
     const isAllFriendsSelected = computed(() => {
-        if (!activeRemoteGroup.value || !currentFriendFavorites.value.length) {
-            return false;
-        }
-        return currentFriendFavorites.value
-            .map((fav) => fav.id)
-            .every((id) => selectedFavoriteFriends.value.includes(id));
+        const list = activeRemoteGroup.value
+            ? currentFriendFavorites.value
+            : currentLocalFriendFavorites.value;
+        if (!list.length) return false;
+        return list.every((fav) => selectedFavoriteFriends.value.includes(fav.id));
     });
 
     watch(
@@ -629,13 +628,13 @@
     }
 
     function toggleSelectAllFriends() {
-        if (!activeRemoteGroup.value) {
-            return;
-        }
+        const list = activeRemoteGroup.value
+            ? currentFriendFavorites.value
+            : currentLocalFriendFavorites.value;
         if (isAllFriendsSelected.value) {
             selectedFavoriteFriends.value = [];
         } else {
-            selectedFavoriteFriends.value = currentFriendFavorites.value.map((fav) => fav.id);
+            selectedFavoriteFriends.value = list.map((fav) => fav.id);
         }
     }
 

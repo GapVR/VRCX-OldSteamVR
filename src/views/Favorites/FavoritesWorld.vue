@@ -698,12 +698,11 @@
     }
 
     const isAllWorldsSelected = computed(() => {
-        if (!activeRemoteGroup.value || !currentRemoteFavorites.value.length) {
-            return false;
-        }
-        return currentRemoteFavorites.value
-            .map((fav) => fav.id)
-            .every((id) => selectedFavoriteWorlds.value.includes(id));
+        const list = activeRemoteGroup.value
+            ? currentRemoteFavorites.value
+            : currentLocalFavorites.value;
+        if (!list.length) return false;
+        return list.every((fav) => selectedFavoriteWorlds.value.includes(fav.id));
     });
 
     watch(
@@ -806,13 +805,13 @@
     }
 
     function toggleSelectAllWorlds() {
-        if (!activeRemoteGroup.value) {
-            return;
-        }
+        const list = activeRemoteGroup.value
+            ? currentRemoteFavorites.value
+            : currentLocalFavorites.value;
         if (isAllWorldsSelected.value) {
             selectedFavoriteWorlds.value = [];
         } else {
-            selectedFavoriteWorlds.value = currentRemoteFavorites.value.map((fav) => fav.id);
+            selectedFavoriteWorlds.value = list.map((fav) => fav.id);
         }
     }
 

@@ -660,12 +660,11 @@
     });
 
     const isAllAvatarsSelected = computed(() => {
-        if (!activeRemoteGroup.value || !currentRemoteFavorites.value.length) {
-            return false;
-        }
-        return currentRemoteFavorites.value
-            .map((fav) => fav.id)
-            .every((id) => selectedFavoriteAvatars.value.includes(id));
+        const list = activeRemoteGroup.value
+            ? currentRemoteFavorites.value
+            : currentLocalFavorites.value;
+        if (!list.length) return false;
+        return list.every((fav) => selectedFavoriteAvatars.value.includes(fav.id));
     });
 
     watch(
@@ -1152,13 +1151,13 @@
     }
 
     function toggleSelectAllAvatars() {
-        if (!activeRemoteGroup.value) {
-            return;
-        }
+        const list = activeRemoteGroup.value
+            ? currentRemoteFavorites.value
+            : currentLocalFavorites.value;
         if (isAllAvatarsSelected.value) {
             selectedFavoriteAvatars.value = [];
         } else {
-            selectedFavoriteAvatars.value = currentRemoteFavorites.value.map((fav) => fav.id);
+            selectedFavoriteAvatars.value = list.map((fav) => fav.id);
         }
     }
 
