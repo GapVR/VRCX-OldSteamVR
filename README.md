@@ -13,6 +13,7 @@
 - Non-friend favorites with memo
 - Simple Feed user ID blacklist
 - User blacklist with red strikethrough on dialogs, game log, and search
+- World names by blacklisted users are also displayed with red strikethrough
 - Red Anti-Feature badges (monetized, no colliders/stations) for world info
 - More avatar details (lights, audio, texture size, etc.)
 - Image viewer file version/fullsize download/copy URL
