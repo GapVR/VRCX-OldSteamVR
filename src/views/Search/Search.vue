@@ -61,7 +61,11 @@
                                 </ItemMedia>
                                 <ItemContent class="min-w-0">
                                     <ItemTitle class="flex items-center gap-1.5 max-w-full">
-                                        <span class="truncate">{{ user.displayName }}</span>
+                                        <span
+                                            class="truncate"
+                                            :class="{ 'line-through text-red-500': userBlacklistStore.isBlacklisted(user.id) }">
+                                            {{ userBlacklistStore.getBlacklistedName(user.id) || user.displayName }}
+                                        </span>
                                         <span
                                             v-if="randomUserColours"
                                             class="shrink-0 text-xs font-normal"
@@ -151,10 +155,16 @@
                                                 <ItemTitle class="truncate w-auto">{{ world.name }}</ItemTitle>
                                             </TooltipWrapper>
                                             <ItemDescription v-if="world.occupants" class="line-clamp-1 text-xs">
-                                                {{ world.authorName }} ({{ world.occupants }})
+                                                <span
+                                                    :class="{ 'line-through text-red-500': userBlacklistStore.isBlacklisted(world.authorId) }">
+                                                    {{ userBlacklistStore.getBlacklistedName(world.authorId) || world.authorName }}
+                                                </span> ({{ world.occupants }})
                                             </ItemDescription>
                                             <ItemDescription v-else class="line-clamp-1 text-xs">
-                                                {{ world.authorName }}
+                                                <span
+                                                    :class="{ 'line-through text-red-500': userBlacklistStore.isBlacklisted(world.authorId) }">
+                                                    {{ userBlacklistStore.getBlacklistedName(world.authorId) || world.authorName }}
+                                                </span>
                                             </ItemDescription>
                                         </ItemContent>
                                     </div>
@@ -234,7 +244,10 @@
                                                 <ItemTitle class="truncate w-auto">{{ avatar.name }}</ItemTitle>
                                             </TooltipWrapper>
                                             <ItemDescription class="line-clamp-1 text-xs">
-                                                {{ avatar.authorName }}
+                                                <span
+                                                    :class="{ 'line-through text-red-500': userBlacklistStore.isBlacklisted(avatar.authorId) }">
+                                                    {{ userBlacklistStore.getBlacklistedName(avatar.authorId) || avatar.authorName }}
+                                                </span>
                                             </ItemDescription>
                                         </ItemContent>
                                     </div>
@@ -328,7 +341,9 @@
     import { storeToRefs } from 'pinia';
     import { useI18n } from 'vue-i18n';
 
-    import { useAppearanceSettingsStore, useAuthStore, useAvatarProviderStore, useSearchStore } from '../../stores';
+    import { useAppearanceSettingsStore, useAuthStore, useAvatarProviderStore, useSearchStore, useUserBlacklistStore } from '../../stores';
+
+    const userBlacklistStore = useUserBlacklistStore();
     import { convertFileUrlToImageUrl, languageClass } from '../../shared/utils';
     import { useUserDisplay } from '../../composables/useUserDisplay';
     import { showAvatarDialog } from '../../coordinators/avatarCoordinator';

@@ -41,6 +41,7 @@ import { useVrcStatusStore } from './vrcStatus';
 import { useVrcxStore } from './vrcx';
 import { useWorldStore } from './world';
 import { useWristOverlaySettingsStore } from './settings/wristOverlay';
+import { useUserBlacklistStore } from './userBlacklist';
 
 export const pinia = createPinia();
 
@@ -159,7 +160,8 @@ export function createGlobalStores() {
         charts: useChartsStore(),
         dashboard: useDashboardStore(),
         modal: useModalStore(),
-        quickSearch: useQuickSearchStore()
+        quickSearch: useQuickSearchStore(),
+        userBlacklist: useUserBlacklistStore()
     };
 }
 
@@ -203,5 +205,6 @@ export {
     useUpdateLoopStore,
     useVrcStatusStore,
     useModalStore,
-    useQuickSearchStore
+    useQuickSearchStore,
+    useUserBlacklistStore
 };

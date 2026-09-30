@@ -37,9 +37,11 @@
 
                 <span
                     class="font-bold cursor-pointer flex-wrap"
+                    :class="{ 'line-through text-red-500': userBlacklistStore.isBlacklisted(userDialog.ref.id) }"
                     style="margin-left: 5px; margin-right: 5px"
-                    v-text="userDialog.ref.displayName"
-                    @click="copyUserDisplayName(userDialog.ref.displayName)"></span>
+                    @click="copyUserDisplayName(userDialog.ref.displayName)">
+                    {{ userBlacklistStore.getBlacklistedName(userDialog.ref.id) || userDialog.ref.displayName }}
+                </span>
 
                 <!-- Pronouns -->
                 <TooltipWrapper v-if="userDialog.ref.pronouns" side="top" :content="t('dialog.user.pronouns')">
@@ -246,7 +248,9 @@
     import { copyToClipboard, formatDateFilter, languageClass } from '../../../shared/utils';
     import { useUserDisplay } from '../../../composables/useUserDisplay';
     import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover';
-    import { useGalleryStore, useUserStore } from '../../../stores';
+    import { useGalleryStore, useUserBlacklistStore, useUserStore } from '../../../stores';
+
+    const userBlacklistStore = useUserBlacklistStore();
     import { Badge } from '../../ui/badge';
     import { Checkbox } from '../../ui/checkbox';
     import UserActionDropdown from './UserActionDropdown.vue';

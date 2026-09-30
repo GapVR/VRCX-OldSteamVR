@@ -66,7 +66,23 @@
             auto-height
             :page-sizes="pageSizes"
             :total-items="totalItems"
-            :on-page-size-change="handlePageSizeChange" />
+            :on-page-size-change="handlePageSizeChange">
+            <template #footer>
+                <div class="flex justify-end">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        class="h-7 text-xs"
+                        @click="blacklistOpen = true">
+                        User Blacklist: {{ blacklist.length }}
+                    </Button>
+                </div>
+            </template>
+        </DataTableLayout>
+
+        <Dialog :open="blacklistOpen" @update:open="blacklistOpen = $event">
+            <UserBlacklistDialog :open="blacklistOpen" @update:open="blacklistOpen = $event" />
+        </Dialog>
     </div>
 </template>
 
@@ -87,8 +103,11 @@
     import { Spinner } from '@/components/ui/spinner';
     import { storeToRefs } from 'pinia';
     import { useI18n } from 'vue-i18n';
+    import { ref } from 'vue';
 
-    import { useAppearanceSettingsStore, useModalStore, useModerationStore } from '../../stores';
+    import { useAppearanceSettingsStore, useModalStore, useModerationStore, useUserBlacklistStore } from '../../stores';
+    import { Dialog } from '@/components/ui/dialog';
+    import UserBlacklistDialog from '@/views/Settings/dialogs/UserBlacklistDialog.vue';
     import { runRefreshPlayerModerationsFlow as refreshPlayerModerations } from '../../coordinators/moderationCoordinator';
     import { DataTableLayout } from '../../components/ui/data-table';
     import { createColumns } from './columns.jsx';
@@ -103,6 +122,8 @@
     const { handlePlayerModerationDelete } = useModerationStore();
     const appearanceSettingsStore = useAppearanceSettingsStore();
     const modalStore = useModalStore();
+    const { blacklist } = storeToRefs(useUserBlacklistStore());
+    const blacklistOpen = ref(false);
 
     async function init() {
         playerModerationTable.value.filters[0].value = JSON.parse(

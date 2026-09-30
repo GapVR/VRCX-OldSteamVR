@@ -39,8 +39,10 @@
                 </span>
                 <span
                     class="cursor-pointer x-grey font-mono text-xs"
-                    @click="showUserDialog(worldDialog.ref.authorId)"
-                    v-text="worldDialog.ref.authorName" />
+                    :class="{ 'line-through text-red-500': userBlacklistStore.isBlacklisted(worldDialog.ref.authorId) }"
+                    @click="showUserDialog(worldDialog.ref.authorId)">
+                    {{ userBlacklistStore.getBlacklistedName(worldDialog.ref.authorId) || worldDialog.ref.authorName }}
+                </span>
                 <div class="flex flex-wrap items-center gap-1">
                     <Badge v-if="worldDialog.ref.$isLabs" variant="outline">{{ t('dialog.world.tags.labs') }}</Badge>
                     <Badge v-else-if="worldDialog.ref.releaseStatus === 'public'" variant="outline">{{ t('dialog.world.tags.public') }}</Badge>
@@ -284,6 +286,7 @@
         useLocationStore,
         useModalStore,
         useUserStore,
+        useUserBlacklistStore,
         useWorldStore
     } from '../../../stores';
     import { showWorldDialog } from '../../../coordinators/worldCoordinator';
@@ -324,6 +327,7 @@
     const { isGameRunning } = storeToRefs(useGameStore());
     const { showFullscreenImageDialog } = useGalleryStore();
     const modalStore = useModalStore();
+    const userBlacklistStore = useUserBlacklistStore();
 
     const { t } = useI18n();
 

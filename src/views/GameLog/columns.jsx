@@ -14,7 +14,7 @@ import { storeToRefs } from 'pinia';
 
 import { copyToClipboard, formatDateFilter, openExternalLink } from '../../shared/utils';
 import { i18n } from '../../plugins';
-import { useInstanceStore, useUiStore } from '../../stores';
+import { useInstanceStore, useUiStore, useUserBlacklistStore } from '../../stores';
 import { lookupUser } from '../../coordinators/userCoordinator';
 import { showWorldDialog } from '../../coordinators/worldCoordinator';
 
@@ -103,11 +103,17 @@ export const createColumns = ({ getCreatedAt, onDelete, onDeletePrompt }) => {
                 const original = row.original;
                 const isFriend = original.isFriend;
                 const isFavorite = original.isFavorite;
+                const userBlacklistStore = useUserBlacklistStore();
+                const blacklisted = userBlacklistStore.isBlacklisted(original.userId);
+                const blacklistedName = userBlacklistStore.getBlacklistedName(original.userId);
                 return (
                     <span class="cursor-pointer">
                         {original.displayName ? (
-                            <span class="cursor-pointer table-user mr-1" onClick={() => lookupUser(original)}>
-                                {original.displayName}
+                            <span
+                                class={blacklisted ? 'cursor-pointer table-user mr-1 line-through text-red-500' : 'cursor-pointer table-user mr-1'}
+                                onClick={() => lookupUser(original)}
+                            >
+                                {blacklistedName || original.displayName}
                             </span>
                         ) : null}
                         {isFriend ? <span>{isFavorite ? '⭐' : '💚'}</span> : (isFavorite ? <span>🏷️</span> : null)}

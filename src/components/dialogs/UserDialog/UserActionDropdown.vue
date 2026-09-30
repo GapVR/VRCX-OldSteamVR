@@ -193,6 +193,17 @@
                         <Pencil class="size-4" />
                         {{ t('dialog.user.actions.edit_note_memo') }}
                     </DropdownMenuItem>
+                    <DropdownMenuItem
+                        v-if="userBlacklistStore.isBlacklisted(userDialog.ref.id)"
+                        variant="destructive"
+                        @click="handleBlacklistToggle()">
+                        <Eye class="size-4" />
+                        Remove from Blacklist
+                    </DropdownMenuItem>
+                    <DropdownMenuItem v-else @click="handleBlacklistToggle()">
+                        <EyeOff class="size-4" />
+                        Add to Blacklist
+                    </DropdownMenuItem>
                     <DropdownMenuSub>
                         <DropdownMenuSubTrigger>
                             <XCircle class="size-4 mr-2" />
@@ -309,6 +320,8 @@
 <script setup>
     import {
         Check,
+        Eye,
+        EyeOff,
         CheckCircle,
         Clipboard,
         Clock,
@@ -351,7 +364,7 @@
         DropdownMenuCheckboxItem,
         DropdownMenuTrigger
     } from '../../ui/dropdown-menu';
-    import { useGameStore, useLocationStore, useUserStore } from '../../../stores';
+    import { useGameStore, useLocationStore, useUserStore, useUserBlacklistStore } from '../../../stores';
     import { useInviteChecks } from '../../../composables/useInviteChecks';
     import { isActionRecent } from '../../../composables/useRecentActions';
     import { invertHexColor } from '@/shared/utils';
@@ -371,6 +384,7 @@
     const { isGameRunning } = storeToRefs(useGameStore());
     const { lastLocation } = storeToRefs(useLocationStore());
     const { checkCanInvite } = useInviteChecks();
+    const userBlacklistStore = useUserBlacklistStore();
 
     const statusOptions = computed(() => [
         {
@@ -425,6 +439,16 @@
 
     function onCommand(command) {
         props.userDialogCommand(command);
+    }
+
+    function handleBlacklistToggle() {
+        const uid = userDialog.value.ref.id;
+        const name = userDialog.value.ref.displayName || uid;
+        if (userBlacklistStore.isBlacklisted(uid)) {
+            userBlacklistStore.remove(uid);
+        } else {
+            userBlacklistStore.add(uid, name);
+        }
     }
 </script>
 <style scoped>

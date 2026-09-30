@@ -38,8 +38,10 @@
                 </span>
                 <span
                     class="cursor-pointer x-grey font-mono text-xs"
-                    @click="showUserDialog(groupDialog.ref.ownerId)"
-                    v-text="groupDialog.ownerDisplayName" />
+                    :class="{ 'line-through text-red-500': userBlacklistStore.isBlacklisted(groupDialog.ref.ownerId) }"
+                    @click="showUserDialog(groupDialog.ref.ownerId)">
+                    {{ userBlacklistStore.getBlacklistedName(groupDialog.ref.ownerId) || groupDialog.ownerDisplayName }}
+                </span>
                 <div class="flex flex-wrap items-center gap-1">
                     <Badge v-if="groupDialog.ref.isVerified" variant="outline">{{ t('dialog.group.tags.verified') }}</Badge>
                     <Badge v-if="groupDialog.ref.privacy === 'private'" variant="outline">{{ t('dialog.group.tags.private') }}</Badge>
@@ -903,7 +905,7 @@
         timeAgo,
         timeToText
     } from '../../../shared/utils';
-    import { useGalleryStore, useGroupStore, useInstanceStore, useLocationStore, useModalStore, useUserStore } from '../../../stores';
+    import { useGalleryStore, useGroupStore, useInstanceStore, useLocationStore, useModalStore, useUserBlacklistStore, useUserStore } from '../../../stores';
     import { useGroupCalendarEvents } from './useGroupCalendarEvents';
     import { useUserDisplay } from '../../../composables/useUserDisplay';
     import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -973,6 +975,7 @@
 
     const { currentUser } = storeToRefs(useUserStore());
     const { groupDialog, inviteGroupDialog } = storeToRefs(useGroupStore());
+    const userBlacklistStore = useUserBlacklistStore();
     const { lastLocation } = storeToRefs(useLocationStore());
     const { showCreateGroupEventDialog, showEditGroupDialog, updateGroupPostSearch } = useGroupStore();
     const { pastCalenderEvents, upcomingCalenderEvents, updateFollowingCalendarData } =

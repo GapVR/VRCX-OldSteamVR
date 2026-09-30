@@ -26,8 +26,10 @@
             <!-- Author -->
             <span
                 class="x-grey font-mono text-xs cursor-pointer truncate max-w-30"
-                @click="showUserDialog(avatarDialog.ref.authorId)"
-                v-text="avatarDialog.ref.authorName" />
+                :class="{ 'line-through text-red-500': userBlacklistStore.isBlacklisted(avatarDialog.ref.authorId) }"
+                @click="showUserDialog(avatarDialog.ref.authorId)">
+                {{ userBlacklistStore.getBlacklistedName(avatarDialog.ref.authorId) || avatarDialog.ref.authorName }}
+            </span>
 
             <!-- Badges row -->
             <div class="flex flex-wrap items-center gap-1">
@@ -350,7 +352,9 @@
         DropdownMenuSeparator,
         DropdownMenuTrigger
     } from '@/components/ui/dropdown-menu';
-    import { useAvatarStore, useGameStore, useUserStore } from '../../../stores';
+    import { useAvatarStore, useGameStore, useUserBlacklistStore, useUserStore } from '../../../stores';
+
+    const userBlacklistStore = useUserBlacklistStore();
 
     const { t } = useI18n();
     const { avatarDialog } = storeToRefs(useAvatarStore());
