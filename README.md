@@ -12,6 +12,7 @@
 - Boop dialog shows preview image
 - Non-friend favorites with memo
 - Simple Feed user ID blacklist
+- User blacklist with red strikethrough on dialogs, game log, and search
 - Red Anti-Feature badges (monetized, no colliders/stations) for world info
 - More avatar details (lights, audio, texture size, etc.)
 - Image viewer file version/fullsize download/copy URL
