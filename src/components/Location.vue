@@ -28,7 +28,7 @@
                                 @click="handleShowWorldDialog">
                                 <Spinner v-if="isTraveling" class="mr-1 shrink-0" />
                                 <span class="min-w-0 flex-1 truncate">
-                                    <span>{{ locationParts[0] }}</span>
+                                    <span :class="{ 'line-through text-red-500': isWorldAuthorBlacklisted }">{{ locationParts[0] }}</span>
                                     <span v-if="locationParts[1]" class="ml-1 text-muted-foreground">{{ locationParts[1] }}</span>
                                     <span v-if="showInstanceIdInLocation && instanceName" class="ml-1 text-muted-foreground">{{
                                         `#${instanceName}`
@@ -90,6 +90,7 @@
         useInstanceStore,
         useInviteStore,
         useSearchStore,
+        useUserBlacklistStore,
         useWorldStore
     } from '../stores';
     import { showGroupDialog } from '../coordinators/groupCoordinator';
@@ -115,6 +116,7 @@
     const { lastInstanceApplied } = storeToRefs(useInstanceStore());
     const { canOpenInstanceInGame } = useInviteStore();
     const { showInstanceIdInLocation, isAgeGatedInstancesVisible } = storeToRefs(useAppearanceSettingsStore());
+    const userBlacklistStore = useUserBlacklistStore();
 
     const props = defineProps({
         location: String,
@@ -161,6 +163,11 @@
     const instanceRef = ref(null);
 
     const isAgeRestricted = computed(() => !isAgeGatedInstancesVisible.value && ageGate.value);
+    const isWorldAuthorBlacklisted = computed(() => {
+        const worldId = parsedLocation.value.worldId;
+        const authorId = worldId ? cachedWorlds.get(worldId)?.authorId : '';
+        return authorId ? userBlacklistStore.isBlacklisted(authorId) : false;
+    });
     const isLocationLink = computed(() => props.link && props.location !== 'private' && props.location !== 'offline');
     const locationClasses = computed(() => {
         const classes = ['x-location'];

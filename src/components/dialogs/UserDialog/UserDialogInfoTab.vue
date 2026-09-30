@@ -55,9 +55,10 @@
                     <div class="min-w-0 flex-1">
                         <span
                             class="text-md text-foreground cursor-pointer block truncate"
+                            :class="{ 'line-through text-red-500': worldAuthorBlacklisted }"
                             @click="showWorldDialog(userDialog.$location.tag)"
                             :title="userDialog.instance?.ref?.world?.name"
-                            >{{ userDialog.instance?.ref?.world?.name }}</span
+                            >{{ worldDisplayName }}</span
                         >
                         <div class="flex min-w-0 flex-wrap items-start gap-1.5">
                             <LocationWorld
@@ -474,7 +475,8 @@
         useUserStore,
         useGalleryStore,
         useLaunchStore,
-        useInviteStore
+        useInviteStore,
+        useUserBlacklistStore
     } from '../../../stores';
     import { showWorldDialog } from '../../../coordinators/worldCoordinator';
     import { queryRequest, userRequest } from '../../../api';
@@ -501,6 +503,7 @@
     const { fullscreenImageDialog } = storeToRefs(useGalleryStore());
 
     const { lastLocation } = storeToRefs(useLocationStore());
+    const userBlacklistStore = useUserBlacklistStore();
     const { userImage, userStatusClass } = useUserDisplay();
     const launchStore = useLaunchStore();
     const inviteStore = useInviteStore();
@@ -521,6 +524,14 @@
             return currentUser.value.currentAvatarImageUrl;
         }
         return hasAvatarSet.value ? userDialog.value.publicProfileRef?.iconUrl : '';
+    });
+    const worldAuthorBlacklisted = computed(() => {
+        const authorId = userDialog.value.instance?.ref?.world?.authorId;
+        return authorId ? userBlacklistStore.isBlacklisted(authorId) : false;
+    });
+    const worldDisplayName = computed(() => {
+        const authorId = userDialog.value.instance?.ref?.world?.authorId;
+        return userBlacklistStore.getBlacklistedName(authorId) || userDialog.value.instance?.ref?.world?.name || '';
     });
 
     watch(

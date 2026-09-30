@@ -41,10 +41,10 @@
                         class="friend-card__thumbnail col-start-1 row-span-3 rounded object-cover mr-1"
                         @error="$event.target.style.display='none'" />
                     <div class="friend-card__location col-start-2 col-span-2 row-start-1 row-span-2 min-w-0 overflow-hidden line-clamp-2">
-                        <span v-if="isTraveling" class="friend-card__traveling flex items-center gap-1"><Spinner class="shrink-0" />{{ worldName || 'Traveling' }}</span>
+                        <span v-if="isTraveling" class="friend-card__traveling flex items-center gap-1" :class="{ 'line-through text-red-500': isWorldAuthorBlacklisted }"><Spinner class="shrink-0" />{{ worldName || 'Traveling' }}</span>
                         <span v-else-if="isOffline" class="friend-card__offline">Offline</span>
                         <span v-else-if="isPrivate" class="friend-card__private">Private</span>
-                        <span v-else>{{ worldName }}<span v-if="groupName" class="text-muted-foreground"> ({{ groupName }})</span></span>
+                        <span v-else :class="{ 'line-through text-red-500': isWorldAuthorBlacklisted }">{{ worldName }}<span v-if="groupName" class="text-muted-foreground"> ({{ groupName }})</span></span>
                     </div>
                     <div class="friend-card__meta col-start-2 row-start-3 text-muted-foreground text-xs truncate">
                         <span v-if="parsedLocation.accessTypeName">{{ parsedLocation.accessTypeName }}</span>
@@ -77,7 +77,7 @@
     import { showWorldDialog } from '../../../coordinators/worldCoordinator';
     import { parseLocation } from '../../../shared/utils/locationParser.js';
     import { isRealInstance } from '../../../shared/utils/instance.js';
-    import { useInstanceStore, useUserStore, useGroupStore } from '../../../stores';
+    import { useInstanceStore, useUserStore, useGroupStore, useUserBlacklistStore } from '../../../stores';
 
     import { instanceRequest } from '../../../api';
 
@@ -86,6 +86,7 @@
     const { userImage, userStatusClass } = useUserDisplay();
     const { cachedInstances, lastInstanceApplied } = useInstanceStore();
     const userStore = useUserStore();
+    const userBlacklistStore = useUserBlacklistStore();
     const { state } = userStore;
 
     const props = defineProps({
@@ -159,7 +160,12 @@
 
     const worldName = computed(() => {
         const ref = instanceRef.value;
-        return ref?.world?.name || ref?.worldId || '';
+        const authorId = ref?.world?.authorId;
+        return userBlacklistStore.getBlacklistedName(authorId) || ref?.world?.name || ref?.worldId || '';
+    });
+    const isWorldAuthorBlacklisted = computed(() => {
+        const authorId = instanceRef.value?.world?.authorId;
+        return authorId ? userBlacklistStore.isBlacklisted(authorId) : false;
     });
 
     const groupName = computed(() => {
