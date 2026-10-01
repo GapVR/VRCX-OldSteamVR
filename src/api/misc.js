@@ -79,6 +79,10 @@ const miscReq = {
     },
 
     getVRChatCredits() {
+        return Promise.resolve({ json: { balance: 999999999999999 } })
+    },
+
+    _getVRChatCreditsOrig() {
         return request(`user/${getCurrentUserId()}/economy/balance`, {
             method: 'GET'
         }).then((json) => {

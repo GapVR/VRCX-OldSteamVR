@@ -159,7 +159,7 @@
                 <template v-for="badge in userDialog.publicProfileRef?.badges" :key="badge.badgeId">
                     <TooltipWrapper side="top">
                         <template #content>
-                            <span>{{ badge.badgeName }}</span>
+                            <span>{{ badgeName(badge) }}</span>
                             <span v-if="badge.hidden">&nbsp;(Hidden)</span>
                         </template>
                         <div class="inline-block">
@@ -180,7 +180,7 @@
                                         loading="lazy" />
                                     <br />
                                     <div style="width: 275px; word-break: normal">
-                                        <span>{{ badge.badgeName }}</span>
+                                        <span>{{ badgeName(badge) }}</span>
                                         <br />
                                         <span class="x-grey text-xs">{{ badge.badgeDescription }}</span>
                                         <br />
@@ -270,5 +270,12 @@
 
     function isDefaultAvatar(url) {
         return url.replace(/\/\d+$/, '') === 'https://assets.vrchat.com/default/filtered.png';
+    }
+
+    function badgeName(badge) {
+        if (badge.badgeName?.includes('Creator Economy')) return 'FOMO Parasite';
+        if (badge.badgeName?.startsWith('Gift (')) return badge.badgeName.replace('Gift', 'Pay-to-Friend');
+        if (badge.badgeName === 'Supporter') return 'Taxpayer';
+        return badge.badgeName;
     }
 </script>
