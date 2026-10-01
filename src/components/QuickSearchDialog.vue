@@ -5,13 +5,16 @@
     import { storeToRefs } from 'pinia';
     import { useI18n } from 'vue-i18n';
 
+    import { computed } from 'vue';
     import { useQuickSearchStore } from '../stores/quickSearch';
     import { useUserDisplay } from '../composables/useUserDisplay';
+    import { useFriendStore, useUserStore } from '../stores';
 
     import QuickSearchSync from './QuickSearchSync.vue';
 
     const { userImage } = useUserDisplay();
     const quickSearchStore = useQuickSearchStore();
+    const friendStore = useFriendStore();
     const {
         isOpen,
         query,
@@ -26,6 +29,17 @@
     } = storeToRefs(quickSearchStore);
     const { selectResult } = quickSearchStore;
     const { t } = useI18n();
+
+    const userStore2 = useUserStore();
+    const recentlyViewed = computed(() => {
+        const history = userStore2.showUserDialogHistory;
+        const arr = Array.from(history);
+        return arr.slice(-10).reverse().map((id) => {
+            let ref = friendStore.friends.get(id)?.ref || userStore2.cachedUsers.get(id);
+            if (!ref) return null;
+            return { id: ref.id, name: ref.displayName || ref.username, ref, type: 'friend' };
+        }).filter(Boolean).slice(0, 10);
+    });
 
     /**
      * @param item
@@ -46,8 +60,24 @@
                 <!-- Sync filterState.search → store.query -->
                 <QuickSearchSync />
                 <CommandInput :placeholder="t('side_panel.search_placeholder')" />
-                <CommandList class="max-h-[min(400px,50vh)] overflow-y-auto overflow-x-hidden">
+                <CommandList class="max-h-[min(450px,55vh)] overflow-y-auto overflow-x-hidden">
                     <template v-if="!query || query.length < 2">
+                        <CommandGroup v-if="recentlyViewed.length > 0" :heading="t('side_panel.recently_viewed')">
+                            <CommandItem
+                                v-for="item in recentlyViewed"
+                                :key="item.id"
+                                :value="[item.name, item.id].filter(Boolean).join(' ')"
+                                class="gap-3"
+                                @select="handleSelect(item)">
+                                <img
+                                    :src="userImage(item.ref)"
+                                    class="size-6 rounded-full object-cover"
+                                    loading="lazy" />
+                                <span class="truncate" :style="{ color: item.ref?.$userColour }">
+                                    {{ item.name }}
+                                </span>
+                            </CommandItem>
+                        </CommandGroup>
                         <CommandGroup :heading="t('side_panel.search_categories')">
                             <CommandItem :value="'hint-friends'" disabled class="gap-3 opacity-70">
                                 <Users class="size-4" />
